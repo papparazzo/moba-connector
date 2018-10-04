@@ -28,8 +28,24 @@
 
 class Bridge : private boost::noncopyable {
     public:
+        enum ResponseCode {
+            RES_EMPTY,
+            RES_UNKNOWN,
+            RES_SYSTEM_STOP,
+            RES_SYSTEM_GO,
+            RES_SYSTEM_HALT,
+        };
+
         Bridge(std::shared_ptr<CS2Connector> connector) : connector(connector) {
         }
+        void setEmergencyStop();
+        void setEmergencyStopClearing();
+
+        ResponseCode recieveCanData();
+
+        std::shared_ptr<CS2Connector> connector;
+
+    protected:
         enum CanCommand {
             CMD_SYSTEM                                  = 0x00,
             CMD_LOCO_DISCOVERY                          = 0x02,
@@ -62,12 +78,6 @@ class Bridge : private boost::noncopyable {
             SYS_SUB_CMD_SYSTEM_HALT = 0x02
         };
 
-        void setEmergencyStop();
-        void setEmergencyStopClearing();
-
-        std::shared_ptr<CS2Connector> connector;
-
-    protected:
         void send(
             uint8_t cmd,
             uint8_t length = 0x00,

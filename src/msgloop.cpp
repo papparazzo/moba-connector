@@ -41,22 +41,20 @@ void MessageLoop::connect() {
 
 void MessageLoop::run() {
     while(true) {
-/*
+        Bridge::ResponseCode rc = bridge->recieveCanData();
 
-        Bridge::SwitchState ss = bridge->checkSwitchState();
-
-        switch(ss) {
-            case Bridge::SYS_SUB_CMD_SYSTEM_STOP:
+        switch(rc) {
+            case Bridge::RES_SYSTEM_STOP:
                 LOG(moba::INFO) << "EMERGENCY_STOP" << std::endl;
                 msgEndpoint->sendMsg(moba::Message::MT_EMERGENCY_STOP);
                 break;
 
-            case Bridge::SYS_SUB_CMD_SYSTEM_GO:
+            case Bridge::RES_SYSTEM_GO:
                 LOG(moba::INFO) << "EMERGENCY_STOP_CLEARING" << std::endl;
                 msgEndpoint->sendMsg(moba::Message::MT_EMERGENCY_STOP_CLEARING);
                 break;
         }
-*/
+
         moba::MessagePtr msg = msgEndpoint->recieveMsg();
         if(!msg) {
             usleep(50000);

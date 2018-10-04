@@ -47,3 +47,27 @@ void Bridge::send(uint8_t cmd, uint8_t length, uint32_t uid, uint8_t data0, uint
 
     connector->sendData(raw);
 }
+
+Bridge::ResponseCode Bridge::recieveCanData() {
+    CS2Connector::RawData data;
+    if(!connector->recieveData(data)) {
+        return RES_EMPTY;
+    }
+
+    if(data.header[1] & 0x01) { // Response-Nachricht
+        return RES_EMPTY;
+    }
+
+    if(data.header[1] == CMD_SYSTEM) {
+        switch(data.data[0]) {
+            case SYS_SUB_CMD_SYSTEM_GO:
+                return RES_SYSTEM_GO;
+
+            case SYS_SUB_CMD_SYSTEM_HALT:
+                return RES_SYSTEM_HALT;
+
+            case SYS_SUB_CMD_SYSTEM_STOP:
+                return RES_SYSTEM_STOP;
+        }
+    }
+}
