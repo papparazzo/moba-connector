@@ -25,6 +25,7 @@
 #include <boost/noncopyable.hpp>
 
 #include <moba/msgendpoint.h>
+#include <moba/msgsystemhandler.h>
 
 #include "bridge.h"
 
@@ -43,6 +44,7 @@ class MessageLoop : private boost::noncopyable {
     protected:
         void printError(moba::JsonItemPtr ptr);
         void printNotice(moba::JsonItemPtr ptr);
+        void setHardwareState(moba::JsonItemPtr data);
 
         moba::MsgEndpointPtr msgEndpoint;
         long appId;
@@ -50,4 +52,6 @@ class MessageLoop : private boost::noncopyable {
         moba::Version version;
 
         std::shared_ptr<Bridge> bridge;
+
+        moba::MsgSystemHandler sysHandler;
 };
