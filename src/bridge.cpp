@@ -22,6 +22,10 @@ void Bridge::setEmergencyStopClearing() {
     send(CMD_SYSTEM, 5, 0x00000000, SYS_SUB_CMD_SYSTEM_GO);
 }
 
+void Bridge::ping() {
+    send(CMD_PING);
+}
+
 void Bridge::send(uint8_t cmd, uint8_t length, uint32_t uid, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3) {
     CS2Connector::RawData raw;
     memset((void*)&raw, '\0', sizeof(raw));
@@ -52,6 +56,11 @@ Bridge::ResponseCode Bridge::recieveCanData() {
     CS2Connector::RawData data;
     if(!connector->recieveData(data)) {
         return RES_EMPTY;
+    }
+
+    // Ping Response-Nachricht
+    if(data.header[1] & 0x01 && data.header[1] == (CMD_PING | 0x01)) {
+        return RES_PING;
     }
 
     if(data.header[1] & 0x01) { // Response-Nachricht

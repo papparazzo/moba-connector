@@ -34,12 +34,14 @@ class Bridge : private boost::noncopyable {
             RES_SYSTEM_STOP,
             RES_SYSTEM_GO,
             RES_SYSTEM_HALT,
+            RES_PING
         };
 
         Bridge(std::shared_ptr<CS2Connector> connector) : connector(connector) {
         }
         void setEmergencyStop();
         void setEmergencyStopClearing();
+        void ping();
 
         ResponseCode recieveCanData();
 
