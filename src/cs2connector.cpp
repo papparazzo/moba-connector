@@ -74,7 +74,6 @@ void CS2Connector::sendData(const RawData &data) {
 }
 
 bool CS2Connector::recieveData(RawData &data, time_t timeoutSec) {
-    int recv_len;
     memset((void*)&data, '\0', sizeof(data));
 
     struct timeval timeout;
@@ -97,7 +96,7 @@ bool CS2Connector::recieveData(RawData &data, time_t timeoutSec) {
     struct sockaddr_in s_addr_other;
     socklen_t slen = sizeof(s_addr_other);
 
-    if((recv_len = ::recvfrom(fd_read, (void*)&data, sizeof(data), 0, (struct sockaddr *) &s_addr_other, &slen)) == -1) {
+    if(::recvfrom(fd_read, (void*)&data, sizeof(data), 0, (struct sockaddr *) &s_addr_other, &slen) == -1) {
         throw CS2ConnectorException("::recvfrom returned -1");
     }
 
