@@ -79,4 +79,7 @@ Bridge::ResponseCode Bridge::recieveCanData() {
                 return RES_SYSTEM_STOP;
         }
     }
+    if(data.header[1] == CMD_S88_EVENT) {
+        reportVector.trigger(0, 0);
+    }
 }

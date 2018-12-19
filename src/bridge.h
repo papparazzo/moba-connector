@@ -25,6 +25,7 @@
 #include <moba/ipc.h>
 
 #include "cs2connector.h"
+#include "reportvector.h"
 
 class Bridge : private boost::noncopyable {
     public:
@@ -90,4 +91,7 @@ class Bridge : private boost::noncopyable {
             uint8_t data2 = 0x00,
             uint8_t data3 = 0x00
         );
+
+        ReportVector reportVector;
+
 };
