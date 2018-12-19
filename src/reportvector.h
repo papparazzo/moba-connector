@@ -20,12 +20,32 @@
 
 #pragma once
 
+#include <map>
+
 class ReportVector {
-public:
-    ReportVector();
-    ReportVector(const ReportVector& orig);
-    virtual ~ReportVector();
-private:
+    public:
+        enum SwitchingEdge {
+            FALLING,
+            RISING,
+            BOTH,
+            IGNORE,
+        };
+
+        ReportVector();
+        ReportVector(const ReportVector& orig);
+        virtual ~ReportVector();
+
+        void addContact(int contactId, int locoId);
+        void addContact(int contactId); // noop
+        void removeContact(int contactId);
+        void trigger(int contactId, SwitchingEdge switchingEdge);
+
+    protected:
+        std::map<int, int> vector;
+
+    private:
+
+
 
 };
 
