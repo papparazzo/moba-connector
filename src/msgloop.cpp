@@ -67,6 +67,7 @@ void MessageLoop::run() {
                     pingSend = false;
                     interfacehandler.sendConnectivity(moba::MsgInterfaceHandler::CO_CONNECTED);
                 }
+                break;
         }
 
         moba::MessagePtr msg = msgEndpoint->recieveMsg();
