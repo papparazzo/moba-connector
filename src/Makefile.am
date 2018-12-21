@@ -1,0 +1,12 @@
+bin_PROGRAMS = moba-connector
+moba_connector_SOURCES = \
+    main.cpp \
+    bridge.cpp \
+    cs2connector.cpp \
+    reportvector.cpp \
+    msgloop.cpp
+
+moba_connector_LDADD = /usr/local/lib/libMoBaCommon.a
+LDFLAGS += -L/usr/local/lib -pthread
+
+ACLOCAL_AMFLAGS = -I m4
