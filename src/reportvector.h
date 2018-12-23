@@ -24,28 +24,39 @@
 
 class ReportVector {
     public:
+        enum HandleSwitchingEdge {
+            HANDLE_FALLING_ONLY,
+            HANDLE_RISING_ONLY,
+            HANDLE_BOTH,
+            IGNORE_BOTH
+        };
+
         enum SwitchingEdge {
             FALLING,
             RISING,
-            BOTH,
-            IGNORE,
+        };
+
+        struct Action {
+            HandleSwitchingEdge edge;
+            int action;
         };
 
         ReportVector();
         ReportVector(const ReportVector& orig);
         virtual ~ReportVector();
 
-        void addContact(int contactId, int locoId);
-        void addContact(int contactId); // noop
-        void removeContact(int contactId);
         void trigger(int contactId, SwitchingEdge switchingEdge);
 
+        void checkContact(int contactId, HandleSwitchingEdge switchingEdge, int action);
+        void ignoreContact(int contactId);
+
+// ignore
+// stop
+// error
+
     protected:
-        std::map<int, int> vector;
+        std::map<int, Action> vector;
 
     private:
-
-
-
 };
 

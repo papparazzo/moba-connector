@@ -29,3 +29,15 @@ ReportVector::ReportVector(const ReportVector& orig) {
 ReportVector::~ReportVector() {
 }
 
+void ReportVector::trigger(int contactId, SwitchingEdge switchingEdge) {
+
+}
+
+void ReportVector::checkContact(int contactId, ReportVector::HandleSwitchingEdge switchingEdge, int action) {
+
+}
+
+void ReportVector::ignoreContact(int contactId) {
+    //checkContact();
+}
+
