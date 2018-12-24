@@ -23,6 +23,7 @@
 #include <memory>
 #include <boost/noncopyable.hpp>
 #include <moba/ipc.h>
+#include <functional>
 
 #include "cs2connector.h"
 #include "reportvector.h"
@@ -36,7 +37,6 @@ class Bridge : private boost::noncopyable {
             RES_SYSTEM_GO,
             RES_SYSTEM_HALT,
             RES_PING,
-            RES_S88_EVENT,
         };
 
         Bridge(std::shared_ptr<CS2Connector> connector) : connector(connector) {
@@ -48,6 +48,10 @@ class Bridge : private boost::noncopyable {
         ResponseCode recieveCanData();
 
         std::shared_ptr<CS2Connector> connector;
+
+        void addS88CallbackHandler(std::function<void(int)> s88callback) {
+            this->s88callback = s88callback;
+        }
 
     protected:
         enum CanCommand {
@@ -91,6 +95,8 @@ class Bridge : private boost::noncopyable {
             uint8_t data2 = 0x00,
             uint8_t data3 = 0x00
         );
+
+        std::function<void(int)> s88callback;
 
         ReportVector reportVector;
 
