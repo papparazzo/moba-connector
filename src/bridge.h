@@ -96,7 +96,7 @@ class Bridge : private boost::noncopyable {
             uint8_t data3 = 0x00
         );
 
-        std::function<void(int)> s88callback;
+        std::function<void(int, int, bool, bool, int)> s88callback;
 
         ReportVector reportVector;
 
