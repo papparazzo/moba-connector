@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
             loop.connect();
             loop.run();
             return EXIT_SUCCESS;
-        } catch(moba::MsgEndpointException &e) {
+        } catch(std::exception &e) {
             LOG(moba::WARNING) << e.what() << std::endl;
             sleep(4);
         }
