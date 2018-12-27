@@ -24,6 +24,7 @@
 #include <moba/msginterfacehandler.h>
 
 #include "msgloop.h"
+#include <functional>
 
 MessageLoop::MessageLoop(
     const std::string &appName, const moba::Version &version,
@@ -46,6 +47,8 @@ void MessageLoop::run() {
     bool pingSend = true;
 
 // TODO: Alle x Sek. ping an CS2 senden
+
+    //bridge->addS88CallbackHandler(std::bind(&MessageLoop::s88report, this, std::placeholders::_5));
 
     while(true) {
         Bridge::ResponseCode rc = bridge->recieveCanData();
@@ -131,3 +134,8 @@ void MessageLoop::setHardwareState(moba::JsonItemPtr data) {
         bridge->setEmergencyStopClearing();
     }
 }
+
+void MessageLoop::s88report(int addr, int contact, bool rising, bool falling, int time) {
+
+}
+

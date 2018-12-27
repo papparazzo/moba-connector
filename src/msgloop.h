@@ -40,6 +40,7 @@ class MessageLoop : private boost::noncopyable {
 
         void run();
         void connect();
+        void s88report(int addr, int contact, bool rising, bool falling, int time);
 
     protected:
         void printError(moba::JsonItemPtr ptr);
