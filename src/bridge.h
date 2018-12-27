@@ -49,7 +49,7 @@ class Bridge : private boost::noncopyable {
 
         std::shared_ptr<CS2Connector> connector;
 
-        void addS88CallbackHandler(std::function<void(int)> s88callback) {
+        void addS88CallbackHandler(std::function<void(int, int, bool, bool, int)> s88callback) {
             this->s88callback = s88callback;
         }
 
