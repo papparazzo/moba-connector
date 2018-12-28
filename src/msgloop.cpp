@@ -54,8 +54,7 @@ void MessageLoop::run() {
         std::placeholders::_1,
         std::placeholders::_2,
         std::placeholders::_3,
-        std::placeholders::_4,
-        std::placeholders::_5
+        std::placeholders::_4
     ));
 
     while(true) {
@@ -142,7 +141,7 @@ void MessageLoop::setHardwareState(moba::JsonItemPtr data) {
     }
 }
 
-void MessageLoop::s88report(int addr, int contact, bool rising, bool falling, int time) {
-    LOG(moba::DEBUG) << "addr " << addr << " contact " << contact << " rising " << rising << " falling " << falling << " time " << time << std::endl;
+void MessageLoop::s88report(int addr, int contact, bool active, int time) {
+    LOG(moba::DEBUG) << "addr " << addr << " contact " << contact << " active " << active << " time " << time << std::endl;
 }
 

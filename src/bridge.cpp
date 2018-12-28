@@ -82,6 +82,6 @@ Bridge::ResponseCode Bridge::recieveCanData() {
         int addr = (data.uid[0] << 8) | data.uid[1];
         int contact = (data.uid[2] << 8) | data.uid[3];
 
-        s88callback(addr, contact, static_cast<bool>(data.data[0]), static_cast<bool>(data.data[1]), time);
+        s88callback(addr, contact, static_cast<bool>(data.data[1]), time);
     }
 }
