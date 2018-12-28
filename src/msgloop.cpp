@@ -48,7 +48,15 @@ void MessageLoop::run() {
 
 // TODO: Alle x Sek. ping an CS2 senden
 
-    //bridge->addS88CallbackHandler(std::bind(&MessageLoop::s88report, this, std::placeholders::_5));
+    bridge->addS88CallbackHandler(std::bind(
+        &MessageLoop::s88report,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3,
+        std::placeholders::_4,
+        std::placeholders::_5
+    ));
 
     while(true) {
         Bridge::ResponseCode rc = bridge->recieveCanData();
@@ -135,6 +143,6 @@ void MessageLoop::setHardwareState(moba::JsonItemPtr data) {
 }
 
 void MessageLoop::s88report(int addr, int contact, bool rising, bool falling, int time) {
-
+    LOG(moba::DEBUG) << "addr " << addr << " contact " << contact << " rising " << rising << " falling " << falling << " time " << time << std::endl;
 }
 
