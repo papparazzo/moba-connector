@@ -63,10 +63,6 @@ Bridge::ResponseCode Bridge::recieveCanData() {
         return RES_PING;
     }
 
-    if(data.header[1] & 0x01) { // Response-Nachricht
-        return RES_EMPTY;
-    }
-
     if(data.header[1] == CMD_SYSTEM) {
         switch(data.data[0]) {
             case SYS_SUB_CMD_SYSTEM_GO:
@@ -79,11 +75,9 @@ Bridge::ResponseCode Bridge::recieveCanData() {
                 return RES_SYSTEM_STOP;
         }
     }
-    if(data.header[1] == CMD_S88_EVENT && s88callback) {
+
+    if(data.header[1] == (CMD_S88_EVENT | 0x01) /*&& s88callback*/) {
         int time = (data.data[2] << 8) | data.data[3];
-        if(time < 300) {
-            return;
-        }
 
         int addr = (data.uid[0] << 8) | data.uid[1];
         int contact = (data.uid[2] << 8) | data.uid[3];
