@@ -97,7 +97,4 @@ class Bridge : private boost::noncopyable {
         );
 
         std::function<void(int, int, bool, int)> s88callback;
-
-        ReportVector reportVector;
-
 };
