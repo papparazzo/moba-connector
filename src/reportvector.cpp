@@ -19,25 +19,25 @@
  */
 
 #include "reportvector.h"
+#include <sstream>
 
-ReportVector::ReportVector() {
+int ReportVector::trigger(Contact contactId) {
+    auto iter = vector.find(contactId);
+
+    if(iter != vector.end()) {
+        auto tmp = iter->second;
+        iter->second = ReportVector::IGNORE_CONTACT;
+        return tmp;
+    }
+    std::stringstream ss;
+    ss << "contact <" << contactId.first << ", " << contactId.second << "> not set!";
+    throw ReportVectorException(ss.str());
 }
 
-ReportVector::ReportVector(const ReportVector& orig) {
+void ReportVector::handleContact(Contact contactId, int locId) {
+    vector[contactId] = locId;
 }
 
-ReportVector::~ReportVector() {
+void ReportVector::ignoreContact(Contact contactId) {
+    handleContact(contactId, ReportVector::IGNORE_CONTACT);
 }
-
-void ReportVector::trigger(int contactId, SwitchingEdge switchingEdge) {
-
-}
-
-void ReportVector::checkContact(int contactId, ReportVector::HandleSwitchingEdge switchingEdge, int action) {
-
-}
-
-void ReportVector::ignoreContact(int contactId) {
-    //checkContact();
-}
-

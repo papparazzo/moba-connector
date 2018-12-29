@@ -20,42 +20,44 @@
 
 #pragma once
 
+#include <boost/noncopyable.hpp>
+
 #include <map>
+#include <exception>
 
-class ReportVector {
+class ReportVectorException : public std::exception {
+
     public:
-        enum HandleSwitchingEdge {
-            HANDLE_FALLING_ONLY,
-            HANDLE_RISING_ONLY,
-            HANDLE_BOTH,
-            IGNORE_BOTH
-        };
+        virtual ~ReportVectorException() throw() {
 
-        enum SwitchingEdge {
-            FALLING,
-            RISING,
-        };
+        }
 
-        struct Action {
-            HandleSwitchingEdge edge;
-            int action;
-        };
+        ReportVectorException(const std::string &what) {
+            this->what__ = what;
+        }
 
-        ReportVector();
-        ReportVector(const ReportVector& orig);
-        virtual ~ReportVector();
+        virtual const char* what() const throw() {
+            return this->what__.c_str();
+        }
 
-        void trigger(int contactId, SwitchingEdge switchingEdge);
+    private:
+        std::string what__;
+};
 
-        void checkContact(int contactId, HandleSwitchingEdge switchingEdge, int action);
-        void ignoreContact(int contactId);
+class ReportVector : private boost::noncopyable {
+    public:
+        static const int IGNORE_CONTACT = -1;
 
-// ignore
-// stop
-// error
+        using Contact = std::pair<int, int> ;
+        using Vector = std::map<Contact, int>;
+
+        int trigger(Contact contactId);
+
+        void handleContact(Contact contactId, int locId);
+        void ignoreContact(Contact contactId);
 
     protected:
-        std::map<int, Action> vector;
+        Vector vector;
 
     private:
 };
