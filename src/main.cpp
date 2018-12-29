@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
             loop.run();
             return EXIT_SUCCESS;
         } catch(std::exception &e) {
-            LOG(moba::WARNING) << e.what() << std::endl;
+            LOG(moba::ERROR) << e.what() << std::endl;
             sleep(4);
         }
     }
