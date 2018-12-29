@@ -77,10 +77,10 @@ Bridge::ResponseCode Bridge::recieveCanData() {
     }
 
     if(data.header[1] == (CMD_S88_EVENT | 0x01) /*&& s88callback*/) {
-        int time = (data.data[2] << 8) | data.data[3];
+        std::uint16_t time = (data.data[2] << 8) | data.data[3];
 
-        int addr = (data.uid[0] << 8) | data.uid[1];
-        int contact = (data.uid[2] << 8) | data.uid[3];
+        std::uint16_t addr = (data.uid[0] << 8) | data.uid[1];
+        std::uint16_t contact = (data.uid[2] << 8) | data.uid[3];
 
         s88callback(addr, contact, static_cast<bool>(data.data[1]), time);
     }
