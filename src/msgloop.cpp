@@ -58,26 +58,30 @@ void MessageLoop::run() {
     ));
 
     while(true) {
-        Bridge::ResponseCode rc = bridge->recieveCanData();
+        try {
+            Bridge::ResponseCode rc = bridge->recieveCanData();
+            switch(rc) {
+                case Bridge::RES_SYSTEM_STOP:
+                    LOG(moba::INFO) << "EMERGENCY_STOP" << std::endl;
+                    sysHandler.sendSetEmergencyStop(true);
+                    break;
 
-        switch(rc) {
-            case Bridge::RES_SYSTEM_STOP:
-                LOG(moba::INFO) << "EMERGENCY_STOP" << std::endl;
-                sysHandler.sendSetEmergencyStop(true);
-                break;
+                case Bridge::RES_SYSTEM_GO:
+                    LOG(moba::INFO) << "EMERGENCY_STOP_CLEARING" << std::endl;
+                    sysHandler.sendSetEmergencyStop(false);
+                    break;
 
-            case Bridge::RES_SYSTEM_GO:
-                LOG(moba::INFO) << "EMERGENCY_STOP_CLEARING" << std::endl;
-                sysHandler.sendSetEmergencyStop(false);
-                break;
-
-            case Bridge::RES_PING:
-                LOG(moba::INFO) << "PING_RESPONSE" << std::endl;
-                if(pingSend) {
-                    pingSend = false;
-                    interfacehandler.sendConnectivity(moba::MsgInterfaceHandler::CO_CONNECTED);
-                }
-                break;
+                case Bridge::RES_PING:
+                    LOG(moba::INFO) << "PING_RESPONSE" << std::endl;
+                    if(pingSend) {
+                        pingSend = false;
+                        interfacehandler.sendConnectivity(moba::MsgInterfaceHandler::CO_CONNECTED);
+                    }
+                    break;
+            }
+        } catch(std::exception &e) {
+            LOG(moba::ERROR) << e.what() << std::endl;
+            bridge->setEmergencyStop();
         }
 
         moba::MessagePtr msg = msgEndpoint->recieveMsg();
@@ -142,6 +146,11 @@ void MessageLoop::setHardwareState(moba::JsonItemPtr data) {
 }
 
 void MessageLoop::s88report(int addr, int contact, bool active, int time) {
+    auto locId = reportVector.trigger({addr, contact});
+    if(locId == ReportVector::IGNORE_CONTACT) {
+        return;
+    }
+
     LOG(moba::DEBUG) << "addr " << addr << " contact " << contact << " active " << active << " time " << time << std::endl;
 }
 
