@@ -23,29 +23,10 @@
 #include <boost/noncopyable.hpp>
 
 #include <map>
-#include <exception>
-
-class ReportVectorException : public std::exception {
-
-    public:
-        virtual ~ReportVectorException() throw() {
-
-        }
-
-        ReportVectorException(const std::string &what) {
-            this->what__ = what;
-        }
-
-        virtual const char* what() const throw() {
-            return this->what__.c_str();
-        }
-
-    private:
-        std::string what__;
-};
 
 class ReportVector : private boost::noncopyable {
     public:
+        static const int CONTACT_UNSET  = 0;
         static const int IGNORE_CONTACT = -1;
 
         using Contact = std::pair<int, int> ;

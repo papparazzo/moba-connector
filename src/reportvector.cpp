@@ -19,19 +19,16 @@
  */
 
 #include "reportvector.h"
-#include <sstream>
 
 int ReportVector::trigger(Contact contactId) {
     auto iter = vector.find(contactId);
 
-    if(iter != vector.end()) {
-        auto tmp = iter->second;
-        iter->second = ReportVector::IGNORE_CONTACT;
-        return tmp;
+    if(iter == vector.end()) {
+        return ReportVector::CONTACT_UNSET;
     }
-    std::stringstream ss;
-    ss << "contact <" << contactId.first << ", " << contactId.second << "> not set!";
-    throw ReportVectorException(ss.str());
+    auto tmp = iter->second;
+    iter->second = ReportVector::IGNORE_CONTACT;
+    return tmp;
 }
 
 void ReportVector::handleContact(Contact contactId, int locId) {
