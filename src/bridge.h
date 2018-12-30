@@ -41,6 +41,7 @@ class Bridge : private boost::noncopyable {
 
         Bridge(std::shared_ptr<CS2Connector> connector) : connector(connector) {
         }
+        void setLocSpeed(int locId, int speed);
         void setEmergencyStop();
         void setEmergencyStopClearing();
         void ping();

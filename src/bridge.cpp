@@ -14,6 +14,10 @@
 #include "bridge.h"
 #include <cstring>
 
+void Bridge::setLocSpeed(int locId, int speed) {
+    
+}
+
 void Bridge::setEmergencyStop() {
     send(CMD_SYSTEM, 5, 0x00000000, SYS_SUB_CMD_SYSTEM_STOP);
 }
