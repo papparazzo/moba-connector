@@ -19,6 +19,7 @@
  */
 
 #include "reportvector.h"
+#include <sstream>
 
 int ReportVector::trigger(Contact contactId) {
     auto iter = vector.find(contactId);
@@ -26,9 +27,18 @@ int ReportVector::trigger(Contact contactId) {
     if(iter == vector.end()) {
         return ReportVector::CONTACT_UNSET;
     }
+
     auto tmp = iter->second;
-    iter->second = ReportVector::IGNORE_CONTACT;
-    return tmp;
+
+    if(tmp != ReportVector::CONTACT_UNREACHABLE) {
+        iter->second = ReportVector::IGNORE_CONTACT;
+        return tmp;
+    }
+
+    // An unreachable Contact was triggered. E.g. train reached contact by a wrong turnout
+    std::stringstream ss;
+    ss << "contact <" << contactId.first << ", " << contactId.second << "> not set!";
+    throw ReportVectorException(ss.str());
 }
 
 void ReportVector::handleContact(Contact contactId, int locId) {
