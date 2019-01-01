@@ -38,3 +38,7 @@ void ReportVector::handleContact(Contact contactId, int locId) {
 void ReportVector::ignoreContact(Contact contactId) {
     handleContact(contactId, ReportVector::IGNORE_CONTACT);
 }
+
+void ReportVector::setContactUnreachable(Contact contactId) {
+    handleContact(contactId, ReportVector::CONTACT_UNREACHABLE);
+}

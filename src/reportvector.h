@@ -26,8 +26,9 @@
 
 class ReportVector : private boost::noncopyable {
     public:
-        static const int CONTACT_UNSET  = 0;
-        static const int IGNORE_CONTACT = -1;
+        static const int CONTACT_UNSET       =  0;
+        static const int IGNORE_CONTACT      = -1;
+        static const int CONTACT_UNREACHABLE = -2;
 
         using Contact = std::pair<int, int> ;
         using Vector = std::map<Contact, int>;
@@ -36,6 +37,7 @@ class ReportVector : private boost::noncopyable {
 
         void handleContact(Contact contactId, int locId);
         void ignoreContact(Contact contactId);
+        void setContactUnreachable(Contact contactId);
 
     protected:
         Vector vector;
