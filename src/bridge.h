@@ -26,7 +26,7 @@
 #include <functional>
 
 #include "cs2connector.h"
-#include "reportvector.h"
+#include "brakevector.h"
 
 class Bridge : private boost::noncopyable {
     public:

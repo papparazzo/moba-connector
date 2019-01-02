@@ -3,7 +3,7 @@ moba_connector_SOURCES = \
     main.cpp \
     bridge.cpp \
     cs2connector.cpp \
-    reportvector.cpp \
+    brakevector.cpp \
     msgloop.cpp
 
 moba_connector_LDADD = /usr/local/lib/libMoBaCommon.a

@@ -18,37 +18,37 @@
  *
  */
 
-#include "reportvector.h"
+#include "brakevector.h"
 #include <sstream>
 
-int ReportVector::trigger(Contact contactId) {
+int BrakeVector::trigger(Contact contactId) {
     auto iter = vector.find(contactId);
 
     if(iter == vector.end()) {
-        return ReportVector::CONTACT_UNSET;
+        return BrakeVector::CONTACT_UNSET;
     }
 
     auto tmp = iter->second;
 
-    if(tmp != ReportVector::CONTACT_UNREACHABLE) {
-        iter->second = ReportVector::IGNORE_CONTACT;
+    if(tmp != BrakeVector::CONTACT_UNREACHABLE) {
+        iter->second = BrakeVector::IGNORE_CONTACT;
         return tmp;
     }
 
     // An unreachable Contact was triggered. E.g. train reached contact by a wrong turnout
     std::stringstream ss;
     ss << "contact <" << contactId.first << ", " << contactId.second << "> not set!";
-    throw ReportVectorException(ss.str());
+    throw BrakeVectorException(ss.str());
 }
 
-void ReportVector::handleContact(Contact contactId, int locId) {
+void BrakeVector::handleContact(Contact contactId, int locId) {
     vector[contactId] = locId;
 }
 
-void ReportVector::ignoreContact(Contact contactId) {
-    handleContact(contactId, ReportVector::IGNORE_CONTACT);
+void BrakeVector::ignoreContact(Contact contactId) {
+    handleContact(contactId, BrakeVector::IGNORE_CONTACT);
 }
 
-void ReportVector::setContactUnreachable(Contact contactId) {
-    handleContact(contactId, ReportVector::CONTACT_UNREACHABLE);
+void BrakeVector::setContactUnreachable(Contact contactId) {
+    handleContact(contactId, BrakeVector::CONTACT_UNREACHABLE);
 }

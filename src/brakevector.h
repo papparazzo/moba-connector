@@ -25,14 +25,14 @@
 #include <map>
 #include <exception>
 
-class ReportVectorException : public std::exception {
+class BrakeVectorException : public std::exception {
 
     public:
-        virtual ~ReportVectorException() throw() {
+        virtual ~BrakeVectorException() throw() {
 
         }
 
-        ReportVectorException(const std::string &what) {
+        BrakeVectorException(const std::string &what) {
             this->what__ = what;
         }
 
@@ -44,7 +44,7 @@ class ReportVectorException : public std::exception {
         std::string what__;
 };
 
-class ReportVector : private boost::noncopyable {
+class BrakeVector : private boost::noncopyable {
     public:
         static const int CONTACT_UNSET       =  0;
         static const int IGNORE_CONTACT      = -1;

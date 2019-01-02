@@ -148,11 +148,11 @@ void MessageLoop::setHardwareState(moba::JsonItemPtr data) {
 void MessageLoop::s88report(int addr, int contact, bool active, int time) {
     LOG(moba::DEBUG) << "addr " << addr << " contact " << contact << " active " << active << " time " << time << std::endl;
     auto locId = reportVector.trigger({addr, contact});
-    if(locId == ReportVector::IGNORE_CONTACT) {
+    if(locId == BrakeVector::IGNORE_CONTACT) {
         return;
     }
-    
-    if(locId == ReportVector::CONTACT_UNSET) {
+    //msgEndpoint->sendMsg();
+    if(locId == BrakeVector::CONTACT_UNSET) {
         return;
     }
     bridge->setLocSpeed(locId, 0);

@@ -28,7 +28,7 @@
 #include <moba/msgsystemhandler.h>
 
 #include "bridge.h"
-#include "reportvector.h"
+#include "brakevector.h"
 
 class MessageLoop : private boost::noncopyable {
     public:
@@ -56,5 +56,5 @@ class MessageLoop : private boost::noncopyable {
         std::shared_ptr<Bridge> bridge;
         moba::MsgSystemHandler sysHandler;
 
-        ReportVector reportVector;
+        BrakeVector reportVector;
 };
