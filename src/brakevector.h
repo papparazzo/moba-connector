@@ -24,9 +24,9 @@
 
 #include <map>
 #include <exception>
+#include <mutex>
 
 class BrakeVectorException : public std::exception {
-
     public:
         virtual ~BrakeVectorException() throw() {
 
@@ -61,7 +61,6 @@ class BrakeVector : private boost::noncopyable {
 
     protected:
         Vector vector;
-
-    private:
+        std::mutex mutex;
 };
 

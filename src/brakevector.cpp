@@ -22,6 +22,7 @@
 #include <sstream>
 
 int BrakeVector::trigger(Contact contactId) {
+    std::lock_guard<std::mutex> guard(mutex);
     auto iter = vector.find(contactId);
 
     if(iter == vector.end()) {
@@ -42,6 +43,7 @@ int BrakeVector::trigger(Contact contactId) {
 }
 
 void BrakeVector::handleContact(Contact contactId, int locId) {
+    std::lock_guard<std::mutex> guard(mutex);
     vector[contactId] = locId;
 }
 
