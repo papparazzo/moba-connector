@@ -45,6 +45,14 @@ class CS2ConnectorException : public std::exception {
         std::string what__;
 };
 
+ struct CS2CanRawData {
+    uint8_t header[2];
+    uint8_t hash[2];
+    uint8_t length;
+    uint8_t uid[4];
+    uint8_t data[4];
+};
+
 class CS2Connector : private boost::noncopyable {
     public:
         struct RawData {
@@ -68,7 +76,6 @@ class CS2Connector : private boost::noncopyable {
     protected:
         static const int PORT_READ   = 15730;
         static const int PORT_WRITE  = 15731;
-        static const int BUFFER_SIZE = 512;
 
         static const int MSG_HANDLER_TIME_OUT_USEC = 0;
 
