@@ -30,14 +30,14 @@
 class CS2ConnectorException : public std::exception {
 
     public:
-        virtual ~CS2ConnectorException() throw() {
+        virtual ~CS2ConnectorException() noexcept {
         }
 
         CS2ConnectorException(const std::string &what) {
             what__ = what;
         }
 
-        virtual const char* what() const throw() {
+        virtual const char* what() const noexcept {
             return what__.c_str();
         }
 
