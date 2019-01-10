@@ -126,7 +126,6 @@ void MessageLoop::printNotice(moba::JsonItemPtr ptr) {
 
 void MessageLoop::printError(moba::JsonItemPtr ptr) {
     moba::JsonObjectPtr o = boost::dynamic_pointer_cast<moba::JsonObject>(ptr);
-
     moba::JsonStringPtr i = boost::dynamic_pointer_cast<moba::JsonString>(o->at("errorId"));
     moba::JsonStringPtr s = boost::dynamic_pointer_cast<moba::JsonString>(o->at("additonalMsg"));
     LOG(moba::WARNING) << "ErrorId <" << *i << "> " << *s << std::endl;
