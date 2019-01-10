@@ -2,7 +2,6 @@ bin_PROGRAMS = moba-connector
 moba_connector_SOURCES = \
     main.cpp \
     bridge.cpp \
-    cs2connector.cpp \
     cs2read.cpp \
     cs2write.cpp \
     brakevector.cpp \
