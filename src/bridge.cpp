@@ -15,7 +15,7 @@
 #include <cstring>
 
 void Bridge::setLocSpeed(uint32_t locId, uint16_t speed) {
-    uint8_t low = speed & 0xFF;
+    uint8_t low  = speed & 0xFF;
     uint8_t high = (speed >> 8) & 0xFF;
     send(CMD_LOCO_SPEED, 6, locId, low, high);
 }
@@ -33,7 +33,7 @@ void Bridge::ping() {
 }
 
 void Bridge::send(uint8_t cmd, uint8_t length, uint32_t uid, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3) {
-    CS2Connector::RawData raw;
+    CS2CanRawData raw;
     memset((void*)&raw, '\0', sizeof(raw));
 
     raw.header[0] = 0x00;
@@ -59,7 +59,7 @@ void Bridge::send(uint8_t cmd, uint8_t length, uint32_t uid, uint8_t data0, uint
 }
 
 Bridge::ResponseCode Bridge::recieveCanData() {
-    CS2Connector::RawData data;
+    CS2CanRawData data;
     if(!connector->recieveData(data)) {
         return RES_EMPTY;
     }
