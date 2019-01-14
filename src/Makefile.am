@@ -6,7 +6,8 @@ moba_connector_SOURCES = \
     cs2write.cpp \
     brakevector.cpp \
     msgloop.cpp \
-    msgreceiver.cpp
+    msgreceiver.cpp \
+    msgsender.cpp
 
 moba_connector_LDADD = /usr/local/lib/libMoBaCommon.a
 LDFLAGS += -L/usr/local/lib -pthread
