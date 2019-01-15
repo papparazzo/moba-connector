@@ -20,7 +20,7 @@
 
 #include "msgsender.h"
 
-MsgSender::MsgSender() {
+MsgSender::MsgSender(CS2ReadPtr cs2reader) : cs2reader{cs2reader} {
 }
 
 MsgSender::~MsgSender() {

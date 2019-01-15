@@ -20,15 +20,18 @@
 
 #pragma once
 
+#include "cs2read.h"
+
 class MsgSender {
     public:
-        MsgSender();
+        MsgSender(CS2ReadPtr cs2reader);
 
         virtual ~MsgSender();
 
         void operator()();
 
-    private:
+    protected:
 
+        CS2ReadPtr cs2reader;
 };
 
