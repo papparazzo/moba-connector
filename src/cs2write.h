@@ -24,6 +24,7 @@
 
 #include <boost/noncopyable.hpp>
 #include <string>
+#include <memory>
 
 class CS2Write : private boost::noncopyable {
     public:
@@ -54,4 +55,4 @@ class CS2Write : private boost::noncopyable {
         );
 };
 
-
+using CS2WritePtr = std::shared_ptr<CS2Write>;

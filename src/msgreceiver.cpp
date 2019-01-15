@@ -20,11 +20,11 @@
 
 #include "msgreceiver.h"
 
-MsgReceiver::MsgReceiver(CS3WritePtr cs2writer) : cs2writer{cs2writer} {
+MsgReceiver::MsgReceiver(CS2WritePtr cs2writer) : cs2writer{cs2writer} {
 
 }
 
-virtual MsgReceiver::~MsgReceiver() {
+MsgReceiver::~MsgReceiver() {
 
 }
 
