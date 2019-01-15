@@ -20,13 +20,21 @@
 
 #pragma once
 
+#include "cs2write.h"
+#include "memory"
+
 class MsgReceiver {
     public:
-        MsgReceiver();
+        MsgReceiver(CS3WritePtr cs2writer);
 
         virtual ~MsgReceiver();
 
         void operator()();
+
+    protected:
+        using CS3WritePtr = std::shared_ptr<CS2Write>;
+
+        CS3WritePtr cs2writer;
 
 };
 

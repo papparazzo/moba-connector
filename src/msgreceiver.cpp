@@ -20,7 +20,7 @@
 
 #include "msgreceiver.h"
 
-MsgReceiver::MsgReceiver() {
+MsgReceiver::MsgReceiver(CS3WritePtr cs2writer) : cs2writer{cs2writer} {
 
 }
 
