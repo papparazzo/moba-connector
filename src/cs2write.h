@@ -35,10 +35,23 @@ class CS2Write : private boost::noncopyable {
         void connect(const std::string &host, int port = CS2Write::DEFAULT_PORT_WRITE);
         void write(const CS2CanRawData &data);
 
+        void setLocSpeed(uint32_t locId, uint16_t speed);
+        void setEmergencyStop();
+        void setEmergencyStopClearing();
+        void ping();
+
     protected:
         int fd_write;
         struct sockaddr_in s_addr_write;
-
+        void send(
+            CanCommand cmd,
+            uint8_t length = 0x00,
+            uint32_t uid = 0x000000,
+            uint8_t data0 = 0x00,
+            uint8_t data1 = 0x00,
+            uint8_t data2 = 0x00,
+            uint8_t data3 = 0x00
+        );
 };
 
 
