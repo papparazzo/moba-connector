@@ -20,7 +20,6 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include <moba/log.h>
 #include <moba/msginterfacehandler.h>
 
 #include "msgloop.h"
@@ -28,8 +27,8 @@
 
 MessageLoop::MessageLoop(
     const std::string &appName, const moba::Version &version,
-    moba::MsgEndpointPtr endpoint, std::shared_ptr<Bridge> bridge
-) : appName(appName), version(version), msgEndpoint(endpoint), bridge(bridge), sysHandler(endpoint) {
+    moba::MsgEndpointPtr endpoint
+) : appName(appName), version(version), msgEndpoint(endpoint), sysHandler(endpoint) {
 }
 
 void MessageLoop::connect() {
@@ -41,13 +40,17 @@ void MessageLoop::connect() {
 }
 
 void MessageLoop::run() {
+
+
+
+
     moba::MsgInterfaceHandler interfacehandler(msgEndpoint);
 
-    bridge->ping();
+    //bridge->ping();
     bool pingSend = true;
 
 // TODO: Alle x Sek. ping an CS2 senden
-
+/*
     bridge->addS88CallbackHandler(std::bind(
         &MessageLoop::s88report,
         this,
@@ -56,8 +59,8 @@ void MessageLoop::run() {
         std::placeholders::_3,
         std::placeholders::_4
     ));
-
-    while(true) {
+*/
+    while(true) {/*
         try {
             Bridge::ResponseCode rc = bridge->recieveCanData();
             switch(rc) {
@@ -83,77 +86,9 @@ void MessageLoop::run() {
             LOG(moba::ERROR) << e.what() << std::endl;
             bridge->setEmergencyStop();
         }
-
+        */
         moba::MessagePtr msg = msgEndpoint->recieveMsg();
-        if(!msg) {
-            usleep(50000);
-            continue;
-        }
-        LOG(moba::NOTICE) << "New Message <" << *msg << ">" << std::endl;
-        switch(msg->getMsgType()) {
-            case moba::Message::MT_ERROR:
-                printError(msg->getData());
-                break;
-
-            case moba::Message::MT_SYSTEM_NOTICE: {
-                printNotice(msg->getData());
-                break;
-            }
-
-            case moba::Message::MT_CLIENT_SHUTDOWN:
-                return;
-
-            case moba::Message::MT_CLIENT_RESET:
-                break;
-
-            case moba::Message::MT_HARDWARE_STATE_CHANGED:
-                setHardwareState(msg->getData());
-                break;
-
-            default:
-                break;
-        }
     }
 }
 
-void MessageLoop::printNotice(moba::JsonItemPtr ptr) {
-    moba::JsonObjectPtr o = boost::dynamic_pointer_cast<moba::JsonObject>(ptr);
-    LOG(moba::INFO) <<
-        moba::castToString(o->at("type")) << ": [" <<
-        moba::castToString(o->at("caption")) << "] " <<
-        moba::castToString(o->at("text")) << std::endl;
-}
-
-void MessageLoop::printError(moba::JsonItemPtr ptr) {
-    moba::JsonObjectPtr o = boost::dynamic_pointer_cast<moba::JsonObject>(ptr);
-    moba::JsonStringPtr i = boost::dynamic_pointer_cast<moba::JsonString>(o->at("errorId"));
-    moba::JsonStringPtr s = boost::dynamic_pointer_cast<moba::JsonString>(o->at("additonalMsg"));
-    LOG(moba::WARNING) << "ErrorId <" << *i << "> " << *s << std::endl;
-}
-
-void MessageLoop::setHardwareState(moba::JsonItemPtr data) {
-    std::string status = moba::castToString(data);
-
-    if(status == "ERROR") {
-        return;
-    }
-    if(status == "EMERGENCY_STOP" || status == "STANDBY") {
-        bridge->setEmergencyStop();
-    } else {
-        bridge->setEmergencyStopClearing();
-    }
-}
-
-void MessageLoop::s88report(int addr, int contact, bool active, int time) {
-    LOG(moba::DEBUG) << "addr " << addr << " contact " << contact << " active " << active << " time " << time << std::endl;
-    auto locId = reportVector.trigger({addr, contact});
-    if(locId == BrakeVector::IGNORE_CONTACT) {
-        return;
-    }
-    //msgEndpoint->sendMsg();
-    if(locId == BrakeVector::CONTACT_UNSET) {
-        return;
-    }
-    bridge->setLocSpeed(locId, 0);
-}
 

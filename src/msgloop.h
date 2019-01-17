@@ -27,7 +27,6 @@
 #include <moba/msgendpoint.h>
 #include <moba/msgsystemhandler.h>
 
-#include "bridge.h"
 #include "brakevector.h"
 
 class MessageLoop : private boost::noncopyable {
@@ -35,8 +34,7 @@ class MessageLoop : private boost::noncopyable {
         MessageLoop(
             const std::string &appName,
             const moba::Version &version,
-            moba::MsgEndpointPtr,
-            std::shared_ptr<Bridge> bridge
+            moba::MsgEndpointPtr
         );
 
         void run();
@@ -44,16 +42,12 @@ class MessageLoop : private boost::noncopyable {
         void s88report(int addr, int contact, bool active, int time);
 
     protected:
-        void printError(moba::JsonItemPtr ptr);
-        void printNotice(moba::JsonItemPtr ptr);
-        void setHardwareState(moba::JsonItemPtr data);
 
         moba::MsgEndpointPtr msgEndpoint;
         long appId;
         std::string appName;
         moba::Version version;
 
-        std::shared_ptr<Bridge> bridge;
         moba::MsgSystemHandler sysHandler;
 
         BrakeVector reportVector;
