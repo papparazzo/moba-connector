@@ -31,6 +31,9 @@ class MsgReceiver {
         void operator()();
 
     protected:
+        void printError(moba::JsonItemPtr ptr);
+        void printNotice(moba::JsonItemPtr ptr);
+        void setHardwareState(moba::JsonItemPtr data);
 
         CS2WritePtr cs2writer;
 
