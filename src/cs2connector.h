@@ -53,33 +53,42 @@ class CS2ConnectorException : public std::exception {
     uint8_t data[4];
 };
 
-class CS2Connector : private boost::noncopyable {
-    public:
-        struct RawData {
-            uint8_t header[2];
-            uint8_t hash[2];
-            uint8_t length;
-            uint8_t uid[4];
-            uint8_t data[4];
-        };
+enum class CanCommand {
+    CMD_SYSTEM                                  = 0x00,
+    CMD_LOCO_DISCOVERY                          = 0x02,
+    CMD_MFX_BIND                                = 0x04,
+    CMD_MFX_VERIFY                              = 0x06,
+    CMD_LOCO_SPEED                              = 0x08,
+    CMD_LOCO_DIRECTION                          = 0x0A,
+    CMD_LOCO_FUNCTION                           = 0x0C,
+    CMD_READ_CONFIG                             = 0x0E,
+    CMD_WRITE_CONFIG                            = 0x10,
+    CMD_SET_SWITCH                              = 0x16,
+    CMD_ATTACHMENTS_CONFIG                      = 0x18,
+    CMD_S88_POLLING                             = 0x20,
+    CMD_S88_EVENT                               = 0x22,
+    CMD_SX1_EVENT                               = 0x24,
+    CMD_PING                                    = 0x30,
+    CMD_UPDATE_OFFER                            = 0x32,
+    CMD_READ_CONFIG_DATA                        = 0x34,
+    CMD_BOOTLOADER_CAN                          = 0x36,
+    CMD_BOOTLOADER_TRACK                        = 0x38,
+    CMD_STATUS_DATA_CONFIGURATION               = 0x3A,
+    CMD_CONFIG_DATA_QUERY                       = 0x40,
+    CMD_CONFIG_DATA_STREAM                      = 0x42,
+    CMD_60128_CONNECT_6021_DATA_STREAM          = 0x44,
+};
 
-        CS2Connector();
-        virtual ~CS2Connector();
+inline CanCommand operator |(CanCommand a, CanCommand b) {
+    return static_cast<CanCommand>(static_cast<int>(a) | static_cast<int>(b));
+}
 
-        void connect(const std::string &host);
-        bool recieveData(RawData &data, time_t timeoutSec = 0);
-        void sendData(const RawData &data);
+inline CanCommand operator |(CanCommand a, int b) {
+    return static_cast<CanCommand>(static_cast<int>(a) | b);
+}
 
-        std::string getCommmandAsString(int cmd);
-        std::string getSystemSubCommand(int subCmd);
-
-    protected:
-        static const int PORT_READ   = 15730;
-        static const int PORT_WRITE  = 15731;
-
-        static const int MSG_HANDLER_TIME_OUT_USEC = 0;
-
-        int fd_read;
-        int fd_write;
-        struct sockaddr_in s_addr_write;
+enum class CanSystemSubCommand {
+    SYS_SUB_CMD_SYSTEM_STOP = 0x00,
+    SYS_SUB_CMD_SYSTEM_GO   = 0x01,
+    SYS_SUB_CMD_SYSTEM_HALT = 0x02
 };
