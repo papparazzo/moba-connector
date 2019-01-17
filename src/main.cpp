@@ -27,7 +27,8 @@
 
 #include "config.h"
 #include "msgloop.h"
-#include "cs2connector.h"
+#include "cs2write.h"
+#include "cs2read.h"
 
 namespace {
     moba::AppData appData = {
@@ -43,16 +44,24 @@ namespace {
 int main(int argc, char *argv[]) {
     moba::setCoreFileSizeToULimit();
 
-    std::shared_ptr<CS2Connector> connector(new CS2Connector());
-    connector->connect("192.168.178.38");
-    std::shared_ptr<Bridge> bridge(new Bridge(connector));
-    moba::MsgEndpointPtr endpoint(new moba::MsgEndpoint(appData.host, appData.port));
+    CS2ReadPtr reader{new CS2Read{}};
+    reader->connect("192.168.178.38");
+
+    CS2WritePtr writer{new CS2Write{}};
+    writer->connect("192.168.178.38");
+
+
+
+    //std::shared_ptr<CS2Connector> connector(new CS2Connector());
+    //connector->connect("192.168.178.38");
+    //std::shared_ptr<Bridge> bridge(new Bridge(connector));
+    //moba::MsgEndpointPtr endpoint(new moba::MsgEndpoint(appData.host, appData.port));
 
     while(true) {
         try {
-            MessageLoop loop(appData.appName, appData.version, endpoint, bridge);
-            loop.connect();
-            loop.run();
+            //MessageLoop loop(appData.appName, appData.version, endpoint, bridge);
+            //loop.connect();
+            //loop.run();
             return EXIT_SUCCESS;
         } catch(std::exception &e) {
             LOG(moba::ERROR) << e.what() << std::endl;
