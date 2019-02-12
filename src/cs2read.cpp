@@ -26,17 +26,7 @@
 #include <unistd.h>
 #include <cstring>
 
-CS2Read::CS2Read() : fd_read(-1) {
-}
-
-CS2Read::~CS2Read() {
-    if(fd_read != -1) {
-        ::close(fd_read);
-    }
-}
-
 void CS2Read::connect(const std::string &host, int port) {
-
     struct sockaddr_in s_addr_read;
 
     if((fd_read = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
@@ -64,4 +54,10 @@ CS2CanRawData CS2Read::read() {
         throw CS2ConnectorException("::recvfrom returned -1");
     }
     return data;
+}
+
+void CS2Read::recieveCanData() {
+    CS2CanRawData data = read();
+    queue->push(data);
+
 }

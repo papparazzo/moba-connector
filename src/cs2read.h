@@ -24,18 +24,33 @@
 
 #include <boost/noncopyable.hpp>
 #include <string>
+#include <memory>
 
 class CS2Read : private boost::noncopyable {
     public:
         static const int DEFAULT_PORT_READ = 15730;
 
-        CS2Read();
-        virtual ~CS2Read();
+        CS2Read(
+            ConcurrentCanQueuePtr queue, const std::string &host, int port = CS2Read::DEFAULT_PORT_READ
+        ) : queue{queue}, host{host}, port{port}, fd_read{-1}  {
+        }
 
-        void connect(const std::string &host, int port = CS2Read::DEFAULT_PORT_READ);
+        virtual ~CS2Read() {
+            if(fd_read != -1) {
+                ::close(fd_read);
+            }
+        }
+
+        void connect();
         CS2CanRawData read();
+
+        void recieveCanData();
 
     protected:
         int fd_read;
-
+        std::string host;
+        int port;
+        ConcurrentCanQueuePtr queue;
 };
+
+using CS2ReadPtr = std::shared_ptr<CS2Read>;
