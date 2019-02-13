@@ -30,21 +30,13 @@ class CS2Read : private boost::noncopyable {
     public:
         static const int DEFAULT_PORT_READ = 15730;
 
-        CS2Read(
-            ConcurrentCanQueuePtr queue, const std::string &host, int port = CS2Read::DEFAULT_PORT_READ
-        ) : queue{queue}, host{host}, port{port}, fd_read{-1}  {
-        }
-
-        virtual ~CS2Read() {
-            if(fd_read != -1) {
-                ::close(fd_read);
-            }
-        }
+        CS2Read(ConcurrentCanQueuePtr queue, const std::string &host, int port = CS2Read::DEFAULT_PORT_READ);
+        virtual ~CS2Read();
 
         void connect();
-        CS2CanRawData read();
+        void read();
 
-        void recieveCanData();
+        void operator()();
 
     protected:
         int fd_read;

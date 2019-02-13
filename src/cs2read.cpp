@@ -26,6 +26,17 @@
 #include <unistd.h>
 #include <cstring>
 
+CS2Read::CS2Read(
+    ConcurrentCanQueuePtr queue, const std::string &host, int port = CS2Read::DEFAULT_PORT_READ
+) : queue{queue}, host{host}, port{port}, fd_read{-1}  {
+}
+
+CS2Read::~CS2Read() {
+    if(fd_read != -1) {
+        ::close(fd_read);
+    }
+}
+
 void CS2Read::connect(const std::string &host, int port) {
     struct sockaddr_in s_addr_read;
 
@@ -43,7 +54,7 @@ void CS2Read::connect(const std::string &host, int port) {
     }
 }
 
-CS2CanRawData CS2Read::read() {
+void CS2Read::read() {
     CS2CanRawData data;
     memset((void*)&data, '\0', sizeof(data));
 
@@ -53,11 +64,15 @@ CS2CanRawData CS2Read::read() {
     if(::recvfrom(fd_read, (void*)&data, sizeof(data), 0, (struct sockaddr *) &s_addr_other, &slen) == -1) {
         throw CS2ConnectorException("::recvfrom returned -1");
     }
-    return data;
+    queue->push(std::move(data));
 }
 
-void CS2Read::recieveCanData() {
-    CS2CanRawData data = read();
-    queue->push(data);
-
+void CS2Read::operator()() {
+    try {
+        while(true) {
+            read();
+        }
+    } catch(const std::exception &e) {
+        
+    }
 }
