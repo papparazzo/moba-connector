@@ -22,6 +22,7 @@
 
 #include <mutex>
 #include <exception>
+#include <utility>
 
 class TerminationException : public std::exception {
 
@@ -57,6 +58,16 @@ class ConcurrentQueue {
             condition.notify_one();
         }
 
+        void push(const T &&data) {
+            std::unique_lock<std::mutex> lock(mutex);
+            if (terminate) {
+                throw TerminationException("canceled");
+            }
+            queue.push(data);
+            lock.unlock();
+            condition.notify_one();
+        }
+
         bool empty() const {
             std::lock_guard<std::mutex> lock(mutex);
             if (terminate) {
@@ -71,7 +82,7 @@ class ConcurrentQueue {
                 condition.wait(lock);
             }
 
-            T value = queue.front();
+            T value = std::move(queue.front());
             queue.pop();
             return value;
         }
