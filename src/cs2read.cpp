@@ -37,7 +37,7 @@ CS2Read::~CS2Read() {
     }
 }
 
-void CS2Read::connect(const std::string &host, int port) {
+void CS2Read::connect() {
     struct sockaddr_in s_addr_read;
 
     if((fd_read = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
@@ -73,6 +73,6 @@ void CS2Read::operator()() {
             read();
         }
     } catch(const std::exception &e) {
-        
+
     }
 }
