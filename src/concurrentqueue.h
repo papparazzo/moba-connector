@@ -47,6 +47,9 @@ class TerminationException : public std::exception {
 template<typename T>
 class ConcurrentQueue {
     public:
+        ConcurrentQueue() {
+        }
+
         virtual ~ConcurrentQueue() noexcept {
         }
 
