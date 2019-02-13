@@ -23,6 +23,8 @@
 #include <mutex>
 #include <exception>
 #include <utility>
+#include <queue>
+#include <condition_variable>
 
 class TerminationException : public std::exception {
 
