@@ -52,7 +52,7 @@ class ConcurrentQueue {
 
         void push(const T &data) {
             std::unique_lock<std::mutex> lock(mutex);
-            if (terminate) {
+            if (doTerminate) {
                 throw TerminationException("canceled");
             }
             queue.push(data);
@@ -62,7 +62,7 @@ class ConcurrentQueue {
 
         void push(const T &&data) {
             std::unique_lock<std::mutex> lock(mutex);
-            if (terminate) {
+            if (doTerminate) {
                 throw TerminationException("canceled");
             }
             queue.push(data);
@@ -72,7 +72,7 @@ class ConcurrentQueue {
 
         bool empty() const {
             std::lock_guard<std::mutex> lock(mutex);
-            if (terminate) {
+            if (doTerminate) {
                 throw TerminationException("canceled");
             }
             return queue.empty();
@@ -91,7 +91,7 @@ class ConcurrentQueue {
 
         void terminate() {
             std::unique_lock<std::mutex> lock(mutex);
-            terminate = true;
+            doTerminate = true;
             lock.unlock();
             condition.notify_all();
         }
@@ -100,7 +100,7 @@ class ConcurrentQueue {
         std::queue<T> queue;
         std::mutex mutex;
         std::condition_variable condition;
-        bool terminate;
+        bool doTerminate;
 
         ConcurrentQueue(const ConcurrentQueue &orig) = delete;
 };
