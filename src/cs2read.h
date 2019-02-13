@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "cs2connector.h"
+#include "shared.h"
 
 #include <boost/noncopyable.hpp>
 #include <string>
