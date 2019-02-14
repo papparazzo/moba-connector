@@ -27,8 +27,7 @@
 #include <cstring>
 
 CS2Read::CS2Read(
-    ConcurrentCanQueuePtr queue, const std::string &host, int port = CS2Read::DEFAULT_PORT_READ
-) : queue{queue}, host{host}, port{port}, fd_read{-1}  {
+    ConcurrentCanQueuePtr queue, const std::string &host, int port) : queue{queue}, host{host}, port{port}, fd_read{-1}  {
 }
 
 CS2Read::~CS2Read() {
@@ -54,7 +53,7 @@ void CS2Read::connect() {
     }
 }
 
-void CS2Read::read() {
+void CS2Read::read() const {
     CS2CanRawData data;
     memset((void*)&data, '\0', sizeof(data));
 
@@ -67,7 +66,7 @@ void CS2Read::read() {
     queue->push(std::move(data));
 }
 
-void CS2Read::operator()() {
+void CS2Read::operator()() const {
     try {
         while(true) {
             read();

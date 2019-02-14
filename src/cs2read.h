@@ -34,9 +34,9 @@ class CS2Read : private boost::noncopyable {
         virtual ~CS2Read();
 
         void connect();
-        void read();
+        void read() const;
 
-        void operator()();
+        void operator()() const;
 
     protected:
         int fd_read;
@@ -44,5 +44,3 @@ class CS2Read : private boost::noncopyable {
         int port;
         ConcurrentCanQueuePtr queue;
 };
-
-using CS2ReadPtr = std::shared_ptr<CS2Read>;
