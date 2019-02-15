@@ -26,12 +26,12 @@
 #include <string>
 #include <memory>
 
-class CS2Read : private boost::noncopyable {
+class CS2Reader : private boost::noncopyable {
     public:
         static const int DEFAULT_PORT_READ = 15730;
 
-        CS2Read(ConcurrentCanQueuePtr queue, const std::string &host, int port = CS2Read::DEFAULT_PORT_READ);
-        virtual ~CS2Read();
+        CS2Reader(ConcurrentCanQueuePtr queue, const std::string &host, int port = CS2Reader::DEFAULT_PORT_READ);
+        virtual ~CS2Reader();
 
         void connect();
         void read() const;

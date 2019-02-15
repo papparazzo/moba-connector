@@ -18,7 +18,7 @@
  *
  */
 
-#include "cs2read.h"
+#include "cs2reader.h"
 
 #include <arpa/inet.h>
 #include <stdio.h>
@@ -26,17 +26,17 @@
 #include <unistd.h>
 #include <cstring>
 
-CS2Read::CS2Read(
+CS2Reader::CS2Reader(
     ConcurrentCanQueuePtr queue, const std::string &host, int port) : queue{queue}, host{host}, port{port}, fd_read{-1}  {
 }
 
-CS2Read::~CS2Read() {
+CS2Reader::~CS2Reader() {
     if(fd_read != -1) {
         ::close(fd_read);
     }
 }
 
-void CS2Read::connect() {
+void CS2Reader::connect() {
     struct sockaddr_in s_addr_read;
 
     if((fd_read = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
@@ -53,7 +53,7 @@ void CS2Read::connect() {
     }
 }
 
-void CS2Read::read() const {
+void CS2Reader::read() const {
     CS2CanRawData data;
     memset((void*)&data, '\0', sizeof(data));
 
@@ -66,7 +66,7 @@ void CS2Read::read() const {
     queue->push(std::move(data));
 }
 
-void CS2Read::operator()() const {
+void CS2Reader::operator()() const {
     try {
         while(true) {
             read();
