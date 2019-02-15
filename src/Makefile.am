@@ -1,15 +1,15 @@
 bin_PROGRAMS = moba-connector
 moba_connector_SOURCES = \
     main.cpp \
-    bridge.cpp \
-    cs2read.cpp \
-    cs2write.cpp \
+    cs2reader.cpp \
+    jsonreader.cpp \
+    cs2writer.cpp \
     brakevector.cpp \
-    msgloop.cpp \
-    msgreceiver.cpp \
     msgsender.cpp
 
-moba_connector_LDADD = /usr/local/lib/libMoBaCommon.a
+ moba_connector_LDADD = -lMoBaCommon $(srcdir)/../modules/lib-msghandling/src/moba/libmsghandling.a
 LDFLAGS += -L/usr/local/lib -pthread
+
+AM_CPPFLAGS = -I$(srcdir)/../modules/lib-msghandling/src -g3 -O0
 
 ACLOCAL_AMFLAGS = -I m4
