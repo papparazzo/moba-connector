@@ -26,7 +26,7 @@
 #include <unistd.h>
 #include <cstring>
 
-CS2Write::CS2Write() : fd_write(-1) {
+CS2Write::CS2Write(const std::string &host, int port) : host{host}, port{port}, fd_write{-1} {
 }
 
 CS2Write::~CS2Write() {
@@ -35,6 +35,7 @@ CS2Write::~CS2Write() {
     }
 }
 
+/*
 void CS2Write::setLocSpeed(uint32_t locId, uint16_t speed) {
     uint8_t low  = speed & 0xFF;
     uint8_t high = (speed >> 8) & 0xFF;
@@ -52,7 +53,7 @@ void CS2Write::setEmergencyStopClearing() {
 void CS2Write::ping() {
     send(CanCommand::CMD_PING);
 }
-
+*/
 void CS2Write::send(CanCommand cmd, uint8_t length, uint32_t uid, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3) {
     CS2CanRawData raw;
     memset((void*)&raw, '\0', sizeof(raw));
@@ -79,7 +80,7 @@ void CS2Write::send(CanCommand cmd, uint8_t length, uint32_t uid, uint8_t data0,
     write(raw);
 }
 
-void CS2Write::connect(const std::string &host, int port) {
+void CS2Write::connect() {
 
     if((fd_write = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
         throw CS2ConnectorException("socket-creation for writing failed");
