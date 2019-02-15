@@ -39,8 +39,8 @@ class CS2Reader : private boost::noncopyable {
         void operator()() const;
 
     protected:
-        int fd_read;
+        ConcurrentCanQueuePtr queue;
         std::string host;
         int port;
-        ConcurrentCanQueuePtr queue;
+        int fd_read;
 };
