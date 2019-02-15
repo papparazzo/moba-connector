@@ -19,16 +19,21 @@
  */
 
 #include <iostream>
+#include <functional>
 #include <memory>
+#include <thread>
 
 #include <moba/helper.h>
-#include <moba/msgendpoint.h>
 #include <moba/log.h>
 
 #include "config.h"
-#include "msgloop.h"
-#include "cs2write.h"
-#include "cs2read.h"
+#include "concurrentqueue.h"
+#include "cs2reader.h"
+#include "jsonreader.h"
+#include "shared.h"
+
+#include "moba/socket.h"
+#include "moba/endpoint.h"
 
 namespace {
     moba::AppData appData = {
@@ -44,28 +49,88 @@ namespace {
 int main(int argc, char *argv[]) {
     moba::setCoreFileSizeToULimit();
 
-    CS2ReadPtr reader{new CS2Read{}};
-    reader->connect("192.168.178.38");
+    ConcurrentCanQueuePtr dataFromCS{new ConcurrentQueue<CS2CanRawData>};
+    ConcurrentCanQueuePtr dataToCS{new ConcurrentQueue<CS2CanRawData>};
+
+    CS2Reader cs2reader{dataFromCS, "192.168.178.38"};
+    cs2reader.connect();
+
+    std::thread cs2ReaderThread{[&cs2reader](){cs2reader();}};
+    cs2ReaderThread.join();
+
+    moba::JsonArrayPtr groups{new moba::JsonArray{}};
+    groups->push_back(moba::toJsonStringPtr("SYSTEM"));
+
+    SocketPtr socket{new Socket{appData.host, appData.port}};
+    EndpointPtr endpoint{new Endpoint{socket}};
+    endpoint->connect(appData.appName, appData.version, groups);
+
+    JsonReader jsonReader{dataToCS, endpoint};
+
+    std::thread jsonReaderThread{[&jsonReader](){jsonReader();}};
+    jsonReaderThread.join();
+
+
+
+
+
+
+    //std::thread cs2WriterThread;
+
+    //std::thread jsonReaderThread;
+    //std::thread jsonWriterThread;
+
+
+
+
+    /*
+
+    // Ping Response-Nachricht
+    if(data.header[1] & 0x01 && data.header[1] == (CanCommand::CMD_PING | 0x01)) {
+        return RES_PING;
+    }
+
+
+    if(data.header[1] == CanCommand::CMD_SYSTEM) {
+        switch(data.data[0]) {
+            case SYS_SUB_CMD_SYSTEM_GO:
+                return RES_SYSTEM_GO;
+
+            case SYS_SUB_CMD_SYSTEM_HALT:
+                return RES_SYSTEM_HALT;
+
+            case SYS_SUB_CMD_SYSTEM_STOP:
+                return RES_SYSTEM_STOP;
+        }
+    }
+    */ /*
+    if(data.header[1] == static_cast<uint8_t>(CanCommand::CMD_S88_EVENT | 0x01) / *&& s88callback* /) {
+        std::uint16_t time = (data.data[2] << 8) | data.data[3];
+
+        std::uint16_t addr = (data.uid[0] << 8) | data.uid[1];
+        std::uint16_t contact = (data.uid[2] << 8) | data.uid[3];
+
+        //s88callback(addr, contact, static_cast<bool>(data.data[1]), time);
+    }
+
+
+
 
     CS2WritePtr writer{new CS2Write{}};
     writer->connect("192.168.178.38");
 
+    MsgSender sender{reader};
+    MsgReceiver reciever{writer};
 
 
-    //std::shared_ptr<CS2Connector> connector(new CS2Connector());
-    //connector->connect("192.168.178.38");
-    //std::shared_ptr<Bridge> bridge(new Bridge(connector));
-    //moba::MsgEndpointPtr endpoint(new moba::MsgEndpoint(appData.host, appData.port));
 
-    while(true) {
-        try {
+
+            std::thread t1{reciever};
+            sender();
+
             //MessageLoop loop(appData.appName, appData.version, endpoint, bridge);
             //loop.connect();
             //loop.run();
             return EXIT_SUCCESS;
-        } catch(std::exception &e) {
-            LOG(moba::ERROR) << e.what() << std::endl;
-            sleep(4);
-        }
-    }
+    */
 }
