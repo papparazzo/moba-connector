@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "cs2connector.h"
+#include "shared.h"
 
 #include <boost/noncopyable.hpp>
 #include <string>
@@ -30,18 +30,21 @@ class CS2Write : private boost::noncopyable {
     public:
         static const int DEFAULT_PORT_WRITE  = 15731;
 
-        CS2Write();
-        virtual ~CS2Write();
+        CS2Write(const std::string &host, int port = CS2Write::DEFAULT_PORT_WRITE);
+        virtual ~CS2Write() noexcept;
 
-        void connect(const std::string &host, int port = CS2Write::DEFAULT_PORT_WRITE);
+        void connect();
         void write(const CS2CanRawData &data);
 
-        void setLocSpeed(uint32_t locId, uint16_t speed);
-        void setEmergencyStop();
-        void setEmergencyStopClearing();
-        void ping();
+        //void setLocSpeed(uint32_t locId, uint16_t speed);
+        //void setEmergencyStop();
+        //void setEmergencyStopClearing();
+        //void ping();
 
     protected:
+        std::string host;
+        int port;
+
         int fd_write;
         struct sockaddr_in s_addr_write;
         void send(
@@ -54,5 +57,3 @@ class CS2Write : private boost::noncopyable {
             uint8_t data3 = 0x00
         );
 };
-
-using CS2WritePtr = std::shared_ptr<CS2Write>;
