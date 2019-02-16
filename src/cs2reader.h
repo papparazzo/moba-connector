@@ -21,6 +21,7 @@
 #pragma once
 
 #include "shared.h"
+#include "brakevector.h"
 
 #include <boost/noncopyable.hpp>
 #include <string>
@@ -30,17 +31,16 @@ class CS2Reader : private boost::noncopyable {
     public:
         static const int DEFAULT_PORT_READ = 15730;
 
-        CS2Reader(ConcurrentCanQueuePtr queue, const std::string &host, int port = CS2Reader::DEFAULT_PORT_READ);
+        CS2Reader(ConcurrentCanQueuePtr queue, BrakeVectorPtr brakeVector);
         virtual ~CS2Reader() noexcept;
 
-        void connect();
+        void connect(const std::string &host, int port = CS2Reader::DEFAULT_PORT_READ);
         void read() const;
 
         void operator()() const;
 
     protected:
         ConcurrentCanQueuePtr queue;
-        std::string host;
-        int port;
+        BrakeVectorPtr brakeVector;
         int fd_read;
 };

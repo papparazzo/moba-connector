@@ -26,8 +26,8 @@
 #include <unistd.h>
 #include <cstring>
 
-CS2Reader::CS2Reader(
-    ConcurrentCanQueuePtr queue, const std::string &host, int port) : queue{queue}, host{host}, port{port}, fd_read{-1}  {
+CS2Reader::CS2Reader(ConcurrentCanQueuePtr queue, BrakeVectorPtr brakeVector) :
+queue{queue}, brakeVector{brakeVector}, fd_read{-1} {
 }
 
 CS2Reader::~CS2Reader() {
@@ -36,7 +36,7 @@ CS2Reader::~CS2Reader() {
     }
 }
 
-void CS2Reader::connect() {
+void CS2Reader::connect(const std::string &host, int port) {
     struct sockaddr_in s_addr_read;
 
     if((fd_read = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
