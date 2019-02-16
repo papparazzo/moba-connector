@@ -49,12 +49,12 @@ namespace {
 int main(int argc, char *argv[]) {
     moba::setCoreFileSizeToULimit();
 
-    ConcurrentCanQueuePtr dataFromCS{new ConcurrentQueue<CS2CanRawData>};
-    ConcurrentCanQueuePtr dataToCS{new ConcurrentQueue<CS2CanRawData>};
+    ConcurrentCanQueuePtr dataToAppServer{new ConcurrentQueue<CS2CanRawData>};
+    ConcurrentCanQueuePtr dataToCS2{new ConcurrentQueue<CS2CanRawData>};
 
     BrakeVectorPtr brakeVector{new BrakeVector{}};
 
-    CS2Reader cs2reader{dataFromCS, brakeVector};
+    CS2Reader cs2reader{dataToAppServer, brakeVector};
     cs2reader.connect("192.168.178.38");
 
     std::thread cs2ReaderThread{[&cs2reader](){cs2reader();}};
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     EndpointPtr endpoint{new Endpoint{socket}};
     endpoint->connect(appData.appName, appData.version, groups);
 
-    JsonReader jsonReader{dataToCS, endpoint, brakeVector};
+    JsonReader jsonReader{dataToCS2, endpoint, brakeVector};
 
     std::thread jsonReaderThread{[&jsonReader](){jsonReader();}};
     jsonReaderThread.join();
