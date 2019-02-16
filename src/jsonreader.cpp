@@ -21,7 +21,8 @@
 #include "jsonreader.h"
 #include "moba/registry.h"
 
-JsonReader::JsonReader(ConcurrentCanQueuePtr queue, EndpointPtr endpoint) : queue{queue}, endpoint{endpoint} {
+JsonReader::JsonReader(ConcurrentCanQueuePtr queue, EndpointPtr endpoint, BrakeVectorPtr brakeVector) :
+queue{queue}, endpoint{endpoint}, brakeVector{brakeVector} {
 }
 
 JsonReader::~JsonReader() {
