@@ -42,6 +42,8 @@ class CS2Reader : private boost::noncopyable {
         void operator()() const;
 
     protected:
+        void s88report(int addr, int contact, bool active, int time);
+        
         ConcurrentCanQueuePtr dataToCS2;
         ConcurrentCanQueuePtr dataToAppServer;
         BrakeVectorPtr brakeVector;

@@ -75,3 +75,17 @@ void CS2Reader::operator()() const {
 
     }
 }
+
+void CS2Reader::s88report(int addr, int contact, bool active, int time) {
+    //LOG(moba::DEBUG) << "addr " << addr << " contact " << contact << " active " << active << " time " << time << std::endl;
+    auto locId = brakeVector->trigger({addr, contact});
+    if(locId == BrakeVector::IGNORE_CONTACT) {
+        return;
+    }
+    if(locId != BrakeVector::CONTACT_UNSET) {
+    //    bridge->setLocSpeed(locId, 0);
+//        dataToCS2->push();
+    }
+ //   dataToAppServer->push();
+
+}
