@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 
     BrakeVectorPtr brakeVector{new BrakeVector{}};
 
-    CS2Reader cs2reader{dataToAppServer, brakeVector};
+    CS2Reader cs2reader{dataToCS2, dataToAppServer, brakeVector};
     cs2reader.connect("192.168.178.38");
 
     std::thread cs2ReaderThread{[&cs2reader](){cs2reader();}};
