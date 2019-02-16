@@ -35,51 +35,6 @@ CS2Writer::~CS2Writer() {
     }
 }
 
-/*
-void CS2Write::setLocSpeed(uint32_t locId, uint16_t speed) {
-    uint8_t low  = speed & 0xFF;
-    uint8_t high = (speed >> 8) & 0xFF;
-    send(CanCommand::CMD_LOCO_SPEED, 6, locId, low, high);
-}
-
-void CS2Write::setEmergencyStop() {
-    //send(CanCommand::CMD_SYSTEM, 5, 0x00000000, CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_STOP);
-}
-
-void CS2Write::setEmergencyStopClearing() {
-    //send(CanCommand::CMD_SYSTEM, 5, 0x00000000, CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_GO);
-}
-
-void CS2Write::ping() {
-    send(CanCommand::CMD_PING);
-}
-*/
-void CS2Writer::send(CanCommand cmd, uint8_t length, uint32_t uid, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3) {
-    CS2CanRawData raw;
-    memset((void*)&raw, '\0', sizeof(raw));
-
-    raw.header[0] = 0x00;
-    raw.header[1] = static_cast<uint8_t>(cmd);
-
-    raw.hash[0] = 0x03;
-    raw.hash[1] = 0x00;
-
-    raw.length = length;
-
-/*
-    raw.uid[0]
-    raw.uid[1]
-    raw.uid[2]
-    raw.uid[3]
-*/
-    raw.data[0] = data0;
-    raw.data[1] = data1;
-    raw.data[2] = data2;
-    raw.data[3] = data3;
-
-    write(raw);
-}
-
 void CS2Writer::connect() {
 
     if((fd_write = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
@@ -95,7 +50,7 @@ void CS2Writer::connect() {
     }
 }
 
-void CS2Writer::write(const CS2CanRawData &data) {
+void CS2Writer::send(const CS2CanRawData &data) {
     if(::sendto(fd_write, (void*)&data, sizeof(data), 0, (struct sockaddr *)&s_addr_write, sizeof(s_addr_write)) == -1) {
         throw CS2ConnectorException("sending failed");
     }
