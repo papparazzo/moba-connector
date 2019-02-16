@@ -26,8 +26,8 @@
 #include <unistd.h>
 #include <cstring>
 
-CS2Reader::CS2Reader(ConcurrentCanQueuePtr queue, BrakeVectorPtr brakeVector) :
-queue{queue}, brakeVector{brakeVector}, fd_read{-1} {
+CS2Reader::CS2Reader(ConcurrentCanQueuePtr dataToCS2, ConcurrentCanQueuePtr dataToAppServer, BrakeVectorPtr brakeVector) :
+dataToCS2{dataToCS2}, dataToAppServer{dataToAppServer}, brakeVector{brakeVector}, fd_read{-1} {
 }
 
 CS2Reader::~CS2Reader() {
@@ -63,7 +63,7 @@ void CS2Reader::read() const {
     if(::recvfrom(fd_read, (void*)&data, sizeof(data), 0, (struct sockaddr *) &s_addr_other, &slen) == -1) {
         throw CS2ConnectorException("::recvfrom returned -1");
     }
-    queue->push(std::move(data));
+    dataToCS2->push(std::move(data));
 }
 
 void CS2Reader::operator()() const {

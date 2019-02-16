@@ -31,7 +31,9 @@ class CS2Reader : private boost::noncopyable {
     public:
         static const int DEFAULT_PORT_READ = 15730;
 
-        CS2Reader(ConcurrentCanQueuePtr queue, BrakeVectorPtr brakeVector);
+        CS2Reader(
+            ConcurrentCanQueuePtr dataToCS2, ConcurrentCanQueuePtr dataToAppServer, BrakeVectorPtr brakeVector
+        );
         virtual ~CS2Reader() noexcept;
 
         void connect(const std::string &host, int port = CS2Reader::DEFAULT_PORT_READ);
@@ -40,7 +42,8 @@ class CS2Reader : private boost::noncopyable {
         void operator()() const;
 
     protected:
-        ConcurrentCanQueuePtr queue;
+        ConcurrentCanQueuePtr dataToCS2;
+        ConcurrentCanQueuePtr dataToAppServer;
         BrakeVectorPtr brakeVector;
         int fd_read;
 };
