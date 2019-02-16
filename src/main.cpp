@@ -52,8 +52,10 @@ int main(int argc, char *argv[]) {
     ConcurrentCanQueuePtr dataFromCS{new ConcurrentQueue<CS2CanRawData>};
     ConcurrentCanQueuePtr dataToCS{new ConcurrentQueue<CS2CanRawData>};
 
-    CS2Reader cs2reader{dataFromCS, "192.168.178.38"};
-    cs2reader.connect();
+    BrakeVectorPtr brakeVector{new BrakeVector{}};
+
+    CS2Reader cs2reader{dataFromCS, brakeVector};
+    cs2reader.connect("192.168.178.38");
 
     std::thread cs2ReaderThread{[&cs2reader](){cs2reader();}};
     cs2ReaderThread.join();
@@ -65,21 +67,10 @@ int main(int argc, char *argv[]) {
     EndpointPtr endpoint{new Endpoint{socket}};
     endpoint->connect(appData.appName, appData.version, groups);
 
-    JsonReader jsonReader{dataToCS, endpoint};
+    JsonReader jsonReader{dataToCS, endpoint, brakeVector};
 
     std::thread jsonReaderThread{[&jsonReader](){jsonReader();}};
     jsonReaderThread.join();
-
-
-
-
-
-
-    //std::thread cs2WriterThread;
-
-    //std::thread jsonReaderThread;
-    //std::thread jsonWriterThread;
-
 
 
 
@@ -89,7 +80,6 @@ int main(int argc, char *argv[]) {
     if(data.header[1] & 0x01 && data.header[1] == (CanCommand::CMD_PING | 0x01)) {
         return RES_PING;
     }
-
 
     if(data.header[1] == CanCommand::CMD_SYSTEM) {
         switch(data.data[0]) {
@@ -113,17 +103,11 @@ int main(int argc, char *argv[]) {
         //s88callback(addr, contact, static_cast<bool>(data.data[1]), time);
     }
 
-
-
-
     CS2WritePtr writer{new CS2Write{}};
     writer->connect("192.168.178.38");
 
     MsgSender sender{reader};
     MsgReceiver reciever{writer};
-
-
-
 
             std::thread t1{reciever};
             sender();
