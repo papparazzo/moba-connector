@@ -26,7 +26,7 @@
 #include <unistd.h>
 #include <cstring>
 
-CS2Writer::CS2Writer(const std::string &host, int port) : host{host}, port{port}, fd_write{-1} {
+CS2Writer::CS2Writer(ConcurrentCanQueuePtr dataToCS2) : dataToCS2{dataToCS2}, fd_write{-1} {
 }
 
 CS2Writer::~CS2Writer() {
@@ -35,7 +35,7 @@ CS2Writer::~CS2Writer() {
     }
 }
 
-void CS2Writer::connect() {
+void CS2Writer::connect(const std::string &host, int port) {
 
     if((fd_write = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
         throw CS2ConnectorException("socket-creation for writing failed");
@@ -56,4 +56,12 @@ void CS2Writer::send(const CS2CanRawData &data) {
     }
 }
 
+void CS2Writer::operator()() const {
+   try {
+        while(true) {
+            send(dataToCS2->pop());
+        }
+    } catch(const std::exception &e) {
 
+    }
+}
