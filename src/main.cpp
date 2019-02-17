@@ -74,47 +74,5 @@ int main(int argc, char *argv[]) {
 
 
 
-    /*
-
-    // Ping Response-Nachricht
-    if(data.header[1] & 0x01 && data.header[1] == (CanCommand::CMD_PING | 0x01)) {
-        return RES_PING;
-    }
-
-    if(data.header[1] == CanCommand::CMD_SYSTEM) {
-        switch(data.data[0]) {
-            case SYS_SUB_CMD_SYSTEM_GO:
-                return RES_SYSTEM_GO;
-
-            case SYS_SUB_CMD_SYSTEM_HALT:
-                return RES_SYSTEM_HALT;
-
-            case SYS_SUB_CMD_SYSTEM_STOP:
-                return RES_SYSTEM_STOP;
-        }
-    }
-    */ /*
-    if(data.header[1] == static_cast<uint8_t>(CanCommand::CMD_S88_EVENT | 0x01) / *&& s88callback* /) {
-        std::uint16_t time = (data.data[2] << 8) | data.data[3];
-
-        std::uint16_t addr = (data.uid[0] << 8) | data.uid[1];
-        std::uint16_t contact = (data.uid[2] << 8) | data.uid[3];
-
-        //s88callback(addr, contact, static_cast<bool>(data.data[1]), time);
-    }
-
-    CS2WritePtr writer{new CS2Write{}};
-    writer->connect("192.168.178.38");
-
-    MsgSender sender{reader};
-    MsgReceiver reciever{writer};
-
-            std::thread t1{reciever};
-            sender();
-
-            //MessageLoop loop(appData.appName, appData.version, endpoint, bridge);
-            //loop.connect();
-            //loop.run();
-            return EXIT_SUCCESS;
-    */
+    return EXIT_SUCCESS;
 }
