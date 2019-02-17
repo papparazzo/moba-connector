@@ -31,13 +31,13 @@
 
 class JsonReader : private boost::noncopyable {
     public:
-        JsonReader(ConcurrentCanQueuePtr queue, EndpointPtr endpoint, BrakeVectorPtr brakeVector);
+        JsonReader(ConcurrentCanQueuePtr dataToCS2, EndpointPtr endpoint, BrakeVectorPtr brakeVector);
         virtual ~JsonReader() noexcept;
 
         void operator()() const;
 
     protected:
-        ConcurrentCanQueuePtr queue;
+        ConcurrentCanQueuePtr dataToCS2;
         EndpointPtr endpoint;
         BrakeVectorPtr brakeVector;
 };
