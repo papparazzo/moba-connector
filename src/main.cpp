@@ -29,7 +29,9 @@
 #include "config.h"
 #include "concurrentqueue.h"
 #include "cs2reader.h"
+#include "cs2writer.h"
 #include "jsonreader.h"
+#include "jsonwriter.h"
 #include "shared.h"
 
 #include "moba/socket.h"
@@ -51,14 +53,7 @@ int main(int argc, char *argv[]) {
 
     ConcurrentCanQueuePtr dataToAppServer{new ConcurrentQueue<CS2CanRawData>};
     ConcurrentCanQueuePtr dataToCS2{new ConcurrentQueue<CS2CanRawData>};
-
     BrakeVectorPtr brakeVector{new BrakeVector{}};
-
-    CS2Reader cs2reader{dataToCS2, dataToAppServer, brakeVector};
-    cs2reader.connect("192.168.178.38");
-
-    std::thread cs2ReaderThread{[&cs2reader](){cs2reader();}};
-    cs2ReaderThread.join();
 
     moba::JsonArrayPtr groups{new moba::JsonArray{}};
     groups->push_back(moba::toJsonStringPtr("SYSTEM"));
@@ -67,12 +62,34 @@ int main(int argc, char *argv[]) {
     EndpointPtr endpoint{new Endpoint{socket}};
     endpoint->connect(appData.appName, appData.version, groups);
 
+    ///////////////////////////////////////////////////////////////////////////////////
+    //
+    CS2Reader cs2Reader{dataToCS2, dataToAppServer, brakeVector};
+    cs2Reader.connect("192.168.178.38");
+
+    std::thread cs2ReaderThread{[&cs2Reader](){cs2Reader();}};
+    cs2ReaderThread.join();
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    //
     JsonReader jsonReader{dataToCS2, endpoint, brakeVector};
 
     std::thread jsonReaderThread{[&jsonReader](){jsonReader();}};
     jsonReaderThread.join();
 
+    ///////////////////////////////////////////////////////////////////////////////////
+    //
+    CS2Writer cs2Writer{dataToCS2};
 
+    std::thread cs2writerThread{[&cs2Writer](){cs2Writer();}};
+    cs2writerThread.join();
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    //
+    JsonWriter jsonWriter{dataToCS2};
+
+    std::thread jsonWriterThread{[&jsonWriter](){jsonWriter();}};
+    cs2writerThread.join();
 
     return EXIT_SUCCESS;
 }
