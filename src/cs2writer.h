@@ -37,7 +37,7 @@ class CS2Writer : private boost::noncopyable {
         void operator()() const;
 
     protected:
-        void send(const CS2CanRawData &data);
+        void send(const CS2CanRawData &data) const;
 
         ConcurrentCanQueuePtr dataToCS2;
         int fd_write;

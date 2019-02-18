@@ -50,7 +50,7 @@ void CS2Writer::connect(const std::string &host, int port) {
     }
 }
 
-void CS2Writer::send(const CS2CanRawData &data) {
+void CS2Writer::send(const CS2CanRawData &data) const {
     if(::sendto(fd_write, (void*)&data, sizeof(data), 0, (struct sockaddr *)&s_addr_write, sizeof(s_addr_write)) == -1) {
         throw CS2ConnectorException("sending failed");
     }
