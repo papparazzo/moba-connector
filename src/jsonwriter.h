@@ -24,8 +24,10 @@
 
 class JsonWriter {
     public:
-        JsonWriter();
+        JsonWriter(ConcurrentCanQueuePtr dataToAppServer);
         virtual ~JsonWriter();
+
+        void operator()() const;
 
     protected:
         ConcurrentCanQueuePtr dataToAppServer;

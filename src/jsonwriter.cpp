@@ -20,9 +20,19 @@
 
 #include "jsonwriter.h"
 
-JsonWriter::JsonWriter() {
+JsonWriter::JsonWriter(ConcurrentCanQueuePtr dataToAppServer) : dataToAppServer{dataToAppServer} {
 }
 
 JsonWriter::~JsonWriter() {
 }
 
+void JsonWriter::operator()() const {
+    try {
+        while(true) {
+
+            //read();
+        }
+    } catch(const std::exception &e) {
+
+    }
+}
