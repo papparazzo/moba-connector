@@ -30,7 +30,7 @@ class CS2Writer : private boost::noncopyable {
     public:
         static const int DEFAULT_PORT_WRITE  = 15731;
 
-        CS2Writer();
+        CS2Writer(ConcurrentCanQueuePtr dataToCS2);
         virtual ~CS2Writer() noexcept;
 
         void connect(const std::string &host, int port = CS2Writer::DEFAULT_PORT_WRITE);
