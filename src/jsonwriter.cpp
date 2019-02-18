@@ -19,8 +19,11 @@
  */
 
 #include "jsonwriter.h"
+#include <moba/log.h>
 
-JsonWriter::JsonWriter(ConcurrentCanQueuePtr dataToAppServer) : dataToAppServer{dataToAppServer} {
+JsonWriter::JsonWriter(
+    ConcurrentCanQueuePtr dataToAppServer, EndpointPtr endpoint
+) : dataToAppServer{dataToAppServer}, endpoint{endpoint} {
 }
 
 JsonWriter::~JsonWriter() {
@@ -29,10 +32,10 @@ JsonWriter::~JsonWriter() {
 void JsonWriter::operator()() const {
     try {
         while(true) {
-
+            auto item = dataToAppServer->pop();
             //read();
         }
     } catch(const std::exception &e) {
-
+        LOG(moba::ERROR) << "exception occured! <" e.what() << ">" << std::endl;
     }
 }

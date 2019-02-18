@@ -20,17 +20,18 @@
 
 #pragma once
 
+#include "moba/endpoint.h"
 #include "shared.h"
 
 class JsonWriter {
     public:
-        JsonWriter(ConcurrentCanQueuePtr dataToAppServer);
+        JsonWriter(ConcurrentCanQueuePtr dataToAppServer, EndpointPtr endpoint);
         virtual ~JsonWriter();
 
         void operator()() const;
 
     protected:
         ConcurrentCanQueuePtr dataToAppServer;
-
+        EndpointPtr endpoint;
 };
 
