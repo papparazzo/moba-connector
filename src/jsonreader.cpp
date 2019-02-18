@@ -20,6 +20,7 @@
 
 #include "jsonreader.h"
 #include "moba/registry.h"
+#include <moba/log.h>
 
 JsonReader::JsonReader(ConcurrentCanQueuePtr dataToCS2, EndpointPtr endpoint, BrakeVectorPtr brakeVector) :
 dataToCS2{dataToCS2}, endpoint{endpoint}, brakeVector{brakeVector} {
@@ -35,6 +36,6 @@ void JsonReader::operator()() const {
             //read();
         }
     } catch(const std::exception &e) {
-
+        LOG(moba::ERROR) << "exception occured! <" e.what() << ">" << std::endl;
     }
 }

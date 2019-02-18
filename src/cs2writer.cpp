@@ -25,6 +25,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <cstring>
+#include <moba/log.h>
 
 CS2Writer::CS2Writer(ConcurrentCanQueuePtr dataToCS2) : dataToCS2{dataToCS2}, fd_write{-1} {
 }
@@ -62,6 +63,6 @@ void CS2Writer::operator()() const {
             send(dataToCS2->pop());
         }
     } catch(const std::exception &e) {
-
+        LOG(moba::ERROR) << "exception occured! <" e.what() << ">" << std::endl;
     }
 }

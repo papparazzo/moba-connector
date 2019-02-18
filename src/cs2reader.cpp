@@ -20,6 +20,8 @@
 
 #include "cs2reader.h"
 
+#include <moba/log.h>
+
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -72,7 +74,7 @@ void CS2Reader::operator()() const {
             read();
         }
     } catch(const std::exception &e) {
-
+        LOG(moba::ERROR) << "exception occured! <" e.what() << ">" << std::endl;
     }
 }
 
@@ -89,3 +91,71 @@ void CS2Reader::s88report(int addr, int contact, bool active, int time) {
  //   dataToAppServer->push();
 
 }
+
+
+
+
+
+/*
+ *
+ *     // Ping Response-Nachricht
+    if(data.header[1] & 0x01 && data.header[1] == (CanCommand::CMD_PING | 0x01)) {
+        return RES_PING;
+    }
+
+    if(data.header[1] == CanCommand::CMD_SYSTEM) {
+        switch(data.data[0]) {
+            case SYS_SUB_CMD_SYSTEM_GO:
+                return RES_SYSTEM_GO;
+
+            case SYS_SUB_CMD_SYSTEM_HALT:
+                return RES_SYSTEM_HALT;
+
+            case SYS_SUB_CMD_SYSTEM_STOP:
+                return RES_SYSTEM_STOP;
+        }
+    }
+    */ /*
+    if(data.header[1] == static_cast<uint8_t>(CanCommand::CMD_S88_EVENT | 0x01) / *&& s88callback* /) {
+        std::uint16_t time = (data.data[2] << 8) | data.data[3];
+
+        std::uint16_t addr = (data.uid[0] << 8) | data.uid[1];
+        std::uint16_t contact = (data.uid[2] << 8) | data.uid[3];
+
+        //s88callback(addr, contact, static_cast<bool>(data.data[1]), time);
+    }
+
+
+ *
+    //bridge->ping();
+    bool pingSend = true;
+
+// TODO: Alle x Sek. ping an CS2 senden
+    while(true) {
+
+            Bridge::ResponseCode rc = bridge->recieveCanData();
+            switch(rc) {
+                case Bridge::RES_SYSTEM_STOP:
+                    LOG(moba::INFO) << "EMERGENCY_STOP" << std::endl;
+                    sysHandler.sendSetEmergencyStop(true);
+                    break;
+
+                case Bridge::RES_SYSTEM_GO:
+                    LOG(moba::INFO) << "EMERGENCY_STOP_CLEARING" << std::endl;
+                    sysHandler.sendSetEmergencyStop(false);
+                    break;
+
+                case Bridge::RES_PING:
+                    LOG(moba::INFO) << "PING_RESPONSE" << std::endl;
+                    if(pingSend) {
+                        pingSend = false;
+                        interfacehandler.sendConnectivity(moba::MsgInterfaceHandler::CO_CONNECTED);
+                    }
+                    break;
+            }
+
+
+    }
+}
+
+        */
