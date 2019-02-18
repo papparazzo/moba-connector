@@ -4,6 +4,7 @@ moba_connector_SOURCES = \
     cs2reader.cpp \
     jsonreader.cpp \
     cs2writer.cpp \
+    jsonwriter.cpp \
     brakevector.cpp
 
  moba_connector_LDADD = -lMoBaCommon $(srcdir)/../modules/lib-msghandling/src/moba/libmsghandling.a
