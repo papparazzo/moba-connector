@@ -20,6 +20,7 @@
 
 #include "jsonwriter.h"
 #include <moba/log.h>
+#include "moba/systemhandler.h"
 
 JsonWriter::JsonWriter(
     ConcurrentCanQueuePtr dataToAppServer, EndpointPtr endpoint
@@ -32,10 +33,38 @@ JsonWriter::~JsonWriter() {
 void JsonWriter::operator()() const {
     try {
         while(true) {
-            auto item = dataToAppServer->pop();
-            //read();
+            auto data = dataToAppServer->pop();
+            switch(data.header[1]) {
+                case CanCommand::CMD_SYSTEM:
+                    convertSystemCommand(data);
+                    break;
+            }
         }
     } catch(const std::exception &e) {
         LOG(moba::ERROR) << "exception occured! <" e.what() << ">" << std::endl;
     }
 }
+
+void JsonWriter::convertSystemCommand(const CS2CanCommand &cmd) const {
+    switch(cmd.data[0]) {
+        case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_GO:
+            return endpoint->sendMsg(SystemSetEmergencyStop{false});
+
+        case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_HALT:
+            return;
+
+        case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_STOP:
+            return endpoint->sendMsg(SystemSetEmergencyStop{true});
+    }
+}
+
+/*
+                 case Bridge::RES_PING:
+                    if(pingSend) {
+                        pingSend = false;
+                        interfacehandler.sendConnectivity(moba::MsgInterfaceHandler::CO_CONNECTED);
+                    }
+                    break;
+            }
+
+ */

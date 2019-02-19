@@ -31,6 +31,8 @@ class JsonWriter {
         void operator()() const;
 
     protected:
+        void convertSystemCommand(const CS2CanCommand &cmd) const;
+
         ConcurrentCanQueuePtr dataToAppServer;
         EndpointPtr endpoint;
 };
