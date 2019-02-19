@@ -36,6 +36,6 @@ void JsonReader::operator()() const {
             //read();
         }
     } catch(const std::exception &e) {
-        LOG(moba::ERROR) << "exception occured! <" e.what() << ">" << std::endl;
+        LOG(moba::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
     }
 }

@@ -34,19 +34,22 @@ void JsonWriter::operator()() const {
     try {
         while(true) {
             auto data = dataToAppServer->pop();
-            switch(data.header[1]) {
+            switch(static_cast<CanCommand>(data.header[1])) {
                 case CanCommand::CMD_SYSTEM:
                     convertSystemCommand(data);
+                    break;
+
+                default:
                     break;
             }
         }
     } catch(const std::exception &e) {
-        LOG(moba::ERROR) << "exception occured! <" e.what() << ">" << std::endl;
+        LOG(moba::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
     }
 }
 
 void JsonWriter::convertSystemCommand(const CS2CanCommand &cmd) const {
-    switch(cmd.data[0]) {
+    switch(static_cast<CanSystemSubCommand>(cmd.data[0])) {
         case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_GO:
             return endpoint->sendMsg(SystemSetEmergencyStop{false});
 
@@ -55,6 +58,10 @@ void JsonWriter::convertSystemCommand(const CS2CanCommand &cmd) const {
 
         case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_STOP:
             return endpoint->sendMsg(SystemSetEmergencyStop{true});
+
+        default:
+            break;
+
     }
 }
 

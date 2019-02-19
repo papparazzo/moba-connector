@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
-    JsonWriter jsonWriter{dataToCS2};
+    JsonWriter jsonWriter{dataToCS2, endpoint};
 
     std::thread jsonWriterThread{[&jsonWriter](){jsonWriter();}};
     cs2writerThread.join();
