@@ -32,7 +32,7 @@
 #include "cs2writer.h"
 #include "jsonreader.h"
 #include "jsonwriter.h"
-#include "shared.h"
+#include "cs2cancommand.h"
 
 #include "moba/socket.h"
 #include "moba/endpoint.h"
@@ -51,8 +51,8 @@ namespace {
 int main(int argc, char *argv[]) {
     moba::setCoreFileSizeToULimit();
 
-    ConcurrentCanQueuePtr dataToAppServer{new ConcurrentQueue<CS2CanRawData>};
-    ConcurrentCanQueuePtr dataToCS2{new ConcurrentQueue<CS2CanRawData>};
+    ConcurrentCanQueuePtr dataToAppServer{new ConcurrentQueue<CS2CanCommand>};
+    ConcurrentCanQueuePtr dataToCS2{new ConcurrentQueue<CS2CanCommand>};
     BrakeVectorPtr brakeVector{new BrakeVector{}};
 
     moba::JsonArrayPtr groups{new moba::JsonArray{}};

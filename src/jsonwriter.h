@@ -21,7 +21,7 @@
 #pragma once
 
 #include "moba/endpoint.h"
-#include "shared.h"
+#include "cs2cancommand.h"
 
 class JsonWriter {
     public:
