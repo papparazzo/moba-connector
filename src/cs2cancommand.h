@@ -79,24 +79,6 @@ enum class CanSystemSubCommand {
     SYS_SUB_CMD_SYSTEM_HALT = 0x02
 };
 
-CS2CanCommand setLocSpeed(uint32_t locId, uint16_t speed) {
-    uint8_t low  = speed & 0xFF;
-    uint8_t high = (speed >> 8) & 0xFF;
-    return CS2CanCommand(CanCommand::CMD_LOCO_SPEED, 6, locId, low, high);
-}
-
-CS2CanCommand setEmergencyStop() {
-    return CS2CanCommand(CanCommand::CMD_SYSTEM, 5, 0x00000000, CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_STOP);
-}
-
-CS2CanCommand setEmergencyStopClearing() {
-    return CS2CanCommand(CanCommand::CMD_SYSTEM, 5, 0x00000000, CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_GO);
-}
-
-CS2CanCommand ping() {
-    return CS2CanCommand(CanCommand::CMD_PING);
-}
-
 struct CS2CanCommand {
     CS2CanCommand(
         CanCommand cmd, uint8_t length = 0x00, uint32_t uident = 0x000000,
@@ -126,6 +108,24 @@ struct CS2CanCommand {
     uint8_t uid[4];
     uint8_t data[4];
 };
+
+CS2CanCommand setLocSpeed(uint32_t locId, uint16_t speed) {
+    uint8_t low  = speed & 0xFF;
+    uint8_t high = (speed >> 8) & 0xFF;
+    return CS2CanCommand(CanCommand::CMD_LOCO_SPEED, 6, locId, low, high);
+}
+
+CS2CanCommand setEmergencyStop() {
+    return CS2CanCommand(CanCommand::CMD_SYSTEM, 5, 0x00000000, static_cast<uint8_t>(CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_STOP));
+}
+
+CS2CanCommand setEmergencyStopClearing() {
+    return CS2CanCommand(CanCommand::CMD_SYSTEM, 5, 0x00000000, static_cast<uint8_t>(CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_GO));
+}
+
+CS2CanCommand ping() {
+    return CS2CanCommand(CanCommand::CMD_PING);
+}
 
 inline CanCommand operator |(CanCommand a, CanCommand b) {
     return static_cast<CanCommand>(static_cast<int>(a) | static_cast<int>(b));
