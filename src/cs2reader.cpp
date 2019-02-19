@@ -56,7 +56,7 @@ void CS2Reader::connect(const std::string &host, int port) {
 }
 
 void CS2Reader::read() const {
-    CS2CanRawData data;
+    CS2CanCommand data;
     memset((void*)&data, '\0', sizeof(data));
 
     struct sockaddr_in s_addr_other;
@@ -91,9 +91,6 @@ void CS2Reader::s88report(int addr, int contact, bool active, int time) {
  //   dataToAppServer->push();
 
 }
-
-
-
 
 
 /*
@@ -131,31 +128,6 @@ void CS2Reader::s88report(int addr, int contact, bool active, int time) {
     bool pingSend = true;
 
 // TODO: Alle x Sek. ping an CS2 senden
-    while(true) {
 
-            Bridge::ResponseCode rc = bridge->recieveCanData();
-            switch(rc) {
-                case Bridge::RES_SYSTEM_STOP:
-                    LOG(moba::INFO) << "EMERGENCY_STOP" << std::endl;
-                    sysHandler.sendSetEmergencyStop(true);
-                    break;
-
-                case Bridge::RES_SYSTEM_GO:
-                    LOG(moba::INFO) << "EMERGENCY_STOP_CLEARING" << std::endl;
-                    sysHandler.sendSetEmergencyStop(false);
-                    break;
-
-                case Bridge::RES_PING:
-                    LOG(moba::INFO) << "PING_RESPONSE" << std::endl;
-                    if(pingSend) {
-                        pingSend = false;
-                        interfacehandler.sendConnectivity(moba::MsgInterfaceHandler::CO_CONNECTED);
-                    }
-                    break;
-            }
-
-
-    }
-}
 
         */

@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "shared.h"
+#include "cs2cancommand.h"
 
 #include <boost/noncopyable.hpp>
 #include <string>
@@ -37,7 +37,7 @@ class CS2Writer : private boost::noncopyable {
         void operator()() const;
 
     protected:
-        void send(const CS2CanRawData &data) const;
+        void send(const CS2CanCommand &data) const;
 
         ConcurrentCanQueuePtr dataToCS2;
         int fd_write;

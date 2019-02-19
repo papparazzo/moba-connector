@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "shared.h"
+#include "cs2cancommand.h"
 #include "brakevector.h"
 
 #include <boost/noncopyable.hpp>
