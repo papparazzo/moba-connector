@@ -55,7 +55,7 @@ void CS2Reader::connect(const std::string &host, int port) {
     }
 }
 
-void CS2Reader::read() const {
+CS2CanCommand CS2Reader::read() const {
     CS2CanCommand data;
     memset((void*)&data, '\0', sizeof(data));
 
@@ -65,50 +65,53 @@ void CS2Reader::read() const {
     if(::recvfrom(fd_read, (void*)&data, sizeof(data), 0, (struct sockaddr *) &s_addr_other, &slen) == -1) {
         throw CS2ConnectorException("::recvfrom returned -1");
     }
-    dataToCS2->push(std::move(data));
+    return std::move(data);
 }
 
-void CS2Reader::operator()() const {
+void CS2Reader::operator()() {
     try {
         while(true) {
-            read();
+            CS2CanCommand data = read();
+
+            if(data.header[1] & 0x01 && data.header[1] == static_cast<uint8_t>(CanCommand::CMD_PING | 0x01)) {
+               // return RES_PING;
+            }
+            if(data.header[1] == static_cast<uint8_t>(CanCommand::CMD_S88_EVENT | 0x01)) {
+                s88report(data);
+            }
+            dataToAppServer->push(data);
         }
     } catch(const std::exception &e) {
         LOG(moba::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
     }
 }
 
-void CS2Reader::s88report(int addr, int contact, bool active, int time) {
+void CS2Reader::s88report(const CS2CanCommand &data) {
+    //std::uint16_t time = (data.data[2] << 8) | data.data[3];
+
+    std::uint16_t addr = (data.uid[0] << 8) | data.uid[1];
+    std::uint16_t contact = (data.uid[2] << 8) | data.uid[3];
+
+    bool active = static_cast<bool>(data.data[1]);
+
     //LOG(moba::DEBUG) << "addr " << addr << " contact " << contact << " active " << active << " time " << time << std::endl;
     auto locId = brakeVector->trigger({addr, contact});
     if(locId == BrakeVector::IGNORE_CONTACT) {
         return;
     }
     if(locId != BrakeVector::CONTACT_UNSET) {
-    //    bridge->setLocSpeed(locId, 0);
-//        dataToCS2->push();
+        auto data = setLocSpeed(locId, 0);
+        dataToCS2->push(data);
+        dataToAppServer->push(data);
     }
- //   dataToAppServer->push();
-
 }
 
 
 /*
  *
  *     // Ping Response-Nachricht
-    if(data.header[1] & 0x01 && data.header[1] == (CanCommand::CMD_PING | 0x01)) {
-        return RES_PING;
-    }
 
-    */ /*
-    if(data.header[1] == static_cast<uint8_t>(CanCommand::CMD_S88_EVENT | 0x01) / *&& s88callback* /) {
-        std::uint16_t time = (data.data[2] << 8) | data.data[3];
 
-        std::uint16_t addr = (data.uid[0] << 8) | data.uid[1];
-        std::uint16_t contact = (data.uid[2] << 8) | data.uid[3];
-
-        //s88callback(addr, contact, static_cast<bool>(data.data[1]), time);
-    }
 
 
  *
