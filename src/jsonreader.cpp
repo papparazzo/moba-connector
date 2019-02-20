@@ -21,6 +21,7 @@
 #include "jsonreader.h"
 #include "moba/registry.h"
 #include <moba/log.h>
+#include <functional>
 
 JsonReader::JsonReader(ConcurrentCanQueuePtr dataToCS2, EndpointPtr endpoint, BrakeVectorPtr brakeVector) :
 dataToCS2{dataToCS2}, endpoint{endpoint}, brakeVector{brakeVector} {
@@ -29,11 +30,28 @@ dataToCS2{dataToCS2}, endpoint{endpoint}, brakeVector{brakeVector} {
 JsonReader::~JsonReader() {
 }
 
-void JsonReader::operator()() const {
-    try {
-        while(true) {
+void JsonReader::setHardwareState(const SystemHardwareStateChanged &data) {
+    switch(data.hardwareState) {
+        case SystemHardwareStateChanged::HardwareState::ERROR:
+            return;
 
-            //read();
+        case SystemHardwareStateChanged::HardwareState::STANDBY:
+        case SystemHardwareStateChanged::HardwareState::EMERGENCY_STOP:
+            return dataToCS2->push(setEmergencyStop());
+
+        case SystemHardwareStateChanged::HardwareState::MANUEL:
+        case SystemHardwareStateChanged::HardwareState::AUTOMATIC:
+            return dataToCS2->push(setEmergencyStopClearing());
+    }
+}
+
+void JsonReader::operator()() {
+    try {
+        Registry registry;
+        registry.registerHandler<SystemHardwareStateChanged>(std::bind(&JsonReader::setHardwareState, this, std::placeholders::_1));
+
+        while(true) {
+            registry.handleMsg(endpoint->waitForNewMsg());
         }
     } catch(const std::exception &e) {
         LOG(moba::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;

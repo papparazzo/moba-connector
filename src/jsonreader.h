@@ -27,6 +27,7 @@
 #include <memory>
 
 #include "moba/endpoint.h"
+#include "moba/systemhandler.h"
 #include "brakevector.h"
 
 class JsonReader : private boost::noncopyable {
@@ -34,10 +35,12 @@ class JsonReader : private boost::noncopyable {
         JsonReader(ConcurrentCanQueuePtr dataToCS2, EndpointPtr endpoint, BrakeVectorPtr brakeVector);
         virtual ~JsonReader() noexcept;
 
-        void operator()() const;
+        void operator()();
 
     protected:
         ConcurrentCanQueuePtr dataToCS2;
         EndpointPtr endpoint;
         BrakeVectorPtr brakeVector;
+
+        void setHardwareState(const SystemHardwareStateChanged &data);
 };
