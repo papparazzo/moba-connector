@@ -59,8 +59,8 @@ int main(int argc, char *argv[]) {
     groups->push_back(moba::toJsonStringPtr("SYSTEM"));
 
     SocketPtr socket{new Socket{appData.host, appData.port}};
-    EndpointPtr endpoint{new Endpoint{socket}};
-    endpoint->connect(appData.appName, appData.version, groups);
+    EndpointPtr endpoint{new Endpoint{socket, appData.appName, appData.version, groups}};
+    endpoint->connect();
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
