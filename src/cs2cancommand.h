@@ -112,19 +112,19 @@ struct CS2CanCommand {
 inline CS2CanCommand setLocSpeed(uint32_t locId, uint16_t speed) {
     uint8_t low  = speed & 0xFF;
     uint8_t high = (speed >> 8) & 0xFF;
-    return CS2CanCommand(CanCommand::CMD_LOCO_SPEED, 6, locId, low, high);
+    return std::move(CS2CanCommand(CanCommand::CMD_LOCO_SPEED, 6, locId, low, high));
 }
 
 inline CS2CanCommand setEmergencyStop() {
-    return CS2CanCommand(CanCommand::CMD_SYSTEM, 5, 0x00000000, static_cast<uint8_t>(CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_STOP));
+    return std::move(CS2CanCommand(CanCommand::CMD_SYSTEM, 5, 0x00000000, static_cast<uint8_t>(CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_STOP)));
 }
 
 inline CS2CanCommand setEmergencyStopClearing() {
-    return CS2CanCommand(CanCommand::CMD_SYSTEM, 5, 0x00000000, static_cast<uint8_t>(CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_GO));
+    return std::move(CS2CanCommand(CanCommand::CMD_SYSTEM, 5, 0x00000000, static_cast<uint8_t>(CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_GO)));
 }
 
 inline CS2CanCommand ping() {
-    return CS2CanCommand(CanCommand::CMD_PING);
+    return std::move(CS2CanCommand(CanCommand::CMD_PING));
 }
 
 inline CanCommand operator |(CanCommand a, CanCommand b) {
