@@ -21,6 +21,7 @@
 #include "jsonwriter.h"
 #include <moba/log.h>
 #include "moba/systemhandler.h"
+#include "moba/interfacehandler.h"
 
 JsonWriter::JsonWriter(
     ConcurrentCanQueuePtr dataToAppServer, EndpointPtr endpoint
@@ -37,6 +38,15 @@ void JsonWriter::operator()() const {
             switch(static_cast<CanCommand>(data.header[1])) {
                 case CanCommand::CMD_SYSTEM:
                     convertSystemCommand(data);
+                    break;
+
+                case CanCommand::CMD_PING:
+                    //if(pingSend) {
+                    //    pingSend = false;
+                        endpoint->sendMsg(InterfaceConnectivityStateChanged{
+                            InterfaceConnectivityStateChanged::Connectivity::CONNECTED
+                        });
+                    //}
                     break;
 
                 default:
@@ -64,14 +74,3 @@ void JsonWriter::convertSystemCommand(const CS2CanCommand &cmd) const {
 
     }
 }
-
-/*
-                 case Bridge::RES_PING:
-                    if(pingSend) {
-                        pingSend = false;
-                        interfacehandler.sendConnectivity(moba::MsgInterfaceHandler::CO_CONNECTED);
-                    }
-                    break;
-            }
-
- */
