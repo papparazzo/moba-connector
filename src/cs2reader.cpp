@@ -82,7 +82,7 @@ void CS2Reader::operator()() {
             dataToAppServer->push(data);
         }
     } catch(const std::exception &e) {
-        LOG(moba::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
+        LOG(moba::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
     }
 }
 

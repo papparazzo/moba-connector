@@ -54,6 +54,6 @@ void JsonReader::operator()() {
             registry.handleMsg(endpoint->waitForNewMsg());
         }
     } catch(const std::exception &e) {
-        LOG(moba::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
+        LOG(moba::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
     }
 }
