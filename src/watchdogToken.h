@@ -23,14 +23,25 @@
 
 struct WatchdogToken {
 
-    bool inTime() {
-        std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+    const int IN_TIME;
+
+    std::chrono::milliseconds pingStartTime;
+
+    void startPing() {
+        pingStartTime = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch()
+        );
+    }
+
+    bool isInTime() {
+        auto currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()
         );
 
+        if(currentTime - pingStartTime < WatchdogToken::IN_TIME) {
+            return true;
+        }
+        return false;
     }
-
-
-
 
 };
