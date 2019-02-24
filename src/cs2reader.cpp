@@ -28,7 +28,7 @@
 #include <unistd.h>
 #include <cstring>
 
-CS2Reader::CS2Reader(ConcurrentCanQueuePtr dataToCS2, ConcurrentCanQueuePtr dataToAppServer, BrakeVectorPtr brakeVector) :
+CS2Reader::CS2Reader(ConcurrentCanQueuePtr dataToCS2, ConcurrentMsgQueuePtr dataToAppServer, BrakeVectorPtr brakeVector) :
 dataToCS2{dataToCS2}, dataToAppServer{dataToAppServer}, brakeVector{brakeVector}, fd_read{-1} {
 }
 

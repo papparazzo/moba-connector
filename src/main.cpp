@@ -51,15 +51,15 @@ namespace {
 int main(int argc, char *argv[]) {
     moba::setCoreFileSizeToULimit();
 
-    ConcurrentCanQueuePtr dataToAppServer{new ConcurrentQueue<CS2CanCommand>};
-    ConcurrentCanQueuePtr dataToCS2{new ConcurrentQueue<CS2CanCommand>};
-    BrakeVectorPtr brakeVector{new BrakeVector{}};
+    auto dataToAppServer = std::make_shared<ConcurrentQueue<DispatchMessage>>();
+    auto dataToCS2 = std::make_shared<ConcurrentQueue<DispatchMessage>>();
+    auto brakeVector = std::make_shared<BrakeVector>();
 
-    moba::JsonArrayPtr groups{new moba::JsonArray{}};
+    auto groups = std::make_shared<moba::JsonArray>();
     groups->push_back(moba::toJsonStringPtr("SYSTEM"));
 
-    SocketPtr socket{new Socket{appData.host, appData.port}};
-    EndpointPtr endpoint{new Endpoint{socket, appData.appName, appData.version, groups}};
+    auto socket = std::make_shared<Socket>(appData.host, appData.port);
+    auto endpoint = std::make_shared<Endpoint>(socket, appData.appName, appData.version, groups);
     endpoint->connect();
 
     ///////////////////////////////////////////////////////////////////////////////////

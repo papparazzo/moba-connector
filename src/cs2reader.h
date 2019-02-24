@@ -32,7 +32,7 @@ class CS2Reader : private boost::noncopyable {
         static const int DEFAULT_PORT_READ = 15730;
 
         CS2Reader(
-            ConcurrentCanQueuePtr dataToCS2, ConcurrentCanQueuePtr dataToAppServer, BrakeVectorPtr brakeVector
+            ConcurrentCanQueuePtr dataToCS2, ConcurrentMsgQueuePtr dataToAppServer, BrakeVectorPtr brakeVector
         );
         virtual ~CS2Reader() noexcept;
 
@@ -45,7 +45,7 @@ class CS2Reader : private boost::noncopyable {
         void s88report(const CS2CanCommand &data);
 
         ConcurrentCanQueuePtr dataToCS2;
-        ConcurrentCanQueuePtr dataToAppServer;
+        ConcurrentMsgQueuePtr dataToAppServer;
         BrakeVectorPtr brakeVector;
         int fd_read;
 };

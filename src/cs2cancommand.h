@@ -28,6 +28,7 @@
 #include <cstdint>
 
 #include "concurrentqueue.h"
+#include "moba/basemessage.h"
 
 class CS2ConnectorException : public std::exception {
 
@@ -136,3 +137,4 @@ inline CanCommand operator |(CanCommand a, int b) {
 }
 
 using ConcurrentCanQueuePtr = std::shared_ptr<ConcurrentQueue<CS2CanCommand>>;
+using ConcurrentMsgQueuePtr = std::shared_ptr<ConcurrentQueue<DispatchMessage>>;
