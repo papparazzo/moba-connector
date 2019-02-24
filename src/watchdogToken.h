@@ -19,15 +19,18 @@
  */
 
 #pragma once
+#include <chrono>
 
-#include "watchdogToken.h"
+struct WatchdogToken {
 
-class Watchdog {
-    public:
-        Watchdog();
+    bool inTime() {
+        std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch()
+        );
 
-        virtual ~Watchdog();
-    private:
+    }
+
+
+
 
 };
-
