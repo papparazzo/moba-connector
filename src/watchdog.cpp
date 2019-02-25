@@ -19,10 +19,25 @@
  */
 
 #include "watchdog.h"
+#include <moba/log.h>
 
-Watchdog::Watchdog() {
+Watchdog::Watchdog(
+    ConcurrentCanQueuePtr dataToCS2, ConcurrentMsgQueuePtr dataToAppServer
+) : dataToCS2{dataToCS2}, dataToAppServer{dataToAppServer} {
 }
 
 Watchdog::~Watchdog() {
 }
 
+void Watchdog::operator()() const {
+    try {
+        while(true) {
+            
+
+//            dataToAppServer->push(data);
+        }
+    } catch(const std::exception &e) {
+        LOG(moba::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
+    }
+
+}

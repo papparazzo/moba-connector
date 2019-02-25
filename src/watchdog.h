@@ -21,13 +21,18 @@
 #pragma once
 
 #include "watchdogToken.h"
+#include "cs2cancommand.h"
 
 class Watchdog {
     public:
-        Watchdog();
+        Watchdog(ConcurrentCanQueuePtr dataToCS2, ConcurrentMsgQueuePtr dataToAppServer);
 
         virtual ~Watchdog();
-    private:
 
+        void operator()() const;
+
+    protected:
+        ConcurrentCanQueuePtr dataToCS2;
+        ConcurrentMsgQueuePtr dataToAppServer;
 };
 
