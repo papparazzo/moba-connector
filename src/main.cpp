@@ -32,6 +32,7 @@
 #include "cs2writer.h"
 #include "jsonreader.h"
 #include "jsonwriter.h"
+#include "watchdog.h"
 #include "cs2cancommand.h"
 
 #include "moba/socket.h"
@@ -51,8 +52,8 @@ namespace {
 int main(int argc, char *argv[]) {
     moba::setCoreFileSizeToULimit();
 
-    auto dataToAppServer = std::make_shared<ConcurrentQueue<DispatchMessage>>();
-    auto dataToCS2 = std::make_shared<ConcurrentQueue<DispatchMessage>>();
+    auto dataToAppServer = std::make_shared<ConcurrentQueue<DispatchGenericMessage>>();
+    auto dataToCS2 = std::make_shared<ConcurrentQueue<CS2CanCommand>>();
     auto brakeVector = std::make_shared<BrakeVector>();
 
     auto groups = std::make_shared<moba::JsonArray>();
@@ -89,7 +90,14 @@ int main(int argc, char *argv[]) {
     JsonWriter jsonWriter{dataToCS2, endpoint};
 
     std::thread jsonWriterThread{[&jsonWriter](){jsonWriter();}};
-    cs2writerThread.join();
+    jsonWriterThread.join();
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    //
+    Watchdog watchdog{dataToCS2, dataToAppServer};
+
+    std::thread watchDogThread{[&watchdog](){watchdog();}};
+    watchDogThread.join();
 
     return EXIT_SUCCESS;
 }
