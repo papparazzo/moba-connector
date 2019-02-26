@@ -38,9 +38,10 @@ struct WatchdogToken {
             std::chrono::system_clock::now().time_since_epoch()
         );
 
+        /*
         if(currentTime - pingStartTime < WatchdogToken::IN_TIME) {
             return true;
-        }
+       }*/
         return false;
     }
 
