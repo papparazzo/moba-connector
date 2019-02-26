@@ -79,7 +79,32 @@ void CS2Reader::operator()() {
             if(data.header[1] == static_cast<uint8_t>(CanCommand::CMD_S88_EVENT | 0x01)) {
                 s88report(data);
             }
-            dataToAppServer->push(data);
+
+
+            auto data = dataToAppServer->pop();
+            switch(static_cast<CanCommand>(data.header[1])) {
+                case CanCommand::CMD_SYSTEM:
+                    convertSystemCommand(data);
+                    break;
+
+                case CanCommand::CMD_PING:
+                    //if(pingSend) {
+                    //    pingSend = false;
+                        endpoint->sendMsg(InterfaceConnectivityStateChanged{
+                            InterfaceConnectivityStateChanged::Connectivity::CONNECTED
+                        });
+                    //}
+                    break;
+
+                default:
+                    break;
+            }
+
+
+
+
+
+//            dataToAppServer->push(data);
         }
     } catch(const std::exception &e) {
         LOG(moba::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
@@ -94,7 +119,7 @@ void CS2Reader::s88report(const CS2CanCommand &data) {
 
     bool active = static_cast<bool>(data.data[1]);
 
-    //LOG(moba::DEBUG) << "addr " << addr << " contact " << contact << " active " << active << " time " << time << std::endl;
+    LOG(moba::LogLevel::DEBUG) << "addr " << addr << " contact " << contact << " active " << active << " time " << time << std::endl;
     auto locId = brakeVector->trigger({addr, contact});
     if(locId == BrakeVector::IGNORE_CONTACT) {
         return;
@@ -102,23 +127,23 @@ void CS2Reader::s88report(const CS2CanCommand &data) {
     if(locId != BrakeVector::CONTACT_UNSET) {
         auto data = setLocSpeed(locId, 0);
         dataToCS2->push(data);
-        dataToAppServer->push(data);
+//        dataToAppServer->push(data);
     }
 }
 
+void JsonWriter::convertSystemCommand(const CS2CanCommand &cmd) const {
+    switch(static_cast<CanSystemSubCommand>(cmd.data[0])) {
+        case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_GO:
+            return endpoint->sendMsg(SystemSetEmergencyStop{false});
 
-/*
- *
- *     // Ping Response-Nachricht
+        case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_HALT:
+            return;
 
+        case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_STOP:
+            return endpoint->sendMsg(SystemSetEmergencyStop{true});
 
+        default:
+            break;
 
-
- *
-    //bridge->ping();
-    bool pingSend = true;
-
-// TODO: Alle x Sek. ping an CS2 senden
-
-
-        */
+    }
+}
