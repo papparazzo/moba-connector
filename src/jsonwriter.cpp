@@ -34,43 +34,8 @@ JsonWriter::~JsonWriter() {
 void JsonWriter::operator()() const {
     try {
         while(true) {
-            auto data = dataToAppServer->pop();
-            switch(static_cast<CanCommand>(data.header[1])) {
-                case CanCommand::CMD_SYSTEM:
-                    convertSystemCommand(data);
-                    break;
-
-                case CanCommand::CMD_PING:
-                    //if(pingSend) {
-                    //    pingSend = false;
-                        endpoint->sendMsg(InterfaceConnectivityStateChanged{
-                            InterfaceConnectivityStateChanged::Connectivity::CONNECTED
-                        });
-                    //}
-                    break;
-
-                default:
-                    break;
-            }
         }
     } catch(const std::exception &e) {
         LOG(moba::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
-    }
-}
-
-void JsonWriter::convertSystemCommand(const CS2CanCommand &cmd) const {
-    switch(static_cast<CanSystemSubCommand>(cmd.data[0])) {
-        case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_GO:
-            return endpoint->sendMsg(SystemSetEmergencyStop{false});
-
-        case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_HALT:
-            return;
-
-        case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_STOP:
-            return endpoint->sendMsg(SystemSetEmergencyStop{true});
-
-        default:
-            break;
-
     }
 }
