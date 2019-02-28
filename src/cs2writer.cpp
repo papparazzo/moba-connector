@@ -42,7 +42,7 @@ void CS2Writer::connect() {
     }
 
     if((fd_write = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
-        throw CS2ConnectorException("socket-creation for writing failed");
+        throw CS2ConnectorException{"socket-creation for writing failed"};
     }
 
     ::memset((char *) &s_addr_write, 0, sizeof(s_addr_write));
@@ -50,7 +50,7 @@ void CS2Writer::connect() {
     s_addr_write.sin_port = htons(port);
 
     if(::inet_aton(host.c_str() , &s_addr_write.sin_addr) == 0) {
-        throw CS2ConnectorException("inet_aton failed");
+        throw CS2ConnectorException{"inet_aton failed"};
     }
 }
 
