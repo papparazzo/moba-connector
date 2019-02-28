@@ -23,8 +23,8 @@
 #include <moba/log.h>
 #include <functional>
 
-JsonReader::JsonReader(ConcurrentCanQueuePtr dataToCS2, EndpointPtr endpoint, BrakeVectorPtr brakeVector) :
-dataToCS2{dataToCS2}, endpoint{endpoint}, brakeVector{brakeVector} {
+JsonReader::JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, BrakeVectorPtr brakeVector) :
+cs2writer{cs2writer}, endpoint{endpoint}, brakeVector{brakeVector} {
 }
 
 JsonReader::~JsonReader() {
@@ -37,11 +37,11 @@ void JsonReader::setHardwareState(const SystemHardwareStateChanged &data) {
 
         case SystemHardwareStateChanged::HardwareState::STANDBY:
         case SystemHardwareStateChanged::HardwareState::EMERGENCY_STOP:
-            return dataToCS2->push(setEmergencyStop());
+            return cs2writer->send(setEmergencyStop());
 
         case SystemHardwareStateChanged::HardwareState::MANUEL:
         case SystemHardwareStateChanged::HardwareState::AUTOMATIC:
-            return dataToCS2->push(setEmergencyStopClearing());
+            return cs2writer->send(setEmergencyStopClearing());
     }
 }
 

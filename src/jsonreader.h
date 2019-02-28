@@ -29,16 +29,17 @@
 #include "moba/endpoint.h"
 #include "moba/systemhandler.h"
 #include "brakevector.h"
+#include "cs2writer.h"
 
 class JsonReader : private boost::noncopyable {
     public:
-        JsonReader(ConcurrentCanQueuePtr dataToCS2, EndpointPtr endpoint, BrakeVectorPtr brakeVector);
+        JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, BrakeVectorPtr brakeVector);
         virtual ~JsonReader() noexcept;
 
         void operator()();
 
     protected:
-        ConcurrentCanQueuePtr dataToCS2;
+        CS2WriterPtr cs2writer;
         EndpointPtr endpoint;
         BrakeVectorPtr brakeVector;
 
