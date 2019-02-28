@@ -52,17 +52,10 @@ void CS2Writer::connect(const std::string &host, int port) {
 }
 
 void CS2Writer::send(const CS2CanCommand &data) const {
+    std::lock_guard<std::mutex> l{m};
+
     if(::sendto(fd_write, (void*)&data, sizeof(data), 0, (struct sockaddr *)&s_addr_write, sizeof(s_addr_write)) == -1) {
         throw CS2ConnectorException("sending failed");
     }
 }
 
-void CS2Writer::operator()() const {
-   try {
-        while(true) {
-            send(dataToCS2->pop());
-        }
-    } catch(const std::exception &e) {
-        LOG(moba::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
-    }
-}

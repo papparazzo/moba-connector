@@ -25,6 +25,7 @@
 #include <boost/noncopyable.hpp>
 #include <string>
 #include <memory>
+#include <mutex>
 
 class CS2Writer : private boost::noncopyable {
     public:
@@ -34,7 +35,6 @@ class CS2Writer : private boost::noncopyable {
         virtual ~CS2Writer() noexcept;
 
         void connect(const std::string &host, int port = CS2Writer::DEFAULT_PORT_WRITE);
-        void operator()() const;
 
     protected:
         void send(const CS2CanCommand &data) const;
@@ -42,4 +42,6 @@ class CS2Writer : private boost::noncopyable {
         ConcurrentCanQueuePtr dataToCS2;
         int fd_write;
         struct sockaddr_in s_addr_write;
+
+        std::mutex m;
 };
