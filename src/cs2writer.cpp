@@ -27,7 +27,7 @@
 #include <cstring>
 #include <moba/log.h>
 
-CS2Writer::CS2Writer(ConcurrentCanQueuePtr dataToCS2) : dataToCS2{dataToCS2}, fd_write{-1} {
+CS2Writer::CS2Writer(const std::string &host, int port) : host{host}, port{port}, fd_write{-1} {
 }
 
 CS2Writer::~CS2Writer() {
@@ -36,7 +36,10 @@ CS2Writer::~CS2Writer() {
     }
 }
 
-void CS2Writer::connect(const std::string &host, int port) {
+void CS2Writer::connect() {
+    if(fd_write != -1) {
+        ::close(fd_write);
+    }
 
     if((fd_write = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
         throw CS2ConnectorException("socket-creation for writing failed");
