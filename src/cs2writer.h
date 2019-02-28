@@ -37,13 +37,15 @@ class CS2Writer : private boost::noncopyable {
         void connect();
 
     protected:
-        void send(const CS2CanCommand &data) const;
+        void send(const CS2CanCommand &data);
 
-        int fd_write;
         struct sockaddr_in s_addr_write;
 
         std::string host;
         int port;
+        int fd_write;
 
         std::mutex m;
 };
+
+using CS2WriterPtr = std::shared_ptr<CS2Writer>;

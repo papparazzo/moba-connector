@@ -54,7 +54,7 @@ void CS2Writer::connect() {
     }
 }
 
-void CS2Writer::send(const CS2CanCommand &data) const {
+void CS2Writer::send(const CS2CanCommand &data) {
     std::lock_guard<std::mutex> l{m};
 
     if(::sendto(fd_write, (void*)&data, sizeof(data), 0, (struct sockaddr *)&s_addr_write, sizeof(s_addr_write)) == -1) {
