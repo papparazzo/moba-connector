@@ -35,9 +35,9 @@ class CS2Writer : private boost::noncopyable {
         virtual ~CS2Writer() noexcept;
 
         void connect();
+        void send(const CS2CanCommand &data);
 
     protected:
-        void send(const CS2CanCommand &data);
 
         struct sockaddr_in s_addr_write;
 
