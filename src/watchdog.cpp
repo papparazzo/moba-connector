@@ -35,11 +35,24 @@ void Watchdog::operator()() const {
     try {
         while(true) {
             cs2writer->send(ping());
+            watchdog->pingStarted();
+
             std::this_thread::sleep_for(std::chrono::milliseconds{30});
-            if(watchdog->isInTime()) {
-                endpoint->sendMsg(InterfaceConnectivityStateChanged{ConnectState::CONNECTED});
+
+            auto inTime = watchdog->isInTime();
+            if(inTime && lastState == ConnectState::ERROR) {
+                lastState == ConnectState::CONNECTED;
+                endpoint->sendMsg(InterfaceConnectivityStateChanged{lastState});
+            } else if(!inTime && lastState == ConnectState::CONNECTED) {
+                lastState == ConnectState::ERROR;
+                endpoint->sendMsg(InterfaceConnectivityStateChanged{lastState});
             }
-                endpoint->sendMsg(InterfaceConnectivityStateChanged{ConnectState::ERROR});
+
+            if(lastState == ConnectState::ERROR) {
+                std::this_thread::sleep_for(std::chrono::milliseconds{25});
+            } else {
+                std::this_thread::sleep_for(std::chrono::milliseconds{2500});
+            }
         }
     } catch(const std::exception &e) {
         LOG(moba::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
