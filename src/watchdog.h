@@ -32,7 +32,7 @@ class Watchdog {
 
         virtual ~Watchdog() noexcept;
 
-        void operator()() const;
+        void operator()();
 
     protected:
         using ConnectState = InterfaceConnectivityStateChanged::Connectivity;

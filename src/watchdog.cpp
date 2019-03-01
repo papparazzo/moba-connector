@@ -31,7 +31,7 @@ Watchdog::Watchdog(
 Watchdog::~Watchdog() {
 }
 
-void Watchdog::operator()() const {
+void Watchdog::operator()() {
     try {
         while(true) {
             cs2writer->send(ping());
@@ -41,10 +41,10 @@ void Watchdog::operator()() const {
 
             auto inTime = watchdog->isInTime();
             if(inTime && lastState == ConnectState::ERROR) {
-                lastState == ConnectState::CONNECTED;
+                lastState = ConnectState::CONNECTED;
                 endpoint->sendMsg(InterfaceConnectivityStateChanged{lastState});
             } else if(!inTime && lastState == ConnectState::CONNECTED) {
-                lastState == ConnectState::ERROR;
+                lastState = ConnectState::ERROR;
                 endpoint->sendMsg(InterfaceConnectivityStateChanged{lastState});
             }
 
