@@ -28,7 +28,7 @@ struct WatchdogToken {
 
     std::chrono::milliseconds pingStartTime;
 
-    void startPing() {
+    void pingStarted() {
         pingStartTime = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()
         );
