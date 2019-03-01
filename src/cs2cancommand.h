@@ -135,6 +135,3 @@ inline CanCommand operator |(CanCommand a, CanCommand b) {
 inline CanCommand operator |(CanCommand a, int b) {
     return static_cast<CanCommand>(static_cast<int>(a) | b);
 }
-
-using ConcurrentCanQueuePtr = std::shared_ptr<ConcurrentQueue<CS2CanCommand>>;
-using ConcurrentMsgQueuePtr = std::shared_ptr<ConcurrentQueue<DispatchMessage>>;
