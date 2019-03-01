@@ -20,10 +20,11 @@
 
 #pragma once
 #include <chrono>
+#include <memory>
 
 struct WatchdogToken {
 
-    const int IN_TIME;
+    const int IN_TIME = 300;
 
     std::chrono::milliseconds pingStartTime;
 
@@ -46,3 +47,5 @@ struct WatchdogToken {
     }
 
 };
+
+using WatchdogTokenPtr = std::shared_ptr<WatchdogToken>;
