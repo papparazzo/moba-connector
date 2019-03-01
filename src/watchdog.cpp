@@ -22,8 +22,8 @@
 #include <moba/log.h>
 
 Watchdog::Watchdog(
-    ConcurrentCanQueuePtr dataToCS2, ConcurrentMsgQueuePtr dataToAppServer
-) : dataToCS2{dataToCS2}, dataToAppServer{dataToAppServer} {
+    WatchdogTokenPtr watchdog, CS2WriterPtr cs2writer, EndpointPtr endpoint
+) : watchdog{watchdog}, cs2writer{cs2writer}, endpoint{endpoint} {
 }
 
 Watchdog::~Watchdog() {
@@ -32,7 +32,6 @@ Watchdog::~Watchdog() {
 void Watchdog::operator()() const {
     try {
         while(true) {
-            
 
 //            dataToAppServer->push(data);
         }

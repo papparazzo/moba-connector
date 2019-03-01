@@ -22,17 +22,20 @@
 
 #include "watchdogToken.h"
 #include "cs2cancommand.h"
+#include "cs2writer.h"
+#include "moba/endpoint.h"
 
 class Watchdog {
     public:
-        Watchdog(ConcurrentCanQueuePtr dataToCS2, ConcurrentMsgQueuePtr dataToAppServer);
+        Watchdog(WatchdogTokenPtr watchdog, CS2WriterPtr cs2writer, EndpointPtr endpoint);
 
-        virtual ~Watchdog();
+        virtual ~Watchdog() noexcept;
 
         void operator()() const;
 
     protected:
-        ConcurrentCanQueuePtr dataToCS2;
-        ConcurrentMsgQueuePtr dataToAppServer;
+        WatchdogTokenPtr watchdog;
+        CS2WriterPtr cs2writer;
+        EndpointPtr endpoint;
 };
 
