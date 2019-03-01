@@ -19,11 +19,13 @@
  */
 
 #include "watchdog.h"
+#include "moba/interfacehandler.h"
 #include <moba/log.h>
+#include <thread>
 
 Watchdog::Watchdog(
     WatchdogTokenPtr watchdog, CS2WriterPtr cs2writer, EndpointPtr endpoint
-) : watchdog{watchdog}, cs2writer{cs2writer}, endpoint{endpoint} {
+) : watchdog{watchdog}, cs2writer{cs2writer}, endpoint{endpoint}, lastState{ConnectState::ERROR} {
 }
 
 Watchdog::~Watchdog() {
@@ -32,8 +34,12 @@ Watchdog::~Watchdog() {
 void Watchdog::operator()() const {
     try {
         while(true) {
-
-//            dataToAppServer->push(data);
+            cs2writer->send(ping());
+            std::this_thread::sleep_for(std::chrono::milliseconds{30});
+            if(watchdog->isInTime()) {
+                endpoint->sendMsg(InterfaceConnectivityStateChanged{ConnectState::CONNECTED});
+            }
+                endpoint->sendMsg(InterfaceConnectivityStateChanged{ConnectState::ERROR});
         }
     } catch(const std::exception &e) {
         LOG(moba::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;

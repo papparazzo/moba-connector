@@ -24,6 +24,7 @@
 #include "cs2cancommand.h"
 #include "cs2writer.h"
 #include "moba/endpoint.h"
+#include "moba/interfacehandler.h"
 
 class Watchdog {
     public:
@@ -34,8 +35,12 @@ class Watchdog {
         void operator()() const;
 
     protected:
+        using ConnectState = InterfaceConnectivityStateChanged::Connectivity;
+
         WatchdogTokenPtr watchdog;
         CS2WriterPtr cs2writer;
         EndpointPtr endpoint;
+
+        ConnectState lastState;
 };
 
