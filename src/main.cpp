@@ -31,8 +31,8 @@
 #include "cs2reader.h"
 #include "cs2writer.h"
 #include "jsonreader.h"
-#include "jsonwriter.h"
 #include "watchdog.h"
+#include "watchdogToken.h"
 #include "cs2cancommand.h"
 
 #include "moba/socket.h"
@@ -44,7 +44,7 @@ namespace {
         moba::Version(PACKAGE_VERSION),
         __DATE__,
         __TIME__,
-        "localhost",
+        "::1",
         7000
     };
 }
@@ -52,8 +52,6 @@ namespace {
 int main(int argc, char *argv[]) {
     moba::setCoreFileSizeToULimit();
 
-    auto dataToAppServer = std::make_shared<ConcurrentQueue<DispatchGenericMessage>>();
-    auto dataToCS2 = std::make_shared<ConcurrentQueue<CS2CanCommand>>();
     auto brakeVector = std::make_shared<BrakeVector>();
 
     auto groups = std::make_shared<moba::JsonArray>();
@@ -63,9 +61,12 @@ int main(int argc, char *argv[]) {
     auto endpoint = std::make_shared<Endpoint>(socket, appData.appName, appData.version, groups);
     endpoint->connect();
 
+    auto cs2Writer = std::make_shared<CS2Writer>("192.168.178.38");
+    auto watchdogToken = std::make_shared<WatchdogToken>();
+
     ///////////////////////////////////////////////////////////////////////////////////
     //
-    CS2Reader cs2Reader{dataToCS2, dataToAppServer, brakeVector};
+    CS2Reader cs2Reader{cs2Writer, brakeVector, endpoint};
     cs2Reader.connect("192.168.178.38");
 
     std::thread cs2ReaderThread{[&cs2Reader](){cs2Reader();}};
@@ -73,28 +74,14 @@ int main(int argc, char *argv[]) {
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
-    JsonReader jsonReader{dataToCS2, endpoint, brakeVector};
+    JsonReader jsonReader{cs2Writer, endpoint, brakeVector};
 
     std::thread jsonReaderThread{[&jsonReader](){jsonReader();}};
     jsonReaderThread.join();
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
-    CS2Writer cs2Writer{dataToCS2};
-
-    std::thread cs2writerThread{[&cs2Writer](){cs2Writer();}};
-    cs2writerThread.join();
-
-    ///////////////////////////////////////////////////////////////////////////////////
-    //
-    JsonWriter jsonWriter{dataToCS2, endpoint};
-
-    std::thread jsonWriterThread{[&jsonWriter](){jsonWriter();}};
-    jsonWriterThread.join();
-
-    ///////////////////////////////////////////////////////////////////////////////////
-    //
-    Watchdog watchdog{dataToCS2, dataToAppServer};
+    Watchdog watchdog{watchdogToken, cs2Writer, endpoint};
 
     std::thread watchDogThread{[&watchdog](){watchdog();}};
     watchDogThread.join();
