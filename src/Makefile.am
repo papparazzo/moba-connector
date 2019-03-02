@@ -4,7 +4,6 @@ moba_connector_SOURCES = \
     cs2reader.cpp \
     jsonreader.cpp \
     cs2writer.cpp \
-    jsonwriter.cpp \
     brakevector.cpp \
     watchdog.cpp
 
