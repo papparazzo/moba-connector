@@ -23,6 +23,9 @@
 #include "cs2cancommand.h"
 #include "brakevector.h"
 
+#include "moba/endpoint.h"
+#include "cs2writer.h"
+
 #include <boost/noncopyable.hpp>
 #include <string>
 #include <memory>
@@ -30,10 +33,7 @@
 class CS2Reader : private boost::noncopyable {
     public:
         static const int DEFAULT_PORT_READ = 15730;
-
-        CS2Reader(
-            ConcurrentCanQueuePtr dataToCS2, ConcurrentMsgQueuePtr dataToAppServer, BrakeVectorPtr brakeVector
-        );
+        CS2Reader(CS2WriterPtr cs2writer, BrakeVectorPtr brakeVector, EndpointPtr endpoint);
         virtual ~CS2Reader() noexcept;
 
         void connect(const std::string &host, int port = CS2Reader::DEFAULT_PORT_READ);
@@ -44,8 +44,8 @@ class CS2Reader : private boost::noncopyable {
     protected:
         void s88report(const CS2CanCommand &data);
 
-        ConcurrentCanQueuePtr dataToCS2;
-        ConcurrentMsgQueuePtr dataToAppServer;
+        CS2WriterPtr cs2writer;
         BrakeVectorPtr brakeVector;
+        EndpointPtr endpoint;
         int fd_read;
 };

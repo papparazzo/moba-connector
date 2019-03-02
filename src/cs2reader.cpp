@@ -28,8 +28,8 @@
 #include <unistd.h>
 #include <cstring>
 
-CS2Reader::CS2Reader(ConcurrentCanQueuePtr dataToCS2, ConcurrentMsgQueuePtr dataToAppServer, BrakeVectorPtr brakeVector) :
-dataToCS2{dataToCS2}, dataToAppServer{dataToAppServer}, brakeVector{brakeVector}, fd_read{-1} {
+CS2Reader::CS2Reader(CS2WriterPtr cs2writer, BrakeVectorPtr brakeVector, EndpointPtr endpoint) :
+cs2writer{cs2writer}, brakeVector{brakeVector}, endpoint{endpoint}, fd_read{-1} {
 }
 
 CS2Reader::~CS2Reader() {
@@ -80,7 +80,7 @@ void CS2Reader::operator()() {
                 s88report(data);
             }
 
-
+/*
             auto data = dataToAppServer->pop();
             switch(static_cast<CanCommand>(data.header[1])) {
                 case CanCommand::CMD_SYSTEM:
@@ -100,7 +100,7 @@ void CS2Reader::operator()() {
                     break;
             }
 
-
+*/
 
 
 
@@ -117,20 +117,20 @@ void CS2Reader::s88report(const CS2CanCommand &data) {
     std::uint16_t addr = (data.uid[0] << 8) | data.uid[1];
     std::uint16_t contact = (data.uid[2] << 8) | data.uid[3];
 
-    bool active = static_cast<bool>(data.data[1]);
+    //bool active = static_cast<bool>(data.data[1]);
 
-    LOG(moba::LogLevel::DEBUG) << "addr " << addr << " contact " << contact << " active " << active << " time " << time << std::endl;
+    //LOG(moba::LogLevel::DEBUG) << "addr " << addr << " contact " << contact << " active " << active << " time " << time << std::endl;
     auto locId = brakeVector->trigger({addr, contact});
     if(locId == BrakeVector::IGNORE_CONTACT) {
         return;
     }
     if(locId != BrakeVector::CONTACT_UNSET) {
-        auto data = setLocSpeed(locId, 0);
-        dataToCS2->push(data);
+//        auto data = setLocSpeed(locId, 0);
+        //dataToCS2->push(data);
 //        dataToAppServer->push(data);
     }
 }
-
+/*
 void JsonWriter::convertSystemCommand(const CS2CanCommand &cmd) const {
     switch(static_cast<CanSystemSubCommand>(cmd.data[0])) {
         case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_GO:
@@ -147,3 +147,4 @@ void JsonWriter::convertSystemCommand(const CS2CanCommand &cmd) const {
 
     }
 }
+*/
