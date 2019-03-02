@@ -41,7 +41,9 @@ class WatchdogToken {
         }
 
         bool isInTime() {
-            if(pingResponseTime - pingStartTime < WatchdogToken::IN_TIME) {
+            auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(pingResponseTime - pingStartTime).count();
+
+            if(diff < WatchdogToken::IN_TIME) {
                 return true;
             }
             return false;
