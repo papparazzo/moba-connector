@@ -22,30 +22,35 @@
 #include <chrono>
 #include <memory>
 
-struct WatchdogToken {
+class WatchdogToken {
 
-    const int IN_TIME = 300;
+    public:
+        WatchdogToken() : pingStartTime{1}, pingResponseTime{0} {
+        }
 
-    std::chrono::milliseconds pingStartTime;
+        void pingStarted() {
+            pingStartTime = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock::now().time_since_epoch()
+            );
+        }
 
-    void pingStarted() {
-        pingStartTime = std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now().time_since_epoch()
-        );
-    }
+        void pingResponsed() {
+            pingResponseTime = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock::now().time_since_epoch()
+            );
+        }
 
-    bool isInTime() {
-        auto currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now().time_since_epoch()
-        );
+        bool isInTime() {
+            if(pingResponseTime - pingStartTime < WatchdogToken::IN_TIME) {
+                return true;
+            }
+            return false;
+        }
 
-        /*
-        if(currentTime - pingStartTime < WatchdogToken::IN_TIME) {
-            return true;
-       }*/
-        return false;
-    }
-
+    protected:
+        const int IN_TIME = 300;
+        std::chrono::milliseconds pingStartTime;
+        std::chrono::milliseconds pingResponseTime;
 };
 
 using WatchdogTokenPtr = std::shared_ptr<WatchdogToken>;
