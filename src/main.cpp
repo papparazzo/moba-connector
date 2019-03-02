@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
-    CS2Reader cs2Reader{cs2Writer, brakeVector, endpoint};
+    CS2Reader cs2Reader{cs2Writer, endpoint, watchdogToken, brakeVector};
     cs2Reader.connect("192.168.178.38");
 
     std::thread cs2ReaderThread{[&cs2Reader](){cs2Reader();}};
