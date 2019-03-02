@@ -22,6 +22,7 @@
 
 #include "cs2cancommand.h"
 #include "brakevector.h"
+#include "watchdogToken.h"
 
 #include "moba/endpoint.h"
 #include "cs2writer.h"
@@ -33,7 +34,7 @@
 class CS2Reader : private boost::noncopyable {
     public:
         static const int DEFAULT_PORT_READ = 15730;
-        CS2Reader(CS2WriterPtr cs2writer, BrakeVectorPtr brakeVector, EndpointPtr endpoint);
+        CS2Reader(CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdog, BrakeVectorPtr brakeVector);
         virtual ~CS2Reader() noexcept;
 
         void connect(const std::string &host, int port = CS2Reader::DEFAULT_PORT_READ);
@@ -43,9 +44,11 @@ class CS2Reader : private boost::noncopyable {
 
     protected:
         void s88report(const CS2CanCommand &data);
+        void convertSystemCommand(const CS2CanCommand &cmd) const;
 
         CS2WriterPtr cs2writer;
-        BrakeVectorPtr brakeVector;
         EndpointPtr endpoint;
+        BrakeVectorPtr brakeVector;
+        WatchdogTokenPtr watchdog;
         int fd_read;
 };

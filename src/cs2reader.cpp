@@ -22,14 +22,16 @@
 
 #include <moba/log.h>
 
+#include "moba/systemhandler.h"
+
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <cstring>
 
-CS2Reader::CS2Reader(CS2WriterPtr cs2writer, BrakeVectorPtr brakeVector, EndpointPtr endpoint) :
-cs2writer{cs2writer}, brakeVector{brakeVector}, endpoint{endpoint}, fd_read{-1} {
+CS2Reader::CS2Reader(CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdog, BrakeVectorPtr brakeVector) :
+cs2writer{cs2writer}, endpoint{endpoint}, brakeVector{brakeVector}, watchdog{watchdog}, fd_read{-1} {
 }
 
 CS2Reader::~CS2Reader() {
@@ -57,7 +59,6 @@ void CS2Reader::connect(const std::string &host, int port) {
 
 CS2CanCommand CS2Reader::read() const {
     CS2CanCommand data;
-    memset((void*)&data, '\0', sizeof(data));
 
     struct sockaddr_in s_addr_other;
     socklen_t slen = sizeof(s_addr_other);
@@ -74,37 +75,22 @@ void CS2Reader::operator()() {
             CS2CanCommand data = read();
 
             if(data.header[1] & 0x01 && data.header[1] == static_cast<uint8_t>(CanCommand::CMD_PING | 0x01)) {
-               // return RES_PING;
+                watchdog->pingResponsed();
+                continue;
             }
             if(data.header[1] == static_cast<uint8_t>(CanCommand::CMD_S88_EVENT | 0x01)) {
                 s88report(data);
+                continue;
             }
 
-/*
-            auto data = dataToAppServer->pop();
             switch(static_cast<CanCommand>(data.header[1])) {
                 case CanCommand::CMD_SYSTEM:
                     convertSystemCommand(data);
-                    break;
-
-                case CanCommand::CMD_PING:
-                    //if(pingSend) {
-                    //    pingSend = false;
-                        endpoint->sendMsg(InterfaceConnectivityStateChanged{
-                            InterfaceConnectivityStateChanged::Connectivity::CONNECTED
-                        });
-                    //}
-                    break;
+                    continue;
 
                 default:
                     break;
             }
-
-*/
-
-
-
-//            dataToAppServer->push(data);
         }
     } catch(const std::exception &e) {
         LOG(moba::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
@@ -112,26 +98,26 @@ void CS2Reader::operator()() {
 }
 
 void CS2Reader::s88report(const CS2CanCommand &data) {
-    //std::uint16_t time = (data.data[2] << 8) | data.data[3];
+    std::uint16_t time = (data.data[2] << 8) | data.data[3];
 
     std::uint16_t addr = (data.uid[0] << 8) | data.uid[1];
     std::uint16_t contact = (data.uid[2] << 8) | data.uid[3];
 
-    //bool active = static_cast<bool>(data.data[1]);
+    bool active = static_cast<bool>(data.data[1]);
 
-    //LOG(moba::LogLevel::DEBUG) << "addr " << addr << " contact " << contact << " active " << active << " time " << time << std::endl;
+    LOG(moba::LogLevel::DEBUG) << "addr " << addr << " contact " << contact << " active " << active << " time " << time << std::endl;
     auto locId = brakeVector->trigger({addr, contact});
     if(locId == BrakeVector::IGNORE_CONTACT) {
         return;
     }
     if(locId != BrakeVector::CONTACT_UNSET) {
-//        auto data = setLocSpeed(locId, 0);
-        //dataToCS2->push(data);
-//        dataToAppServer->push(data);
+        auto data = setLocSpeed(locId, 0);
+        //endpoint->sendMsg();
+        cs2writer->send(data);
     }
 }
-/*
-void JsonWriter::convertSystemCommand(const CS2CanCommand &cmd) const {
+
+void CS2Reader::convertSystemCommand(const CS2CanCommand &cmd) const {
     switch(static_cast<CanSystemSubCommand>(cmd.data[0])) {
         case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_GO:
             return endpoint->sendMsg(SystemSetEmergencyStop{false});
@@ -144,7 +130,5 @@ void JsonWriter::convertSystemCommand(const CS2CanCommand &cmd) const {
 
         default:
             break;
-
     }
 }
-*/
