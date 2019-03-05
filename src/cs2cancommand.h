@@ -129,11 +129,19 @@ inline CS2CanCommand ping() {
 }
 
 inline CS2CanCommand getConfig(const std::string &cfg) {
-    //"loks"    // -> Komplette Lokliste
-    //"lokstat" // -> Aktueller Zustand der Loks
     uint32_t uident;
     memcpy(&uident, cfg.c_str(), cfg.length());
     return std::move(CS2CanCommand(CanCommand::CMD_CONFIG_DATA_QUERY, 8, uident));
+}
+
+inline CS2CanCommand getLoklist() {
+    // -> Komplette Lokliste
+    return getConfig("loks");
+}
+
+inline CS2CanCommand getLokStat() {
+    // -> Aktueller Zustand der Loks
+    return getConfig("lokstat");
 }
 
 inline CanCommand operator |(CanCommand a, CanCommand b) {
