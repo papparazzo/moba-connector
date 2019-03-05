@@ -128,6 +128,14 @@ inline CS2CanCommand ping() {
     return std::move(CS2CanCommand(CanCommand::CMD_PING));
 }
 
+inline CS2CanCommand getConfig(const std::string &cfg) {
+    //"loks"    // -> Komplette Lokliste
+    //"lokstat" // -> Aktueller Zustand der Loks
+    uint32_t uident;
+    memcpy(&uident, cfg.c_str(), cfg.length());
+    return std::move(CS2CanCommand(CanCommand::CMD_CONFIG_DATA_QUERY, 8, uident));
+}
+
 inline CanCommand operator |(CanCommand a, CanCommand b) {
     return static_cast<CanCommand>(static_cast<int>(a) | static_cast<int>(b));
 }
