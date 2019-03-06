@@ -45,10 +45,15 @@ void JsonReader::setHardwareState(const SystemHardwareStateChanged &data) {
     }
 }
 
+void JsonReader::setBrakeVector(const InterfaceSetBrakeVector &data) {
+
+}
+
 void JsonReader::operator()() {
     try {
         Registry registry;
         registry.registerHandler<SystemHardwareStateChanged>(std::bind(&JsonReader::setHardwareState, this, std::placeholders::_1));
+        registry.registerHandler<InterfaceSetBrakeVector>(std::bind(&JsonReader::setBrakeVector, this, std::placeholders::_1));
 
         while(true) {
             registry.handleMsg(endpoint->waitForNewMsg());

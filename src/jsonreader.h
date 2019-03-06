@@ -28,6 +28,7 @@
 
 #include "moba/endpoint.h"
 #include "moba/systemhandler.h"
+#include "moba/interfacehandler.h"
 #include "brakevector.h"
 #include "cs2writer.h"
 
@@ -44,4 +45,6 @@ class JsonReader : private boost::noncopyable {
         BrakeVectorPtr brakeVector;
 
         void setHardwareState(const SystemHardwareStateChanged &data);
+        void setBrakeVector(const InterfaceSetBrakeVector &data);
+
 };
