@@ -26,6 +26,7 @@
 #include <sys/socket.h>
 
 #include <cstdint>
+#include <cstring>
 
 #include "concurrentqueue.h"
 #include "moba/basemessage.h"
@@ -130,7 +131,7 @@ inline CS2CanCommand ping() {
 
 inline CS2CanCommand getConfig(const std::string &cfg) {
     uint32_t uident;
-    memcpy(&uident, cfg.c_str(), cfg.length());
+    std::memcpy(&uident, cfg.c_str(), cfg.length());
     return std::move(CS2CanCommand(CanCommand::CMD_CONFIG_DATA_QUERY, 8, uident));
 }
 
