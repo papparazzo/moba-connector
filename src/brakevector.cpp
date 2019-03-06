@@ -31,15 +31,15 @@ int BrakeVector::trigger(Contact contactId) {
 
     auto tmp = iter->second;
 
-    if(tmp != BrakeVector::CONTACT_UNREACHABLE) {
-        iter->second = BrakeVector::IGNORE_CONTACT;
-        return tmp;
+    if(tmp == BrakeVector::CONTACT_UNREACHABLE) {
+        // An unreachable Contact was triggered. E.g. train reached contact by a wrong turnout
+        std::stringstream ss;
+        ss << "contact <" << contactId.first << ", " << contactId.second << "> not set!";
+        throw BrakeVectorException(ss.str());
     }
 
-    // An unreachable Contact was triggered. E.g. train reached contact by a wrong turnout
-    std::stringstream ss;
-    ss << "contact <" << contactId.first << ", " << contactId.second << "> not set!";
-    throw BrakeVectorException(ss.str());
+    iter->second = BrakeVector::IGNORE_CONTACT;
+    return tmp;
 }
 
 void BrakeVector::handleContact(Contact contactId, int locId) {
