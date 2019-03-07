@@ -113,8 +113,7 @@ void CS2Reader::s88report(const CS2CanCommand &data) {
     if(locId == BrakeVector::CONTACT_UNSET) {
         return;
     }
-    auto data = setLocSpeed(locId, 0);
-    cs2writer->send(data);
+    cs2writer->send(setLocSpeed(locId, 0));
     //endpoint->sendMsg();
 }
 
