@@ -23,6 +23,7 @@
 #include <moba/log.h>
 
 #include "moba/systemhandler.h"
+#include "moba/interfacehandler.h"
 
 #include <arpa/inet.h>
 #include <stdio.h>
@@ -114,7 +115,7 @@ void CS2Reader::s88report(const CS2CanCommand &data) {
         return;
     }
     cs2writer->send(setLocSpeed(locId, 0));
-    //endpoint->sendMsg();
+    endpoint->sendMsg(InterfaceContactTriggered{ContactTrigger{addr, contact, active, time}});
 }
 
 void CS2Reader::convertSystemCommand(const CS2CanCommand &cmd) const {
