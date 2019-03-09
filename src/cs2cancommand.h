@@ -93,10 +93,10 @@ struct CS2CanCommand {
         hash[1] = 0x00;
         len = length;
 
-        uid[0] = uident & 0xFF;
-        uid[1] = (uident >> 8) & 0xFF;;
-        uid[2] = (uident >> 16) & 0xFF;;
-        uid[3] = (uident >> 24) & 0xFF;;
+        uid[0] = (uident >> 24) & 0xFF;;
+        uid[1] = (uident >> 16) & 0xFF;;
+        uid[2] = (uident >> 8) & 0xFF;;
+        uid[3] = uident & 0xFF;
 
         data[0] = data0;
         data[1] = data1;
