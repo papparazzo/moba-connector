@@ -129,20 +129,22 @@ inline CS2CanCommand ping() {
     return std::move(CS2CanCommand(CanCommand::CMD_PING));
 }
 
-inline CS2CanCommand getConfig(const std::string &cfg) {
-    uint32_t uident;
-    std::memcpy(&uident, cfg.c_str(), cfg.length());
-    return std::move(CS2CanCommand(CanCommand::CMD_CONFIG_DATA_QUERY, 8, uident));
-}
-
 inline CS2CanCommand getLoklist() {
-    // -> Komplette Lokliste
-    return getConfig("loks");
+    // Komplette Lokliste -> "loks"
+    CS2CanCommand cmd;
+    //                     | cmd      | hash      | len | Ascii-code "loks" 6C->l, 6F->o, 6B->k, ...
+    unsigned char data[] = {0x00, 0x40, 0x03, 0x00, 0x08, 0x6C, 0x6F, 0x6B, 0x73, 0x00, 0x00, 0x00, 0x00};
+    memcpy((void*)&cmd, data, 13);
+    return std::move(cmd);
 }
 
 inline CS2CanCommand getLokStat() {
-    // -> Aktueller Zustand der Loks
-    return getConfig("lokstat");
+    // Aktueller Zustand der Loks -> "lokstat"
+    CS2CanCommand cmd;
+    //                     | cmd      | hash      | len | Ascii-code "loks" 6C->l, 6F->o, 6B->k, ...
+    unsigned char data[] = {0x00, 0x40, 0x03, 0x00, 0x08, 0x6C, 0x6F, 0x6B, 0x73, 0x74, 0x61, 0x74, 0x00};
+    memcpy((void*)&cmd, data, 13);
+    return std::move(cmd);
 }
 
 inline CanCommand operator |(CanCommand a, CanCommand b) {
