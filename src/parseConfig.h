@@ -23,8 +23,8 @@
 class ParseConfig {
     public:
         ParseConfig();
-        ParseConfig(const parseConfig& orig);
-        virtual ~parseConfig();
+        ParseConfig(const ParseConfig& orig);
+        virtual ~ParseConfig();
     private:
 
 };
