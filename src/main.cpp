@@ -27,7 +27,6 @@
 #include <moba/log.h>
 
 #include "config.h"
-#include "concurrentqueue.h"
 #include "cs2reader.h"
 #include "cs2writer.h"
 #include "jsonreader.h"

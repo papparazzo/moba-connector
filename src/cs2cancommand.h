@@ -28,7 +28,6 @@
 #include <cstdint>
 #include <cstring>
 
-#include "concurrentqueue.h"
 #include "moba/basemessage.h"
 
 class CS2ConnectorException : public std::exception {
