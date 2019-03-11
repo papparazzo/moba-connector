@@ -29,7 +29,7 @@
 
 class BrakeVectorException : public std::exception {
     public:
-        virtual ~BrakeVectorException() throw() {
+        virtual ~BrakeVectorException() noexcept {
 
         }
 
@@ -37,7 +37,7 @@ class BrakeVectorException : public std::exception {
             this->what__ = what;
         }
 
-        virtual const char* what() const throw() {
+        virtual const char* what() const noexcept {
             return this->what__.c_str();
         }
 
