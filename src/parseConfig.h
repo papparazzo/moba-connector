@@ -24,7 +24,7 @@ class ParseConfig {
     public:
         ParseConfig();
         ParseConfig(const ParseConfig& orig);
-        virtual ~ParseConfig();
+        virtual ~ParseConfig() noexcept;
     private:
 
 };
