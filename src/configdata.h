@@ -24,8 +24,6 @@
 #include <exception>
 #include <string>
 
-#include "shared.h"
-
 class ConfigDataException : public std::exception {
     public:
         virtual ~ConfigDataException() noexcept {
