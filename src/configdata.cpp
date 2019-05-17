@@ -18,7 +18,7 @@
  *
  */
 
-#include "configData.h"
+#include "configdata.h"
 #include <cstring>
 
 namespace {
