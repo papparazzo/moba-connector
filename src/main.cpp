@@ -52,12 +52,10 @@ int main(int argc, char *argv[]) {
     moba::setCoreFileSizeToULimit();
 
     auto brakeVector = std::make_shared<BrakeVector>();
-
-    auto groups = std::make_shared<moba::JsonArray>();
-    groups->push_back(moba::toJsonStringPtr("SYSTEM"));
-
+    auto groups = Groups::SYSTEM;
     auto socket = std::make_shared<Socket>(appData.host, appData.port);
     auto endpoint = std::make_shared<Endpoint>(socket, appData.appName, appData.version, groups);
+
     endpoint->connect();
 
     auto cs2Writer = std::make_shared<CS2Writer>("192.168.178.38");
