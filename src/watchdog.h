@@ -24,7 +24,7 @@
 #include "cs2cancommand.h"
 #include "cs2writer.h"
 #include "moba/endpoint.h"
-#include "moba/interfacehandler.h"
+#include "moba/interfacemessage.h"
 
 class Watchdog {
     public:
