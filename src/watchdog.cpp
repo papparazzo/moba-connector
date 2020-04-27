@@ -19,8 +19,8 @@
  */
 
 #include "watchdog.h"
-#include "moba/interfacehandler.h"
-#include <moba/log.h>
+#include "moba/interfacemessage.h"
+#include <moba-common/log.h>
 #include <thread>
 
 Watchdog::Watchdog(
@@ -55,7 +55,6 @@ void Watchdog::operator()() {
             }
         }
     } catch(const std::exception &e) {
-        LOG(moba::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
+        LOG(moba::common::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
     }
-
 }
