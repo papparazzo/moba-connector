@@ -27,8 +27,9 @@
 #include <memory>
 
 #include "moba/endpoint.h"
-#include "moba/systemhandler.h"
-#include "moba/interfacehandler.h"
+#include "moba/systemmessage.h"
+#include "moba/interfacemessage.h"
+#include "moba/shared.h"
 #include "brakevector.h"
 #include "cs2writer.h"
 

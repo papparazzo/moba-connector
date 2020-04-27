@@ -28,7 +28,7 @@
 #include <cstdint>
 #include <cstring>
 
-#include "moba/basemessage.h"
+#include "moba/message.h"
 
 class CS2ConnectorException : public std::exception {
 
@@ -113,15 +113,15 @@ struct CS2CanCommand {
 inline CS2CanCommand setLocSpeed(std::uint32_t locId, std::uint16_t speed) {
     std::uint8_t low  = speed & 0xFF;
     std::uint8_t high = (speed >> 8) & 0xFF;
-    return std::move(CS2CanCommand(CanCommand::CMD_LOCO_SPEED, 6, locId, low, high));
+    return CS2CanCommand{CanCommand::CMD_LOCO_SPEED, 6, locId, low, high};
 }
 
 inline CS2CanCommand setEmergencyStop() {
-    return std::move(CS2CanCommand(CanCommand::CMD_SYSTEM, 5, 0x00000000, static_cast<std::uint8_t>(CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_STOP)));
+    return CS2CanCommand{CanCommand::CMD_SYSTEM, 5, 0x00000000, static_cast<std::uint8_t>(CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_STOP)};
 }
 
 inline CS2CanCommand setEmergencyStopClearing() {
-    return std::move(CS2CanCommand(CanCommand::CMD_SYSTEM, 5, 0x00000000, static_cast<std::uint8_t>(CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_GO)));
+    return CS2CanCommand{CanCommand::CMD_SYSTEM, 5, 0x00000000, static_cast<std::uint8_t>(CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_GO)};
 }
 
 inline CS2CanCommand ping() {
@@ -134,7 +134,7 @@ inline CS2CanCommand getLoklist() {
     //                     | cmd      | hash      | len | Ascii-code "loks" 6C->l, 6F->o, 6B->k, ...
     unsigned char data[] = {0x00, 0x40, 0x03, 0x00, 0x08, 0x6C, 0x6F, 0x6B, 0x73, 0x00, 0x00, 0x00, 0x00};
     memcpy((void*)&cmd, data, 13);
-    return std::move(cmd);
+    return cmd;
 }
 
 inline CS2CanCommand getLokStat() {
@@ -143,7 +143,7 @@ inline CS2CanCommand getLokStat() {
     //                     | cmd      | hash      | len | Ascii-code "loks" 6C->l, 6F->o, 6B->k, ...
     unsigned char data[] = {0x00, 0x40, 0x03, 0x00, 0x08, 0x6C, 0x6F, 0x6B, 0x73, 0x74, 0x61, 0x74, 0x00};
     memcpy((void*)&cmd, data, 13);
-    return std::move(cmd);
+    return cmd;
 }
 
 inline CanCommand operator |(CanCommand a, CanCommand b) {

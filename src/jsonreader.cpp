@@ -20,7 +20,7 @@
 
 #include "jsonreader.h"
 #include "moba/registry.h"
-#include <moba/log.h>
+#include <moba-common/log.h>
 #include <functional>
 
 JsonReader::JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, BrakeVectorPtr brakeVector) :
@@ -61,6 +61,6 @@ void JsonReader::operator()() {
             registry.handleMsg(endpoint->waitForNewMsg());
         }
     } catch(const std::exception &e) {
-        LOG(moba::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
+        LOG(moba::common::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
     }
 }
