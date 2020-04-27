@@ -21,6 +21,7 @@
 #pragma once
 #include <chrono>
 #include <memory>
+#include <mutex>
 
 class WatchdogToken {
 
@@ -29,18 +30,21 @@ class WatchdogToken {
         }
 
         void pingStarted() {
+            std::lock_guard<std::mutex> l{m};
             pingStartTime = std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::system_clock::now().time_since_epoch()
             );
         }
 
         void pingResponsed() {
+            std::lock_guard<std::mutex> l{m};
             pingResponseTime = std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::system_clock::now().time_since_epoch()
             );
         }
 
         bool isInTime() {
+            std::lock_guard<std::mutex> l{m};
             auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(pingResponseTime - pingStartTime).count();
 
             if(diff < WatchdogToken::IN_TIME) {
@@ -50,6 +54,7 @@ class WatchdogToken {
         }
 
     protected:
+        std::mutex m;
         const int IN_TIME = 300;
         std::chrono::milliseconds pingStartTime;
         std::chrono::milliseconds pingResponseTime;
