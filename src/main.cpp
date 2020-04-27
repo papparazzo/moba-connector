@@ -23,8 +23,8 @@
 #include <memory>
 #include <thread>
 
-#include <moba/helper.h>
-#include <moba/log.h>
+#include <moba-common/helper.h>
+#include <moba-common/log.h>
 
 #include "config.h"
 #include "cs2reader.h"
@@ -38,9 +38,9 @@
 #include "moba/endpoint.h"
 
 namespace {
-    moba::AppData appData = {
+    moba::common::AppData appData = {
         PACKAGE_NAME,
-        moba::Version(PACKAGE_VERSION),
+        moba::common::Version(PACKAGE_VERSION),
         __DATE__,
         __TIME__,
         "::1",
@@ -49,7 +49,7 @@ namespace {
 }
 
 int main(int argc, char *argv[]) {
-    moba::setCoreFileSizeToULimit();
+    moba::common::setCoreFileSizeToULimit();
 
     auto brakeVector = std::make_shared<BrakeVector>();
     auto groups = Groups::SYSTEM;
