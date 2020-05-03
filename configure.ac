@@ -4,6 +4,7 @@ AC_INIT([moba-connector], [0.1.0-0000], [pappi-@gmx.de])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_SUBDIRS([modules/lib-msghandling])
+AC_CONFIG_SUBDIRS([modules/lib-cs2interface])
 AC_CONFIG_AUX_DIR([.])
 
 AM_INIT_AUTOMAKE([foreign])
