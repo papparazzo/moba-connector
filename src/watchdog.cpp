@@ -22,6 +22,7 @@
 #include "moba/interfacemessage.h"
 #include <moba-common/log.h>
 #include <thread>
+#include "moba/cs2utils.h"
 
 Watchdog::Watchdog(
     WatchdogTokenPtr watchdog, CS2WriterPtr cs2writer, EndpointPtr endpoint

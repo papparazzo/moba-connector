@@ -21,8 +21,8 @@
 #pragma once
 
 #include "watchdogToken.h"
-#include "cs2cancommand.h"
-#include "cs2writer.h"
+#include "moba/cs2cancommand.h"
+#include "moba/cs2writer.h"
 #include "moba/endpoint.h"
 #include "moba/interfacemessage.h"
 
