@@ -19,7 +19,6 @@
  */
 
 #include "brakevector.h"
-#include <sstream>
 
 int BrakeVector::trigger(Contact contactId) {
     std::lock_guard<std::mutex> guard(mutex);
@@ -33,11 +32,10 @@ int BrakeVector::trigger(Contact contactId) {
 
     if(tmp == BrakeVector::CONTACT_UNREACHABLE) {
         // An unreachable Contact was triggered. E.g. train reached contact by a wrong turnout
-        std::stringstream ss;
-        ss << "contact <" << contactId.first << ", " << contactId.second << "> not set!";
-        throw BrakeVectorException(ss.str());
+        return tmp;
     }
 
+    // Ignore following contacts afterwards (it might be from the same train, E.g. light)
     iter->second = BrakeVector::IGNORE_CONTACT;
     return tmp;
 }

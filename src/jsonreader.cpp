@@ -20,6 +20,7 @@
 
 #include "jsonreader.h"
 #include "moba/registry.h"
+#include "moba/cs2utils.h"
 #include <moba-common/log.h>
 #include <functional>
 

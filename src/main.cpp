@@ -27,15 +27,17 @@
 #include <moba-common/log.h>
 
 #include "config.h"
-#include "cs2reader.h"
-#include "cs2writer.h"
 #include "jsonreader.h"
 #include "watchdog.h"
 #include "watchdogToken.h"
-#include "cs2cancommand.h"
+
+#include "moba/cs2reader.h"
+#include "moba/cs2writer.h"
+#include "moba/cs2cancommand.h"
 
 #include "moba/socket.h"
 #include "moba/endpoint.h"
+#include "jsonwriter.h"
 
 namespace {
     moba::common::AppData appData = {
@@ -51,23 +53,30 @@ namespace {
 int main(int argc, char *argv[]) {
     moba::common::setCoreFileSizeToULimit();
 
-    auto brakeVector = std::make_shared<BrakeVector>();
     auto groups = Groups::SYSTEM;
     auto socket = std::make_shared<Socket>(appData.host, appData.port);
     auto endpoint = std::make_shared<Endpoint>(socket, appData.appName, appData.version, groups);
 
     endpoint->connect();
 
-    auto cs2Writer = std::make_shared<CS2Writer>("192.168.178.38");
+    auto cs2Writer = std::make_shared<CS2Writer>();
+    cs2Writer->connect("192.168.178.38");
+
+    auto cs2Reader = std::make_shared<CS2Reader>();
+    cs2Reader->connect();
+
+
+
+
+    auto brakeVector = std::make_shared<BrakeVector>();
     auto watchdogToken = std::make_shared<WatchdogToken>();
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
-    CS2Reader cs2Reader{cs2Writer, endpoint, watchdogToken, brakeVector};
-    cs2Reader.connect("192.168.178.38");
+    JsonWriter jsonwriter{cs2Reader, cs2Writer, endpoint, watchdogToken, brakeVector};
 
-    std::thread cs2ReaderThread{[&cs2Reader](){cs2Reader();}};
-    cs2ReaderThread.join();
+    std::thread jsonwriterThread{[&jsonwriter](){jsonwriter();}};
+    jsonwriterThread.join();
 
     ///////////////////////////////////////////////////////////////////////////////////
     //

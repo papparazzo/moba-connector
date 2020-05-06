@@ -1,7 +1,7 @@
 /*
  *  Project:    moba-connector
  *
- *  Copyright (C) 2019 Stefan Paproth <pappi-@gmx.de>
+ *  Copyright (C) 2020 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -21,31 +21,29 @@
 #pragma once
 
 #include <boost/noncopyable.hpp>
-#include <string>
-#include <memory>
 
-#include "moba/endpoint.h"
-#include "moba/systemmessage.h"
-#include "moba/interfacemessage.h"
-#include "moba/shared.h"
 #include "moba/cs2cancommand.h"
+#include "moba/endpoint.h"
 #include "moba/cs2writer.h"
+#include "moba/cs2reader.h"
 
 #include "brakevector.h"
+#include "watchdogToken.h"
 
-class JsonReader : private boost::noncopyable {
+class JsonWriter : private boost::noncopyable {
     public:
-        JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, BrakeVectorPtr brakeVector);
-        virtual ~JsonReader() noexcept;
+        JsonWriter(CS2ReaderPtr cs2reader, CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdog, BrakeVectorPtr brakeVector);
+        virtual ~JsonWriter() noexcept { }
 
         void operator()();
 
     protected:
+        void s88report(const CS2CanCommand &data);
+        void convertSystemCommand(const CS2CanCommand &cmd) const;
+
+        CS2ReaderPtr cs2reader;
         CS2WriterPtr cs2writer;
         EndpointPtr endpoint;
         BrakeVectorPtr brakeVector;
-
-        void setHardwareState(const SystemHardwareStateChanged &data);
-        void setBrakeVector(const InterfaceSetBrakeVector &data);
-
+        WatchdogTokenPtr watchdog;
 };

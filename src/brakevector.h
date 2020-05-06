@@ -27,31 +27,13 @@
 #include <mutex>
 #include <memory>
 
-class BrakeVectorException : public std::exception {
-    public:
-        virtual ~BrakeVectorException() noexcept {
-
-        }
-
-        BrakeVectorException(const std::string &what) {
-            this->what__ = what;
-        }
-
-        virtual const char* what() const noexcept {
-            return this->what__.c_str();
-        }
-
-    private:
-        std::string what__;
-};
-
 class BrakeVector : private boost::noncopyable {
     public:
         static const int CONTACT_UNSET       =  0;
         static const int IGNORE_CONTACT      = -1;
         static const int CONTACT_UNREACHABLE = -2;
 
-        using Contact = std::pair<int, int> ;
+        using Contact = std::pair<int, int>;
         using Vector = std::map<Contact, int>;
 
         int trigger(Contact contactId);
