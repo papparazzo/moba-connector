@@ -58,13 +58,13 @@ void JsonWriter::operator()() {
     }
 }
 
-void JsonWriter::s88report(const CS2CanCommand &data) {
-    std::uint16_t time = (data.data[2] << 8) | data.data[3];
+void JsonWriter::s88report(const CS2CanCommand &cmd) {
+    auto addr = cmd.getWordAt0();
+    auto contact = cmd.getWordAt2();
 
-    std::uint16_t addr = (data.uid[0] << 8) | data.uid[1];
-    std::uint16_t contact = (data.uid[2] << 8) | data.uid[3];
+    auto time = cmd.getWordAt6();
 
-    bool active = static_cast<bool>(data.data[1]);
+    bool active = static_cast<bool>(cmd.data[4]);
 
     LOG(moba::common::LogLevel::DEBUG) << "addr " << addr << " contact " << contact << " active " << active << " time " << time << std::endl;
     auto locId = brakeVector->trigger({addr, contact});
