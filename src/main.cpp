@@ -53,9 +53,9 @@ namespace {
 int main(int argc, char *argv[]) {
     moba::common::setCoreFileSizeToULimit();
 
-    auto groups = Groups::SYSTEM;
     auto socket = std::make_shared<Socket>(appData.host, appData.port);
-    auto endpoint = std::make_shared<Endpoint>(socket, appData.appName, appData.version, groups);
+
+    auto endpoint = EndpointPtr{new Endpoint{socket, appData.appName, appData.version, {Message::SYSTEM}}};
 
     endpoint->connect();
 
@@ -64,9 +64,6 @@ int main(int argc, char *argv[]) {
 
     auto cs2Reader = std::make_shared<CS2Reader>();
     cs2Reader->connect();
-
-
-
 
     auto brakeVector = std::make_shared<BrakeVector>();
     auto watchdogToken = std::make_shared<WatchdogToken>();
