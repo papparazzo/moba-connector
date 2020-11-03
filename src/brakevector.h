@@ -41,6 +41,7 @@ class BrakeVector : private boost::noncopyable {
         void handleContact(Contact contactId, int locId);
         void ignoreContact(Contact contactId);
         void setContactUnreachable(Contact contactId);
+        void reset();
 
     protected:
         Vector vector;

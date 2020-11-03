@@ -52,3 +52,8 @@ void BrakeVector::ignoreContact(Contact contactId) {
 void BrakeVector::setContactUnreachable(Contact contactId) {
     handleContact(contactId, BrakeVector::CONTACT_UNREACHABLE);
 }
+
+void BrakeVector::reset() {
+    std::lock_guard<std::mutex> guard{mutex};
+    vector.clear();
+}
