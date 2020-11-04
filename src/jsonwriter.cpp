@@ -79,7 +79,7 @@ void JsonWriter::s88report(const CS2CanCommand &cmd) {
 }
 
 void JsonWriter::convertSystemCommand(const CS2CanCommand &cmd) const {
-    switch(static_cast<CanSystemSubCommand>(cmd.data[0])) {
+    switch(static_cast<CanSystemSubCommand>(cmd.data[4])) {
         case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_GO:
             return endpoint->sendMsg(SystemSetEmergencyStop{false});
 
