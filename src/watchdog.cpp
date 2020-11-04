@@ -33,8 +33,8 @@ Watchdog::~Watchdog() {
 }
 
 void Watchdog::operator()() {
-    try {
-        while(true) {
+    while(true) {
+        try {
             cs2writer->send(ping());
             watchdog->pingStarted();
 
@@ -42,20 +42,15 @@ void Watchdog::operator()() {
 
             auto inTime = watchdog->isInTime();
             if(inTime && lastState == ConnectState::ERROR) {
+                endpoint->sendMsg(InterfaceConnectivityStateChanged{ConnectState::CONNECTED});
                 lastState = ConnectState::CONNECTED;
-                endpoint->sendMsg(InterfaceConnectivityStateChanged{lastState});
             } else if(!inTime && lastState == ConnectState::CONNECTED) {
+                endpoint->sendMsg(InterfaceConnectivityStateChanged{ConnectState::ERROR});
                 lastState = ConnectState::ERROR;
-                endpoint->sendMsg(InterfaceConnectivityStateChanged{lastState});
             }
-
-            if(lastState == ConnectState::ERROR) {
-                std::this_thread::sleep_for(std::chrono::milliseconds{25});
-            } else {
-                std::this_thread::sleep_for(std::chrono::milliseconds{2500});
-            }
+        } catch(const std::exception &e) {
+            LOG(moba::common::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
         }
-    } catch(const std::exception &e) {
-        LOG(moba::common::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds{500});
     }
 }
