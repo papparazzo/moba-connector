@@ -26,10 +26,14 @@
 
 Watchdog::Watchdog(
     WatchdogTokenPtr watchdog, CS2WriterPtr cs2writer, EndpointPtr endpoint
-) : watchdog{watchdog}, cs2writer{cs2writer}, endpoint{endpoint}, lastState{ConnectState::ERROR} {
+) : watchdog{watchdog}, cs2writer{cs2writer}, endpoint{endpoint}, lastState{ConnectState::ERROR}, reset{false} {
 }
 
 Watchdog::~Watchdog() {
+}
+
+void Watchdog::sendConnectivityState() {
+    reset = true;
 }
 
 void Watchdog::operator()() {
@@ -47,6 +51,9 @@ void Watchdog::operator()() {
             } else if(!inTime && lastState == ConnectState::CONNECTED) {
                 endpoint->sendMsg(InterfaceConnectivityStateChanged{ConnectState::ERROR});
                 lastState = ConnectState::ERROR;
+            } else if(reset) {
+                endpoint->sendMsg(InterfaceConnectivityStateChanged{lastState});
+                reset = false;
             }
         } catch(const std::exception &e) {
             LOG(moba::common::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
