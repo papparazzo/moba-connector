@@ -21,6 +21,7 @@
 #include "jsonwriter.h"
 
 #include <moba-common/log.h>
+#include <thread>
 
 #include "moba/systemmessage.h"
 #include "moba/interfacemessage.h"
@@ -31,8 +32,8 @@ cs2reader{cs2reader}, cs2writer{cs2writer}, endpoint{endpoint}, brakeVector{brak
 }
 
 void JsonWriter::operator()() {
-    try {
-        while(true) {
+    while(true) {
+        try {
             CS2CanCommand data = cs2reader->read();
 
             if(data.header[1] & 0x01 && data.header[1] == static_cast<uint8_t>(CanCommand::CMD_PING | 0x01)) {
@@ -52,9 +53,10 @@ void JsonWriter::operator()() {
                 default:
                     break;
             }
+        } catch(const std::exception &e) {
+            LOG(moba::common::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
+            std::this_thread::sleep_for(std::chrono::milliseconds{500});
         }
-    } catch(const std::exception &e) {
-        LOG(moba::common::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
     }
 }
 
@@ -66,7 +68,6 @@ void JsonWriter::s88report(const CS2CanCommand &cmd) {
 
     bool active = static_cast<bool>(cmd.data[4]);
 
-    LOG(moba::common::LogLevel::DEBUG) << "addr " << addr << " contact " << contact << " active " << active << " time " << time << std::endl;
     auto locId = brakeVector->trigger({addr, contact});
     if(locId == BrakeVector::IGNORE_CONTACT) {
         return;
