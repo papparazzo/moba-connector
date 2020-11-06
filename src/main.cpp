@@ -54,10 +54,7 @@ int main(int argc, char *argv[]) {
     moba::common::setCoreFileSizeToULimit();
 
     auto socket = std::make_shared<Socket>(appData.host, appData.port);
-
     auto endpoint = EndpointPtr{new Endpoint{socket, appData.appName, appData.version, {Message::SYSTEM}}};
-
-    endpoint->connect();
 
     auto cs2Writer = std::make_shared<CS2Writer>();
     cs2Writer->connect("192.168.178.38");
@@ -71,23 +68,20 @@ int main(int argc, char *argv[]) {
     ///////////////////////////////////////////////////////////////////////////////////
     //
     JsonWriter jsonwriter{cs2Reader, cs2Writer, endpoint, watchdogToken, brakeVector};
-
     std::thread jsonwriterThread{[&jsonwriter](){jsonwriter();}};
-    jsonwriterThread.join();
-
-    ///////////////////////////////////////////////////////////////////////////////////
-    //
-    JsonReader jsonReader{cs2Writer, endpoint, brakeVector};
-
-    std::thread jsonReaderThread{[&jsonReader](){jsonReader();}};
-    jsonReaderThread.join();
+    jsonwriterThread.detach();
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
     Watchdog watchdog{watchdogToken, cs2Writer, endpoint};
-
     std::thread watchDogThread{[&watchdog](){watchdog();}};
-    watchDogThread.join();
+    watchDogThread.detach();
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    //
+    JsonReader jsonReader{cs2Writer, endpoint, watchdogToken, brakeVector};
+    std::thread jsonReaderThread{[&jsonReader](){jsonReader();}};
+    jsonReaderThread.join();
 
     return EXIT_SUCCESS;
 }

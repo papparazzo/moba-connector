@@ -24,6 +24,7 @@
 #include <string>
 #include <memory>
 
+#include "moba/clientmessage.h"
 #include "moba/endpoint.h"
 #include "moba/systemmessage.h"
 #include "moba/interfacemessage.h"
@@ -32,20 +33,26 @@
 #include "moba/cs2writer.h"
 
 #include "brakevector.h"
+#include "watchdogToken.h"
 
 class JsonReader : private boost::noncopyable {
     public:
-        JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, BrakeVectorPtr brakeVector);
+        JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, BrakeVectorPtr brakeVector);
         virtual ~JsonReader() noexcept;
 
         void operator()();
 
     protected:
-        CS2WriterPtr cs2writer;
-        EndpointPtr endpoint;
-        BrakeVectorPtr brakeVector;
-
         void setHardwareState(const SystemHardwareStateChanged &data);
         void setBrakeVector(const InterfaceSetBrakeVector &data);
 
+        void shutdown();
+        void reset();
+
+        bool closing;
+
+        CS2WriterPtr cs2writer;
+        EndpointPtr endpoint;
+        BrakeVectorPtr brakeVector;
+        WatchdogTokenPtr watchdogToken;
 };

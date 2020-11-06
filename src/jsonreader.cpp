@@ -21,11 +21,13 @@
 #include "jsonreader.h"
 #include "moba/registry.h"
 #include "moba/cs2utils.h"
+
 #include <moba-common/log.h>
+#include <thread>
 #include <functional>
 
-JsonReader::JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, BrakeVectorPtr brakeVector) :
-cs2writer{cs2writer}, endpoint{endpoint}, brakeVector{brakeVector} {
+JsonReader::JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, BrakeVectorPtr brakeVector) :
+closing{false}, cs2writer{cs2writer}, endpoint{endpoint}, brakeVector{brakeVector}, watchdogToken{watchdogToken} {
 }
 
 JsonReader::~JsonReader() {
@@ -52,16 +54,33 @@ void JsonReader::setBrakeVector(const InterfaceSetBrakeVector &data) {
     }
 }
 
-void JsonReader::operator()() {
-    try {
-        Registry registry;
-        registry.registerHandler<SystemHardwareStateChanged>(std::bind(&JsonReader::setHardwareState, this, std::placeholders::_1));
-        registry.registerHandler<InterfaceSetBrakeVector>(std::bind(&JsonReader::setBrakeVector, this, std::placeholders::_1));
+void JsonReader::shutdown() {
+    //cs2writer->send(setHalt());
+    closing = true;
+}
 
-        while(true) {
-            registry.handleMsg(endpoint->waitForNewMsg());
+void JsonReader::reset() {
+    //cs2writer->send(setHalt());
+    //brakeVector->reset();
+}
+
+void JsonReader::operator()() {
+    while(!closing) {
+        try {
+            endpoint->connect();
+            Registry registry;
+            registry.registerHandler<SystemHardwareStateChanged>(std::bind(&JsonReader::setHardwareState, this, std::placeholders::_1));
+            registry.registerHandler<InterfaceSetBrakeVector>(std::bind(&JsonReader::setBrakeVector, this, std::placeholders::_1));
+            registry.registerHandler<ClientShutdown>([this]{shutdown();});
+            registry.registerHandler<ClientReset>([this]{reset();});
+
+            while(true) {
+                registry.handleMsg(endpoint->waitForNewMsg());
+            }
+        } catch(const std::exception &e) {
+            watchdogToken->synchronizeStart();
+            LOG(moba::common::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
         }
-    } catch(const std::exception &e) {
-        LOG(moba::common::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds{500});
     }
 }
