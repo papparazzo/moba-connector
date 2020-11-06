@@ -25,25 +25,21 @@
 #include "moba/cs2writer.h"
 #include "moba/endpoint.h"
 #include "moba/interfacemessage.h"
-#include <atomic>
 
 class Watchdog {
     public:
-        Watchdog(WatchdogTokenPtr watchdog, CS2WriterPtr cs2writer, EndpointPtr endpoint);
+        Watchdog(WatchdogTokenPtr watchdogToken, CS2WriterPtr cs2writer, EndpointPtr endpoint);
 
         virtual ~Watchdog() noexcept;
 
         void operator()();
-        void sendConnectivityState();
 
     protected:
         using ConnectState = InterfaceConnectivityStateChanged::Connectivity;
 
-        WatchdogTokenPtr watchdog;
+        WatchdogTokenPtr watchdogToken;
         CS2WriterPtr cs2writer;
         EndpointPtr endpoint;
         ConnectState lastState;
-
-        std::atomic_bool reset;
 };
 

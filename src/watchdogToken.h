@@ -22,11 +22,26 @@
 #include <chrono>
 #include <memory>
 #include <mutex>
+#include <atomic>
 
 class WatchdogToken {
 
     public:
-        WatchdogToken() : pingStartTime{1}, pingResponseTime{0} {
+        enum class TokenState {
+            CONNECTED,   // got a pong from CS within a reasonable time
+            ERROR,       // got no pong or highly delayed
+            SYNCHRONIZE  // send last state again. Important after network failure
+        };
+
+        WatchdogToken() : pingStartTime{1}, pingResponseTime{0}, synchronize{false} {
+        }
+
+        void synchronizeStart() {
+            synchronize = true;
+        }
+
+        void synchronizeFinish() {
+            synchronize = false;
         }
 
         void pingStarted() {
@@ -43,13 +58,16 @@ class WatchdogToken {
             );
         }
 
-        bool isInTime() {
+        TokenState getTokenState() {
             std::lock_guard<std::mutex> l{m};
+            if(synchronize) {
+                return TokenState::SYNCHRONIZE;
+            }
             auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(pingResponseTime - pingStartTime).count();
             if(diff < WatchdogToken::IN_TIME && diff > 0) {
-                return true;
+                return TokenState::CONNECTED;
             }
-            return false;
+            return TokenState::ERROR;
         }
 
     protected:
@@ -57,6 +75,7 @@ class WatchdogToken {
         const int IN_TIME = 300;
         std::chrono::milliseconds pingStartTime;
         std::chrono::milliseconds pingResponseTime;
+        std::atomic_bool synchronize;
 };
 
 using WatchdogTokenPtr = std::shared_ptr<WatchdogToken>;

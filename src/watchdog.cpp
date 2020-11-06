@@ -25,35 +25,31 @@
 #include "moba/cs2utils.h"
 
 Watchdog::Watchdog(
-    WatchdogTokenPtr watchdog, CS2WriterPtr cs2writer, EndpointPtr endpoint
-) : watchdog{watchdog}, cs2writer{cs2writer}, endpoint{endpoint}, lastState{ConnectState::ERROR}, reset{false} {
+    WatchdogTokenPtr watchdogToken, CS2WriterPtr cs2writer, EndpointPtr endpoint
+) : watchdogToken{watchdogToken}, cs2writer{cs2writer}, endpoint{endpoint}, lastState{ConnectState::ERROR} {
 }
 
 Watchdog::~Watchdog() {
-}
-
-void Watchdog::sendConnectivityState() {
-    reset = true;
 }
 
 void Watchdog::operator()() {
     while(true) {
         try {
             cs2writer->send(ping());
-            watchdog->pingStarted();
+            watchdogToken->pingStarted();
 
             std::this_thread::sleep_for(std::chrono::milliseconds{30});
 
-            auto inTime = watchdog->isInTime();
-            if(inTime && lastState == ConnectState::ERROR) {
+            auto tokenState = watchdogToken->getTokenState();
+            if(tokenState == WatchdogToken::TokenState::SYNCHRONIZE) {
+                endpoint->sendMsg(InterfaceConnectivityStateChanged{lastState});
+                watchdogToken->synchronizeFinish();
+            } else if(tokenState == WatchdogToken::TokenState::CONNECTED && lastState == ConnectState::ERROR) {
                 endpoint->sendMsg(InterfaceConnectivityStateChanged{ConnectState::CONNECTED});
                 lastState = ConnectState::CONNECTED;
-            } else if(!inTime && lastState == ConnectState::CONNECTED) {
+            } else if(tokenState == WatchdogToken::TokenState::ERROR && lastState == ConnectState::CONNECTED) {
                 endpoint->sendMsg(InterfaceConnectivityStateChanged{ConnectState::ERROR});
                 lastState = ConnectState::ERROR;
-            } else if(reset) {
-                endpoint->sendMsg(InterfaceConnectivityStateChanged{lastState});
-                reset = false;
             }
         } catch(const std::exception &e) {
             LOG(moba::common::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
