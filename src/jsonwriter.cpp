@@ -53,7 +53,7 @@ void JsonWriter::operator()() {
                 default:
                     break;
             }
-            controlLoco(data);
+            controlLocoCommands(data);
 
         } catch(const std::exception &e) {
             LOG(moba::common::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
@@ -97,7 +97,7 @@ void JsonWriter::convertSystemCommand(const CS2CanCommand &cmd) const {
     }
 }
 
-void JsonWriter::controlLoco(const CS2CanCommand &cmd) const {
+void JsonWriter::controlLocoCommands(const CS2CanCommand &cmd) const {
     switch(static_cast<CanCommand>(cmd.header[1])) {
         case CanCommand::CMD_LOCO_DIRECTION:
             return endpoint->sendMsg(InterfaceSetLocoDirection{cmd.getUID(), cmd.data[4]});
