@@ -40,18 +40,11 @@ void JsonWriter::operator()() {
                 watchdog->pingResponsed();
                 continue;
             }
-            if(data.header[1] == static_cast<uint8_t>(CanCommand::CMD_S88_EVENT | 0x01)) {
-                s88report(data);
+            if(s88report(data)) {
                 continue;
             }
-
-            switch(static_cast<CanCommand>(data.header[1])) {
-                case CanCommand::CMD_SYSTEM:
-                    convertSystemCommand(data);
-                    continue;
-
-                default:
-                    break;
+            if(systemCommands(data)) {
+                continue;
             }
             controlLocoCommands(data);
 
@@ -62,7 +55,11 @@ void JsonWriter::operator()() {
     }
 }
 
-void JsonWriter::s88report(const CS2CanCommand &cmd) {
+bool JsonWriter::s88report(const CS2CanCommand &cmd) {
+    if(cmd.header[1] == static_cast<uint8_t>(CanCommand::CMD_S88_EVENT | 0x01)) {
+        return false;
+    }
+
     auto addr = cmd.getWordAt0();
     auto contact = cmd.getWordAt2();
 
@@ -72,40 +69,46 @@ void JsonWriter::s88report(const CS2CanCommand &cmd) {
 
     auto locId = brakeVector->trigger({addr, contact});
     if(locId == BrakeVector::IGNORE_CONTACT) {
-        return;
+        return true;
     }
     if(locId == BrakeVector::CONTACT_UNSET) {
-        return;
+        return true;
     }
     cs2writer->send(setLocSpeed(locId, 0));
     endpoint->sendMsg(InterfaceContactTriggered{ContactTrigger{addr, contact, active, time}});
+    return true;
 }
 
-void JsonWriter::convertSystemCommand(const CS2CanCommand &cmd) const {
+bool JsonWriter::systemCommands(const CS2CanCommand &cmd) const {
+    if(static_cast<CanCommand>(cmd.header[1]) != CanCommand::CMD_SYSTEM) {
+        return false;
+    }
+
     switch(static_cast<CanSystemSubCommand>(cmd.data[4])) {
         case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_GO:
-            return endpoint->sendMsg(SystemSetEmergencyStop{false});
-
-        case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_HALT:
-            return;
+            endpoint->sendMsg(SystemSetEmergencyStop{false});
+            return true;
 
         case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_STOP:
-            return endpoint->sendMsg(SystemSetEmergencyStop{true});
+            endpoint->sendMsg(SystemSetEmergencyStop{true});
+            return true;
 
         default:
-            break;
+            return false;
     }
 }
 
-void JsonWriter::controlLocoCommands(const CS2CanCommand &cmd) const {
+bool JsonWriter::controlLocoCommands(const CS2CanCommand &cmd) const {
     switch(static_cast<CanCommand>(cmd.header[1])) {
         case CanCommand::CMD_LOCO_DIRECTION:
-            return endpoint->sendMsg(InterfaceSetLocoDirection{cmd.getUID(), cmd.data[4]});
+            endpoint->sendMsg(InterfaceSetLocoDirection{cmd.getUID(), cmd.data[4]});
+            return true;
 
         case CanCommand::CMD_LOCO_SPEED:
-            return endpoint->sendMsg(InterfaceSetLocoSpeed{cmd.getUID(), cmd.getWordAt4()});
+            endpoint->sendMsg(InterfaceSetLocoSpeed{cmd.getUID(), cmd.getWordAt4()});
+            return true;
 
         default:
-            break;
+            return false;
     }
 }

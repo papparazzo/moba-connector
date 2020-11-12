@@ -38,9 +38,9 @@ class JsonWriter : private boost::noncopyable {
         void operator()();
 
     protected:
-        void s88report(const CS2CanCommand &data);
-        void convertSystemCommand(const CS2CanCommand &cmd) const;
-        void controlLocoCommands(const CS2CanCommand &cmd) const;
+        bool s88report(const CS2CanCommand &data);
+        bool systemCommands(const CS2CanCommand &cmd) const;
+        bool controlLocoCommands(const CS2CanCommand &cmd) const;
 
         CS2ReaderPtr cs2reader;
         CS2WriterPtr cs2writer;
