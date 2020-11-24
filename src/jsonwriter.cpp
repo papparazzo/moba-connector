@@ -75,6 +75,7 @@ bool JsonWriter::s88report(const CS2CanCommand &cmd) {
         return true;
     }
     cs2writer->send(setLocSpeed(locId, 0));
+    endpoint->sendMsg(InterfaceSetLocoSpeed{locId, 0});
     endpoint->sendMsg(InterfaceContactTriggered{ContactTrigger{addr, contact, active, time}});
     return true;
 }
