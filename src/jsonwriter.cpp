@@ -71,12 +71,9 @@ bool JsonWriter::s88report(const CS2CanCommand &cmd) {
     if(locId == BrakeVector::IGNORE_CONTACT) {
         return true;
     }
-    if(locId == BrakeVector::CONTACT_UNSET) {
-        return true;
-    }
     cs2writer->send(setLocSpeed(locId, 0));
-    endpoint->sendMsg(InterfaceSetLocoSpeed{locId, 0});
-    endpoint->sendMsg(InterfaceContactTriggered{ContactTrigger{addr, contact, active, time}});
+    endpoint->sendMsg(InterfaceSetLocoSpeed{static_cast<std::uint32_t>(locId), 0});
+    endpoint->sendMsg(InterfaceContactTriggered{ContactTriggerData{addr, contact, active, time}});
     return true;
 }
 
