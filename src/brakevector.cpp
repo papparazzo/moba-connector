@@ -25,15 +25,10 @@ int BrakeVector::trigger(Contact contactId) {
     auto iter = vector.find(contactId);
 
     if(iter == vector.end()) {
-        return BrakeVector::CONTACT_UNSET;
+        return BrakeVector::IGNORE_CONTACT;
     }
 
     auto tmp = iter->second;
-
-    if(tmp == BrakeVector::CONTACT_UNREACHABLE) {
-        // An unreachable Contact was triggered. E.g. train reached contact by a wrong turnout
-        return tmp;
-    }
 
     // Ignore following contacts afterwards (it might be from the same train, E.g. light)
     iter->second = BrakeVector::IGNORE_CONTACT;
@@ -43,14 +38,6 @@ int BrakeVector::trigger(Contact contactId) {
 void BrakeVector::handleContact(Contact contactId, int locId) {
     std::lock_guard<std::mutex> guard{mutex};
     vector[contactId] = locId;
-}
-
-void BrakeVector::ignoreContact(Contact contactId) {
-    handleContact(contactId, BrakeVector::IGNORE_CONTACT);
-}
-
-void BrakeVector::setContactUnreachable(Contact contactId) {
-    handleContact(contactId, BrakeVector::CONTACT_UNREACHABLE);
 }
 
 void BrakeVector::reset() {

@@ -29,9 +29,7 @@
 
 class BrakeVector : private boost::noncopyable {
     public:
-        static const int CONTACT_UNSET       =  0;
-        static const int IGNORE_CONTACT      = -1;
-        static const int CONTACT_UNREACHABLE = -2;
+        static const int IGNORE_CONTACT = 0;
 
         using Contact = std::pair<int, int>;
         using Vector = std::map<Contact, int>;
@@ -39,8 +37,6 @@ class BrakeVector : private boost::noncopyable {
         int trigger(Contact contactId);
 
         void handleContact(Contact contactId, int locId);
-        void ignoreContact(Contact contactId);
-        void setContactUnreachable(Contact contactId);
         void reset();
 
     protected:
