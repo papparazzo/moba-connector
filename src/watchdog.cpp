@@ -19,7 +19,7 @@
  */
 
 #include "watchdog.h"
-#include "moba/interfacemessage.h"
+#include "moba/interfacemessages.h"
 #include <moba-common/log.h>
 #include <thread>
 #include "moba/cs2utils.h"

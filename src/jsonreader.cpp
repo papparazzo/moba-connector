@@ -50,7 +50,7 @@ void JsonReader::setHardwareState(const SystemHardwareStateChanged &data) {
 
 void JsonReader::setBrakeVector(const InterfaceSetBrakeVector &data) {
     for(auto iter : data.items) {
-        brakeVector->handleContact({iter.contact.contactNb, iter.contact.modulAddr}, iter.locId);
+        brakeVector->handleContact({iter.contact.modulAddr, iter.contact.contactNb}, iter.localId);
     }
 }
 

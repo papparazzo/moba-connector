@@ -23,8 +23,8 @@
 #include <moba-common/log.h>
 #include <thread>
 
-#include "moba/systemmessage.h"
-#include "moba/interfacemessage.h"
+#include "moba/systemmessages.h"
+#include "moba/interfacemessages.h"
 #include "moba/cs2utils.h"
 
 JsonWriter::JsonWriter(CS2ReaderPtr cs2reader, CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdog, BrakeVectorPtr brakeVector) :
@@ -56,24 +56,26 @@ void JsonWriter::operator()() {
 }
 
 bool JsonWriter::s88report(const CS2CanCommand &cmd) {
-    if(cmd.header[1] == static_cast<uint8_t>(CanCommand::CMD_S88_EVENT | 0x01)) {
+    if(cmd.header[1] != static_cast<uint8_t>(CanCommand::CMD_S88_EVENT | 0x01)) {
         return false;
     }
 
-    auto addr = cmd.getWordAt0();
+    auto module = cmd.getWordAt0();
     auto contact = cmd.getWordAt2();
 
     auto time = cmd.getWordAt6();
 
     bool active = static_cast<bool>(cmd.data[4]);
 
-    auto locId = brakeVector->trigger({addr, contact});
+    LOG(moba::common::LogLevel::DEBUG) << "Feedback module <" << module << "> contact <" << contact << ">" << std::endl;
+
+    auto locId = brakeVector->trigger({module, contact});
     if(locId == BrakeVector::IGNORE_CONTACT) {
         return true;
     }
     cs2writer->send(setLocSpeed(locId, 0));
     endpoint->sendMsg(InterfaceSetLocoSpeed{static_cast<std::uint32_t>(locId), 0});
-    endpoint->sendMsg(InterfaceContactTriggered{ContactTriggerData{addr, contact, active, time}});
+    endpoint->sendMsg(InterfaceContactTriggered{ContactTriggerData{module, contact, active, time}});
     return true;
 }
 

@@ -24,10 +24,10 @@
 #include <string>
 #include <memory>
 
-#include "moba/clientmessage.h"
+#include "moba/clientmessages.h"
 #include "moba/endpoint.h"
-#include "moba/systemmessage.h"
-#include "moba/interfacemessage.h"
+#include "moba/systemmessages.h"
+#include "moba/interfacemessages.h"
 #include "moba/shared.h"
 #include "moba/cs2cancommand.h"
 #include "moba/cs2writer.h"

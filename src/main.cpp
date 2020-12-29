@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     moba::common::setCoreFileSizeToULimit();
 
     auto socket = std::make_shared<Socket>(appData.host, appData.port);
-    auto endpoint = EndpointPtr{new Endpoint{socket, appData.appName, appData.version, {Message::SYSTEM}}};
+    auto endpoint = EndpointPtr{new Endpoint{socket, appData.appName, appData.version, {Message::INTERFACE, Message::SYSTEM}}};
 
     auto cs2Writer = std::make_shared<CS2Writer>();
     cs2Writer->connect("192.168.178.38");
