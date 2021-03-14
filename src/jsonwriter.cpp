@@ -70,11 +70,11 @@ bool JsonWriter::s88report(const CS2CanCommand &cmd) {
     LOG(moba::common::LogLevel::DEBUG) << "Feedback module <" << module << "> contact <" << contact << ">" << std::endl;
 
     auto locId = brakeVector->trigger({module, contact});
-    if(locId == BrakeVector::IGNORE_CONTACT) {
-        return true;
+    if(locId != BrakeVector::IGNORE_CONTACT) {
+        cs2writer->send(setLocSpeed(locId, 0));
+        endpoint->sendMsg(InterfaceSetLocoSpeed{static_cast<std::uint32_t>(locId), 0});
     }
-    cs2writer->send(setLocSpeed(locId, 0));
-    endpoint->sendMsg(InterfaceSetLocoSpeed{static_cast<std::uint32_t>(locId), 0});
+    // Verzögerung einbauen
     endpoint->sendMsg(InterfaceContactTriggered{ContactTriggerData{module, contact, active, time}});
     return true;
 }
