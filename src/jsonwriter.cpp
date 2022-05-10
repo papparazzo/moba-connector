@@ -74,6 +74,7 @@ bool JsonWriter::s88report(const CS2CanCommand &cmd) {
         cs2writer->send(setLocSpeed(locId, 0));
         endpoint->sendMsg(InterfaceSetLocoSpeed{static_cast<std::uint32_t>(locId), 0});
     }
+
     // Verzögerung einbauen
     endpoint->sendMsg(InterfaceContactTriggered{ContactTriggerData{module, contact, active, time}});
     return true;
