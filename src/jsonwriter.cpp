@@ -87,11 +87,11 @@ bool JsonWriter::systemCommands(const CS2CanCommand &cmd) const {
 
     switch(static_cast<CanSystemSubCommand>(cmd.data[4])) {
         case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_GO:
-            endpoint->sendMsg(SystemSetEmergencyStop{false});
+            endpoint->sendMsg(SystemReleaseEmergencyStop{});
             return true;
 
         case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_STOP:
-            endpoint->sendMsg(SystemSetEmergencyStop{true});
+            endpoint->sendMsg(SystemTriggerEmergencyStop{SystemTriggerEmergencyStop::EmergencyTriggerReason::CENTRAL_STATION});
             return true;
 
         default:
