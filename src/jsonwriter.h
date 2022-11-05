@@ -29,10 +29,11 @@
 
 #include "brakevector.h"
 #include "watchdogToken.h"
+#include "sharedData.h"
 
 class JsonWriter : private boost::noncopyable {
     public:
-        JsonWriter(CS2ReaderPtr cs2reader, CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdog, BrakeVectorPtr brakeVector);
+        JsonWriter(CS2ReaderPtr cs2reader, CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdog, SharedDataPtr sharedData);
         virtual ~JsonWriter() noexcept { }
 
         void operator()();
@@ -41,10 +42,11 @@ class JsonWriter : private boost::noncopyable {
         bool s88report(const CS2CanCommand &data);
         bool systemCommands(const CS2CanCommand &cmd) const;
         bool controlLocoCommands(const CS2CanCommand &cmd) const;
+        bool controlSwitch(const CS2CanCommand &cmd) const;
 
         CS2ReaderPtr cs2reader;
         CS2WriterPtr cs2writer;
         EndpointPtr endpoint;
-        BrakeVectorPtr brakeVector;
         WatchdogTokenPtr watchdog;
+        SharedDataPtr sharedData;
 };

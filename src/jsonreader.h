@@ -34,10 +34,11 @@
 
 #include "brakevector.h"
 #include "watchdogToken.h"
+#include "sharedData.h"
 
 class JsonReader : private boost::noncopyable {
     public:
-        JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, BrakeVectorPtr brakeVector);
+        JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, SharedDataPtr sharedData);
         virtual ~JsonReader() noexcept;
 
         void operator()();
@@ -50,10 +51,9 @@ class JsonReader : private boost::noncopyable {
         void reset();
 
         bool closing;
-        bool automatic;
 
         CS2WriterPtr cs2writer;
         EndpointPtr endpoint;
-        BrakeVectorPtr brakeVector;
         WatchdogTokenPtr watchdogToken;
+        SharedDataPtr sharedData;
 };

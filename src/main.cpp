@@ -38,6 +38,7 @@
 #include "moba/socket.h"
 #include "moba/endpoint.h"
 #include "jsonwriter.h"
+#include "sharedData.h"
 
 namespace {
     moba::common::AppData appData = {
@@ -54,7 +55,7 @@ int main(int argc, char *argv[]) {
     moba::common::setCoreFileSizeToULimit();
 
     auto socket = std::make_shared<Socket>(appData.host, appData.port);
-    auto endpoint = EndpointPtr{new Endpoint{socket, appData.appName, appData.version, {Message::INTERFACE, Message::SYSTEM}}};
+    auto endpoint = EndpointPtr{new Endpoint{socket, appData.appName, appData.version, {Message::INTERFACE, Message::SYSTEM, Message::TIMER}}};
 
     auto cs2Writer = std::make_shared<CS2Writer>();
     cs2Writer->connect("192.168.178.38");
@@ -62,12 +63,12 @@ int main(int argc, char *argv[]) {
     auto cs2Reader = std::make_shared<CS2Reader>();
     cs2Reader->connect();
 
-    auto brakeVector = std::make_shared<BrakeVector>();
     auto watchdogToken = std::make_shared<WatchdogToken>();
+    auto sharedData = std::make_shared<SharedData>();
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
-    JsonWriter jsonwriter{cs2Reader, cs2Writer, endpoint, watchdogToken, brakeVector};
+    JsonWriter jsonwriter{cs2Reader, cs2Writer, endpoint, watchdogToken, sharedData};
     std::thread jsonwriterThread{[&jsonwriter](){jsonwriter();}};
     jsonwriterThread.detach();
 
@@ -79,7 +80,7 @@ int main(int argc, char *argv[]) {
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
-    JsonReader jsonReader{cs2Writer, endpoint, watchdogToken, brakeVector};
+    JsonReader jsonReader{cs2Writer, endpoint, watchdogToken, sharedData};
     std::thread jsonReaderThread{[&jsonReader](){jsonReader();}};
     jsonReaderThread.join();
 

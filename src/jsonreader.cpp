@@ -26,8 +26,8 @@
 #include <thread>
 #include <functional>
 
-JsonReader::JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, BrakeVectorPtr brakeVector) :
-closing{false}, automatic{false}, cs2writer{cs2writer}, endpoint{endpoint}, brakeVector{brakeVector}, watchdogToken{watchdogToken} {
+JsonReader::JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, SharedDataPtr sharedData) :
+closing{false}, cs2writer{cs2writer}, endpoint{endpoint}, watchdogToken{watchdogToken}, sharedData{sharedData} {
 }
 
 JsonReader::~JsonReader() {
@@ -50,7 +50,7 @@ void JsonReader::setHardwareState(const SystemHardwareStateChanged &data) {
 
 void JsonReader::setBrakeVector(const InterfaceSetBrakeVector &data) {
     for(auto iter : data.items) {
-        brakeVector->handleContact({iter.contact.modulAddr, iter.contact.contactNb}, iter.localId);
+        sharedData->brakeVector.handleContact({iter.contact.modulAddr, iter.contact.contactNb}, iter.localId);
     }
 }
 
@@ -61,8 +61,16 @@ void JsonReader::shutdown() {
 
 void JsonReader::reset() {
     //cs2writer->send(setHalt());
-    brakeVector->reset();
+    sharedData->brakeVector.reset();
 }
+
+/*
+void JsonReader::sswitch() {
+    cs2writer.send(setSwitch(convertMMToLocId(6), true, true));
+//    usleep(50000);
+    cs2writer.send(setSwitch(convertMMToLocId(6), true, false));
+}
+*/
 
 void JsonReader::operator()() {
     while(!closing) {
@@ -75,7 +83,7 @@ void JsonReader::operator()() {
             registry.registerHandler<InterfaceSetLocoSpeed>([this](const InterfaceSetLocoSpeed &d){cs2writer->send(setLocSpeed(d.localId, d.speed));});
             registry.registerHandler<ClientShutdown>([this]{shutdown();});
             registry.registerHandler<ClientReset>([this]{reset();});
-            registry.registerHandler<SystemSetAutomaticMode>([this](const SystemSetAutomaticMode &d){automatic = d.automaticActive;});
+            registry.registerHandler<SystemSetAutomaticMode>([this](const SystemSetAutomaticMode &d){sharedData->automatic = d.automaticActive;});
 
             while(true) {
                 registry.handleMsg(endpoint->waitForNewMsg());
