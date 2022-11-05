@@ -50,6 +50,7 @@ class JsonReader : private boost::noncopyable {
         void reset();
 
         bool closing;
+        bool automatic;
 
         CS2WriterPtr cs2writer;
         EndpointPtr endpoint;
