@@ -19,14 +19,13 @@
  */
 
 #include "brakevector.h"
-#include <moba-common/log.h>
 
 int BrakeVector::trigger(Contact contactId) {
     std::lock_guard<std::mutex> guard{mutex};
     auto iter = vector.find(contactId);
 
     if(iter == vector.end()) {
-        LOG(moba::common::LogLevel::DEBUG) << "contact no found. Ignoring..." << std::endl;
+        std::cerr << "contact no found. Ignoring..." << std::endl;
         return BrakeVector::IGNORE_CONTACT;
     }
 

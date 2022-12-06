@@ -22,7 +22,6 @@
 #include "moba/registry.h"
 #include "moba/cs2utils.h"
 
-#include <moba-common/log.h>
 #include <thread>
 #include <functional>
 
@@ -85,12 +84,12 @@ void JsonReader::operator()() {
             registry.registerHandler<ClientReset>([this]{reset();});
             registry.registerHandler<SystemSetAutomaticMode>([this](const SystemSetAutomaticMode &d){sharedData->automatic = d.automaticActive;});
 
-            while(true) {
+            while(!closing) {
                 registry.handleMsg(endpoint->waitForNewMsg());
             }
         } catch(const std::exception &e) {
             watchdogToken->synchronizeStart();
-            LOG(moba::common::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
+            std::cerr << "exception occured! <" << e.what() << ">" << std::endl;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds{500});
     }

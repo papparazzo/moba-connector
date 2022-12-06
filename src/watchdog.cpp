@@ -20,7 +20,6 @@
 
 #include "watchdog.h"
 #include "moba/interfacemessages.h"
-#include <moba-common/log.h>
 #include <thread>
 #include "moba/cs2utils.h"
 
@@ -52,7 +51,7 @@ void Watchdog::operator()() {
                 lastState = ConnectState::ERROR;
             }
         } catch(const std::exception &e) {
-            LOG(moba::common::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
+            std::cerr << "exception occured! <" << e.what() << ">" << std::endl;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds{500});
     }

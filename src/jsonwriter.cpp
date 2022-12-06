@@ -52,7 +52,7 @@ void JsonWriter::operator()() {
 
             controlSwitch(data);
         } catch(const std::exception &e) {
-            LOG(moba::common::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
+            std::cerr << "exception occured! <" << e.what() << ">" << std::endl;
             std::this_thread::sleep_for(std::chrono::milliseconds{500});
         }
     }
@@ -70,7 +70,7 @@ bool JsonWriter::s88report(const CS2CanCommand &cmd) {
 
     bool active = static_cast<bool>(cmd.data[4]);
 
-    LOG(moba::common::LogLevel::DEBUG) << "Feedback module <" << module << "> contact <" << contact << ">" << std::endl;
+    std::cerr << "Feedback module <" << module << "> contact <" << contact << ">" << std::endl;
 
     auto locId = sharedData->brakeVector.trigger({module, contact});
     if(locId != BrakeVector::IGNORE_CONTACT) {
