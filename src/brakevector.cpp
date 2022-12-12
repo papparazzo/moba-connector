@@ -19,6 +19,7 @@
  */
 
 #include "brakevector.h"
+#include <iostream>
 
 int BrakeVector::trigger(Contact contactId) {
     std::lock_guard<std::mutex> guard{mutex};
