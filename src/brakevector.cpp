@@ -26,7 +26,6 @@ int BrakeVector::trigger(Contact contactId) {
     auto iter = vector.find(contactId);
 
     if(iter == vector.end()) {
-        std::cerr << "contact no found. Ignoring..." << std::endl;
         return BrakeVector::IGNORE_CONTACT;
     }
 
