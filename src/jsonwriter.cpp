@@ -78,7 +78,7 @@ bool JsonWriter::s88report(const CS2CanCommand &cmd) {
         endpoint->sendMsg(InterfaceSetLocoSpeed{static_cast<std::uint32_t>(locId), 0});
     }
 
-    // FIXME Verzögerung einbauen (Warum?)
+    // FIXME Verzögerung einbauen (um Rueckmeldekontact zu entprellen...)
     endpoint->sendMsg(InterfaceContactTriggered{ContactTriggerData{module, contact, active, time}});
     return true;
 }
