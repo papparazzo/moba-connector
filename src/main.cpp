@@ -67,19 +67,19 @@ int main(int argc, char *argv[]) {
     ///////////////////////////////////////////////////////////////////////////////////
     //
     JsonWriter jsonwriter{cs2Reader, cs2Writer, endpoint, watchdogToken, sharedData};
-    std::thread jsonwriterThread{[&jsonwriter](){jsonwriter();}};
+    std::thread jsonwriterThread{[&jsonwriter]() {jsonwriter();}};
     jsonwriterThread.detach();
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
     Watchdog watchdog{watchdogToken, cs2Writer, endpoint};
-    std::thread watchDogThread{[&watchdog](){watchdog();}};
+    std::thread watchDogThread{[&watchdog]() {watchdog();}};
     watchDogThread.detach();
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
     JsonReader jsonReader{cs2Writer, endpoint, watchdogToken, sharedData};
-    std::thread jsonReaderThread{[&jsonReader](){jsonReader();}};
+    std::thread jsonReaderThread{[&jsonReader]() {jsonReader();}};
     jsonReaderThread.join();
 
     return EXIT_SUCCESS;
