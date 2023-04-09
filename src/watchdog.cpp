@@ -25,7 +25,7 @@
 
 Watchdog::Watchdog(
     WatchdogTokenPtr watchdogToken, CS2WriterPtr cs2writer, EndpointPtr endpoint
-) : watchdogToken{watchdogToken}, cs2writer{cs2writer}, endpoint{endpoint}, lastState{ConnectState::ERROR} {
+): watchdogToken{watchdogToken}, cs2writer{cs2writer}, endpoint{endpoint}, lastState{ConnectState::ERROR} {
 }
 
 Watchdog::~Watchdog() {

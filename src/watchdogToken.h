@@ -27,56 +27,59 @@
 
 class WatchdogToken {
 
-    public:
-        enum class TokenState {
-            CONNECTED,   // got a pong from CS within a reasonable time
-            ERROR,       // got no pong or highly delayed
-            SYNCHRONIZE  // send last state again. Important after network failure
-        };
+public:
+    enum class TokenState {
+        CONNECTED,   // got a pong from CS within a reasonable time
+        ERROR,       // got no pong or highly delayed
+        SYNCHRONIZE  // send last state again. Important after network failure
+    };
 
-        WatchdogToken() : pingStartTime{1}, pingResponseTime{0}, synchronize{false} {
+    WatchdogToken(): pingStartTime{1}, pingResponseTime{0}, synchronize{false} {
+    }
+
+    void synchronizeStart() {
+        synchronize = true;
+    }
+
+    void synchronizeFinish() {
+        synchronize = false;
+    }
+
+    void pingStarted() {
+        std::lock_guard<std::mutex> l{m};
+        pingStartTime = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch()
+        );
+    }
+
+    void pingResponsed() {
+        std::lock_guard<std::mutex> l{m};
+        pingResponseTime = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch()
+        );
+    }
+
+    TokenState getTokenState() {
+        std::lock_guard<std::mutex> l{m};
+        if(synchronize) {
+            return TokenState::SYNCHRONIZE;
         }
-
-        void synchronizeStart() {
-            synchronize = true;
+        auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(
+            pingResponseTime - pingStartTime
+        ).count();
+        
+        if(diff < WatchdogToken::IN_TIME && diff > 0) {
+            return TokenState::CONNECTED;
         }
+        return TokenState::ERROR;
+    }
 
-        void synchronizeFinish() {
-            synchronize = false;
-        }
-
-        void pingStarted() {
-            std::lock_guard<std::mutex> l{m};
-            pingStartTime = std::chrono::duration_cast<std::chrono::milliseconds>(
-                std::chrono::system_clock::now().time_since_epoch()
-            );
-        }
-
-        void pingResponsed() {
-            std::lock_guard<std::mutex> l{m};
-            pingResponseTime = std::chrono::duration_cast<std::chrono::milliseconds>(
-                std::chrono::system_clock::now().time_since_epoch()
-            );
-        }
-
-        TokenState getTokenState() {
-            std::lock_guard<std::mutex> l{m};
-            if(synchronize) {
-                return TokenState::SYNCHRONIZE;
-            }
-            auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(pingResponseTime - pingStartTime).count();
-            if(diff < WatchdogToken::IN_TIME && diff > 0) {
-                return TokenState::CONNECTED;
-            }
-            return TokenState::ERROR;
-        }
-
-    protected:
-        std::mutex m;
-        const int IN_TIME = 300;
-        std::chrono::milliseconds pingStartTime;
-        std::chrono::milliseconds pingResponseTime;
-        std::atomic_bool synchronize;
+protected:
+    std::mutex m;
+    const int IN_TIME = 300;
+    std::chrono::milliseconds pingStartTime;
+    std::chrono::milliseconds pingResponseTime;
+    std::atomic_bool synchronize;
 };
 
 using WatchdogTokenPtr = std::shared_ptr<WatchdogToken>;
