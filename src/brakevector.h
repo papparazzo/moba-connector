@@ -27,21 +27,28 @@
 #include <mutex>
 #include <memory>
 
-class BrakeVector : private boost::noncopyable {
-    public:
-        static const int IGNORE_CONTACT = 0;
+class BrakeVector {
+public:
+    BrakeVector() = default;
+    
+    BrakeVector(const BrakeVector&) = delete;
+    BrakeVector& operator=(const BrakeVector&) = delete;
+    
+    ~BrakeVector() = default;
+    
+    static const int IGNORE_CONTACT = 0;
 
-        using Contact = std::pair<int, int>;
-        using Vector = std::map<Contact, int>;
+    using Contact = std::pair<int, int>;
+    using Vector = std::map<Contact, int>;
 
-        int trigger(Contact contactId);
+    int trigger(Contact contactId);
 
-        void handleContact(Contact contactId, int locId);
-        void reset();
+    void handleContact(Contact contactId, int locId);
+    void reset();
 
-    protected:
-        Vector vector;
-        std::mutex mutex;
+protected:
+    Vector vector;
+    std::mutex mutex;
 };
 
 using BrakeVectorPtr = std::shared_ptr<BrakeVector>;
