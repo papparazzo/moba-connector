@@ -27,7 +27,7 @@
 #include "moba/interfacemessages.h"
 #include "moba/cs2utils.h"
 
-JsonWriter::JsonWriter(CS2ReaderPtr cs2reader, CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdog, SharedDataPtr sharedData) :
+JsonWriter::JsonWriter(CS2ReaderPtr cs2reader, CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdog, SharedDataPtr sharedData):
 cs2reader{cs2reader}, cs2writer{cs2writer}, endpoint{endpoint}, watchdog{watchdog}, sharedData{sharedData} {
 }
 
@@ -74,7 +74,7 @@ bool JsonWriter::s88report(const CS2CanCommand &cmd) {
 
     auto locId = sharedData->brakeVector.trigger({module, contact});
     if(locId != BrakeVector::IGNORE_CONTACT) {
-        cs2writer->send(setLocSpeed(locId, 0));
+        cs2writer->send(::setLocSpeed(locId, 0));
         endpoint->sendMsg(InterfaceSetLocoSpeed{static_cast<std::uint32_t>(locId), 0});
     }
 
@@ -120,7 +120,7 @@ bool JsonWriter::controlSwitch(const CS2CanCommand &cmd) const {
     switch(static_cast<CanCommand>(cmd.header[1])) {
         case CanCommand::CMD_SET_SWITCH:
             if(sharedData->automatic) {
-                cs2writer->send(setEmergencyStop());
+                cs2writer->send(::setEmergencyStop());
                 endpoint->sendMsg(SystemTriggerEmergencyStop{SystemTriggerEmergencyStop::EmergencyTriggerReason::SELF_ACTING_BY_EXTERN_SWITCHING});
             }
             return true;

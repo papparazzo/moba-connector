@@ -11,7 +11,8 @@ moba_connector_LDADD = \
   $(srcdir)/../modules/lib-msghandling/src/moba/libmsghandling.a \
   $(srcdir)/../modules/lib-cs2interface/src/moba/libcs2interface.a
 
-LDFLAGS += -L/usr/local/lib -pthread
+AM_LDFLAGS = \
+  -L/usr/local/lib -pthread
 
 AM_CPPFLAGS = \
   -I$(srcdir)/../modules/lib-msghandling/src \
