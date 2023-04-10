@@ -48,28 +48,31 @@ void JsonReader::setHardwareState(const SystemHardwareStateChanged &data) {
 }
 
 void JsonReader::setBrakeVector(const InterfaceSetBrakeVector &data) {
-    for(auto iter : data.items) {
-        sharedData->brakeVector.handleContact({iter.contact.modulAddr, iter.contact.contactNb}, iter.localId);
+    for(auto iter: data.items) {
+        sharedData->brakeVector.handleContact(
+            {iter.contact.modulAddr, iter.contact.contactNb},
+            iter.localId
+        );
     }
 }
 
 void JsonReader::shutdown() {
-    //cs2writer->send(setHalt());
+    //cs2writer->send(::setHalt());
     closing = true;
 }
 
 void JsonReader::reset() {
-    //cs2writer->send(setHalt());
+    //cs2writer->send(::setHalt());
     sharedData->brakeVector.reset();
 }
 
-/*
-void JsonReader::sswitch() {
-    cs2writer.send(setSwitch(convertMMToLocId(6), true, true));
-//    usleep(50000);
-    cs2writer.send(setSwitch(convertMMToLocId(6), true, false));
+void JsonReader::setSwitch(const InterfaceSwitchAccessoryDecoders &data) {
+    /*
+    cs2writer.send(::setSwitch(convertMMToLocId(addr), r, true));
+    usleep(50000);
+    cs2writer.send(::setSwitch(convertMMToLocId(addr), r, false));
+    */
 }
-*/
 
 void JsonReader::operator()() {
     while(!closing) {
@@ -80,6 +83,7 @@ void JsonReader::operator()() {
             registry.registerHandler<InterfaceSetBrakeVector>(std::bind(&JsonReader::setBrakeVector, this, std::placeholders::_1));
             registry.registerHandler<InterfaceSetLocoDirection>([this](const InterfaceSetLocoDirection &d) {cs2writer->send(setLocDirection(d.localId, static_cast<std::uint8_t>(d.direction)));});
             registry.registerHandler<InterfaceSetLocoSpeed>([this](const InterfaceSetLocoSpeed &d) {cs2writer->send(setLocSpeed(d.localId, d.speed));});
+            registry.registerHandler<InterfaceSwitchAccessoryDecoders>(std::bind(&JsonReader::setSwitch, this, std::placeholders::_1));
             registry.registerHandler<ClientShutdown>([this]{shutdown();});
             registry.registerHandler<ClientReset>([this]{reset();});
             registry.registerHandler<SystemSetAutomaticMode>([this](const SystemSetAutomaticMode &d) {sharedData->automatic = d.automaticActive;});

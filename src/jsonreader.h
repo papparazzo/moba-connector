@@ -36,24 +36,25 @@
 #include "watchdogToken.h"
 #include "sharedData.h"
 
-class JsonReader : private boost::noncopyable {
-    public:
-        JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, SharedDataPtr sharedData);
-        virtual ~JsonReader() noexcept;
+class JsonReader: private boost::noncopyable {
+public:
+    JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, SharedDataPtr sharedData);
+    virtual ~JsonReader() noexcept;
 
-        void operator()();
+    void operator()();
 
-    protected:
-        void setHardwareState(const SystemHardwareStateChanged &data);
-        void setBrakeVector(const InterfaceSetBrakeVector &data);
+protected:
+    void setHardwareState(const SystemHardwareStateChanged &data);
+    void setBrakeVector(const InterfaceSetBrakeVector &data);
+    void setSwitch(const InterfaceSwitchAccessoryDecoders &data);
+    
+    void shutdown();
+    void reset();
 
-        void shutdown();
-        void reset();
+    bool closing;
 
-        bool closing;
-
-        CS2WriterPtr cs2writer;
-        EndpointPtr endpoint;
-        WatchdogTokenPtr watchdogToken;
-        SharedDataPtr sharedData;
+    CS2WriterPtr cs2writer;
+    EndpointPtr endpoint;
+    WatchdogTokenPtr watchdogToken;
+    SharedDataPtr sharedData;
 };
