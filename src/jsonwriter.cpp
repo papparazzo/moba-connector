@@ -27,8 +27,8 @@
 #include "moba/interfacemessages.h"
 #include "moba/cs2utils.h"
 
-JsonWriter::JsonWriter(CS2ReaderPtr cs2reader, CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdog, SharedDataPtr sharedData):
-cs2reader{cs2reader}, cs2writer{cs2writer}, endpoint{endpoint}, watchdog{watchdog}, sharedData{sharedData} {
+JsonWriter::JsonWriter(CS2ReaderPtr cs2reader, CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, SharedDataPtr sharedData):
+cs2reader{cs2reader}, cs2writer{cs2writer}, endpoint{endpoint}, watchdogToken{watchdogToken}, sharedData{sharedData} {
 }
 
 void JsonWriter::operator()() {
@@ -37,7 +37,7 @@ void JsonWriter::operator()() {
             CS2CanCommand data = cs2reader->read();
 
             if(data.header[1] & 0x01 && data.header[1] == static_cast<uint8_t>(CanCommand::CMD_PING | 0x01)) {
-                watchdog->pingResponsed();
+                watchdogToken->pingResponsed();
                 continue;
             }
             if(s88report(data)) {
