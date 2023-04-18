@@ -56,6 +56,15 @@ void JsonReader::setBrakeVector(const InterfaceSetBrakeVector &data) {
     }
 }
 
+void JsonReader::resetBrakeVector(const InterfaceResetBrakeVector &data) {
+    for(auto iter: data.items) {
+        sharedData->brakeVector.handleContact(
+            {iter.contact.modulAddr, iter.contact.contactNb},
+            BrakeVector::IGNORE_CONTACT
+        );        
+    }
+}
+
 void JsonReader::shutdown() {
     //cs2writer->send(::setHalt());
     closing = true;
@@ -81,6 +90,7 @@ void JsonReader::operator()() {
             Registry registry;
             registry.registerHandler<SystemHardwareStateChanged>(std::bind(&JsonReader::setHardwareState, this, std::placeholders::_1));
             registry.registerHandler<InterfaceSetBrakeVector>(std::bind(&JsonReader::setBrakeVector, this, std::placeholders::_1));
+            registry.registerHandler<InterfaceResetBrakeVector>(std::bind(&JsonReader::resetBrakeVector, this, std::placeholders::_1));
             registry.registerHandler<InterfaceSetLocoDirection>([this](const InterfaceSetLocoDirection &d) {cs2writer->send(setLocDirection(d.localId, static_cast<std::uint8_t>(d.direction)));});
             registry.registerHandler<InterfaceSetLocoSpeed>([this](const InterfaceSetLocoSpeed &d) {cs2writer->send(setLocSpeed(d.localId, d.speed));});
             registry.registerHandler<InterfaceSwitchAccessoryDecoders>(std::bind(&JsonReader::setSwitch, this, std::placeholders::_1));

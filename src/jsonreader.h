@@ -46,6 +46,7 @@ public:
 protected:
     void setHardwareState(const SystemHardwareStateChanged &data);
     void setBrakeVector(const InterfaceSetBrakeVector &data);
+    void resetBrakeVector(const InterfaceResetBrakeVector &data);
     void setSwitch(const InterfaceSwitchAccessoryDecoders &data);
     
     void shutdown();
