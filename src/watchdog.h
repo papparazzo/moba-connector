@@ -30,7 +30,7 @@ class Watchdog {
 public:
     Watchdog(WatchdogTokenPtr watchdogToken, CS2WriterPtr cs2writer, EndpointPtr endpoint);
 
-    virtual ~Watchdog() noexcept;
+    virtual ~Watchdog() noexcept = default;
 
     void operator()();
 
@@ -38,8 +38,8 @@ protected:
     using ConnectState = InterfaceConnectivityStateChanged::Connectivity;
 
     WatchdogTokenPtr watchdogToken;
-    CS2WriterPtr cs2writer;
-    EndpointPtr endpoint;
-    ConnectState lastState;
+    CS2WriterPtr     cs2writer;
+    EndpointPtr      endpoint;
+    ConnectState     lastState;
 };
 

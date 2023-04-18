@@ -26,7 +26,6 @@
 #include <atomic>
 
 class WatchdogToken {
-
 public:
     enum class TokenState {
         CONNECTED,   // got a pong from CS within a reasonable time

@@ -28,9 +28,6 @@ Watchdog::Watchdog(
 ): watchdogToken{watchdogToken}, cs2writer{cs2writer}, endpoint{endpoint}, lastState{ConnectState::ERROR} {
 }
 
-Watchdog::~Watchdog() {
-}
-
 void Watchdog::operator()() {
     while(true) {
         try {
