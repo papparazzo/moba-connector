@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <boost/noncopyable.hpp>
-
 #include "moba/cs2cancommand.h"
 #include "moba/endpoint.h"
 #include "moba/cs2writer.h"
@@ -31,11 +29,14 @@
 #include "watchdogToken.h"
 #include "sharedData.h"
 
-class JsonWriter: private boost::noncopyable {
+class JsonWriter {
 public:
     JsonWriter(CS2ReaderPtr cs2reader, CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdog, SharedDataPtr sharedData);
-    virtual ~JsonWriter() noexcept { }
+    virtual ~JsonWriter() noexcept = default;
 
+    JsonWriter(const JsonWriter&) = delete;
+    JsonWriter& operator=(const JsonWriter&) = delete;
+    
     void operator()();
 
 protected:

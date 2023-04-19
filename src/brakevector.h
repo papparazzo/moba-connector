@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <boost/noncopyable.hpp>
-
 #include <map>
 #include <exception>
 #include <mutex>

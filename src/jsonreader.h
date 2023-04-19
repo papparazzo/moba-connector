@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include <boost/noncopyable.hpp>
 #include <string>
 #include <memory>
 
@@ -36,11 +35,14 @@
 #include "watchdogToken.h"
 #include "sharedData.h"
 
-class JsonReader: private boost::noncopyable {
+class JsonReader {
 public:
     JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, SharedDataPtr sharedData);
-    virtual ~JsonReader() noexcept;
+    virtual ~JsonReader() noexcept = default;
 
+    JsonReader(const JsonReader&) = delete;
+    JsonReader& operator=(const JsonReader&) = delete;
+    
     void operator()();
 
 protected:
@@ -54,8 +56,8 @@ protected:
 
     bool closing;
 
-    CS2WriterPtr cs2writer;
-    EndpointPtr endpoint;
+    CS2WriterPtr     cs2writer;
+    EndpointPtr      endpoint;
     WatchdogTokenPtr watchdogToken;
-    SharedDataPtr sharedData;
+    LocomotivesPtr   locomotives;
 };
