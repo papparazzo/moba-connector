@@ -30,6 +30,9 @@ class Watchdog {
 public:
     Watchdog(WatchdogTokenPtr watchdogToken, CS2WriterPtr cs2writer, EndpointPtr endpoint);
 
+    Watchdog(const Watchdog&) = delete;
+    Watchdog(Watchdog&&) = default;
+    Watchdog& operator=(const Watchdog&) = delete;
     virtual ~Watchdog() noexcept = default;
 
     void operator()();
