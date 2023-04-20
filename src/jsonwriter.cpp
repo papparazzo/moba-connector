@@ -26,6 +26,8 @@
 #include "moba/systemmessages.h"
 #include "moba/interfacemessages.h"
 #include "moba/cs2utils.h"
+#include "moba/configloklistreader.h"
+#include "moba/configreader.h"
 
 JsonWriter::JsonWriter(CS2ReaderPtr cs2reader, CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, SharedDataPtr sharedData):
 cs2reader{cs2reader}, cs2writer{cs2writer}, endpoint{endpoint}, watchdogToken{watchdogToken}, sharedData{sharedData} {
@@ -128,4 +130,17 @@ bool JsonWriter::controlSwitch(const CS2CanCommand &cmd) const {
         default:
             return false;
     }
+}
+
+void JsonWriter::readFunctionList() {
+    cs2writer->send(::getLokList());
+    auto cfgReader = std::make_shared<ConfigLoklistReader>();
+
+    ConfigReader configReader{};
+    configReader.addHandler(cfgReader);
+
+    while(
+        configReader.handleCanCommand(cs2reader->read()) != 
+        ConfigReader::HANDLED_AND_FINISHED
+    ); // no op
 }

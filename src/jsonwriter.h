@@ -45,6 +45,8 @@ protected:
     bool controlLocoCommands(const CS2CanCommand &cmd) const;
     bool controlSwitch(const CS2CanCommand &cmd) const;
     
+    void readFunctionList();
+
     CS2ReaderPtr cs2reader;
     CS2WriterPtr cs2writer;
     EndpointPtr endpoint;
