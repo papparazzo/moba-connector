@@ -41,6 +41,7 @@ public:
     virtual ~JsonReader() noexcept = default;
 
     JsonReader(const JsonReader&) = delete;
+    JsonReader(JsonReader&&) = default;
     JsonReader& operator=(const JsonReader&) = delete;
     
     void operator()();
