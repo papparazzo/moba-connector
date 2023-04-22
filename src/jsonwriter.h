@@ -29,11 +29,13 @@
 #include "watchdogToken.h"
 #include "sharedData.h"
 
+// TODO Consider renaming into CS2Reader instead of JsonWriter
 class JsonWriter {
 public:
     JsonWriter(CS2ReaderPtr cs2reader, CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdog, SharedDataPtr sharedData);
     virtual ~JsonWriter() noexcept = default;
 
+    JsonWriter(JsonWriter&&) = default;
     JsonWriter(const JsonWriter&) = delete;
     JsonWriter& operator=(const JsonWriter&) = delete;
     
