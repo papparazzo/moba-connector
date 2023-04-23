@@ -30,7 +30,7 @@ JsonReader::JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTok
 closing{false}, cs2writer{cs2writer}, endpoint{endpoint}, watchdogToken{watchdogToken}, sharedData{sharedData} {
 }
 
-void JsonReader::setHardwareState(const SystemHardwareStateChanged &data) {
+void JsonReader::setHardwareState(SystemHardwareStateChanged &&data) {
     switch(data.hardwareState) {
         case SystemHardwareStateChanged::HardwareState::ERROR:
             return;
@@ -45,7 +45,7 @@ void JsonReader::setHardwareState(const SystemHardwareStateChanged &data) {
     }
 }
 
-void JsonReader::setBrakeVector(const InterfaceSetBrakeVector &data) {
+void JsonReader::setBrakeVector(InterfaceSetBrakeVector &&data) {
     for(auto iter: data.items) {
         sharedData->brakeVector.handleContact(
             {iter.contact.modulAddr, iter.contact.contactNb},
@@ -54,7 +54,7 @@ void JsonReader::setBrakeVector(const InterfaceSetBrakeVector &data) {
     }
 }
 
-void JsonReader::resetBrakeVector(const InterfaceResetBrakeVector &data) {
+void JsonReader::resetBrakeVector(InterfaceResetBrakeVector &&data) {
     for(auto iter: data.items) {
         sharedData->brakeVector.handleContact(
             {iter.contact.modulAddr, iter.contact.contactNb},
@@ -73,7 +73,7 @@ void JsonReader::reset() {
     sharedData->brakeVector.reset();
 }
 
-void JsonReader::setSwitch(const InterfaceSwitchAccessoryDecoders &data) {
+void JsonReader::setSwitch(InterfaceSwitchAccessoryDecoders &&data) {
     /*
     cs2writer.send(::setSwitch(convertMMToLocId(addr), r, true));
     usleep(50000);
@@ -117,12 +117,12 @@ void JsonReader::operator()() {
             registry.registerHandler<SystemHardwareStateChanged>(std::bind(&JsonReader::setHardwareState, this, std::placeholders::_1));
             registry.registerHandler<InterfaceSetBrakeVector>(std::bind(&JsonReader::setBrakeVector, this, std::placeholders::_1));
             registry.registerHandler<InterfaceResetBrakeVector>(std::bind(&JsonReader::resetBrakeVector, this, std::placeholders::_1));
-            registry.registerHandler<InterfaceSetLocoDirection>([this](const InterfaceSetLocoDirection &d) {cs2writer->send(setLocDirection(d.localId, static_cast<std::uint8_t>(d.direction)));});
-            registry.registerHandler<InterfaceSetLocoSpeed>([this](const InterfaceSetLocoSpeed &d) {cs2writer->send(setLocSpeed(d.localId, d.speed));});
+            registry.registerHandler<InterfaceSetLocoDirection>([this](InterfaceSetLocoDirection &&d) {cs2writer->send(setLocDirection(d.localId, static_cast<std::uint8_t>(d.direction)));});
+            registry.registerHandler<InterfaceSetLocoSpeed>([this](InterfaceSetLocoSpeed &&d) {cs2writer->send(setLocSpeed(d.localId, d.speed));});
             registry.registerHandler<InterfaceSwitchAccessoryDecoders>(std::bind(&JsonReader::setSwitch, this, std::placeholders::_1));
             registry.registerHandler<ClientShutdown>([this]{shutdown();});
             registry.registerHandler<ClientReset>([this]{reset();});
-            registry.registerHandler<SystemSetAutomaticMode>([this](const SystemSetAutomaticMode &d) {sharedData->automatic = d.automaticActive;});
+            registry.registerHandler<SystemSetAutomaticMode>([this](SystemSetAutomaticMode &&d) {sharedData->automatic = d.automaticActive;});
 
             while(!closing) {
                 registry.handleMsg(endpoint->waitForNewMsg());

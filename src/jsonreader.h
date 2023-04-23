@@ -48,10 +48,10 @@ public:
     void operator()();
 
 protected:
-    void setHardwareState(const SystemHardwareStateChanged &data);
-    void setBrakeVector(const InterfaceSetBrakeVector &data);
-    void resetBrakeVector(const InterfaceResetBrakeVector &data);
-    void setSwitch(const InterfaceSwitchAccessoryDecoders &data);
+    void setHardwareState(SystemHardwareStateChanged &&data);
+    void setBrakeVector(InterfaceSetBrakeVector &&data);
+    void resetBrakeVector(InterfaceResetBrakeVector &&data);
+    void setSwitch(InterfaceSwitchAccessoryDecoders &&data);
     void setLocoFunction(InterfaceSetLocoFunction &&data);
     
     void shutdown();
