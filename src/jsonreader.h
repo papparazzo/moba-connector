@@ -24,6 +24,7 @@
 #include <memory>
 
 #include "moba/clientmessages.h"
+#include "moba/configloklistreader.h"
 #include "moba/endpoint.h"
 #include "moba/systemmessages.h"
 #include "moba/interfacemessages.h"
@@ -51,6 +52,7 @@ protected:
     void setBrakeVector(const InterfaceSetBrakeVector &data);
     void resetBrakeVector(const InterfaceResetBrakeVector &data);
     void setSwitch(const InterfaceSwitchAccessoryDecoders &data);
+    void setLocoFunction(InterfaceSetLocoFunction &&data);
     
     void shutdown();
     void reset();
@@ -60,5 +62,6 @@ protected:
     CS2WriterPtr     cs2writer;
     EndpointPtr      endpoint;
     WatchdogTokenPtr watchdogToken;
+    SharedDataPtr    sharedData;
     LocomotivesPtr   locomotives;
 };

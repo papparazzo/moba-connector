@@ -21,15 +21,13 @@
 #include "jsonreader.h"
 #include "moba/registry.h"
 #include "moba/cs2utils.h"
+#include "moba/clientmessages.h"
 
 #include <thread>
 #include <functional>
 
 JsonReader::JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, SharedDataPtr sharedData) :
 closing{false}, cs2writer{cs2writer}, endpoint{endpoint}, watchdogToken{watchdogToken}, sharedData{sharedData} {
-}
-
-JsonReader::~JsonReader() {
 }
 
 void JsonReader::setHardwareState(const SystemHardwareStateChanged &data) {
@@ -81,6 +79,34 @@ void JsonReader::setSwitch(const InterfaceSwitchAccessoryDecoders &data) {
     usleep(50000);
     cs2writer.send(::setSwitch(convertMMToLocId(addr), r, false));
     */
+}
+
+void JsonReader::setLocoFunction(InterfaceSetLocoFunction &&data) {
+    
+    auto iter = locomotives->find(data.localId);
+    if(iter == locomotives->end()) {
+        std::cerr << "given localId <" << data.localId << "> does not exist" << std::endl;
+        endpoint->sendMsg(ClientError{ErrorId::INVALID_VALUE_GIVEN, "given localId does not exist"});
+        return;
+    }
+    
+    auto &func = iter->second->functions;
+    
+    // TODO: Try alternative functions...
+    auto iterf = func.find(static_cast<std::uint32_t>(data.function));
+    
+    if(iterf == func.end()) {
+        std::cerr << "no function found for localId <" << data.localId << ">" << std::endl;
+        return;
+    }
+    
+    // std::cerr << "localid " << data.localId << " function " << data.function << " on " << data.active << std::endl;
+    
+    cs2writer->send(::setLocFunction(
+        data.localId, 
+        static_cast<std::uint8_t>(iterf->second), 
+        data.active
+    ));
 }
 
 void JsonReader::operator()() {
