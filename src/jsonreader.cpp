@@ -22,6 +22,7 @@
 #include "moba/registry.h"
 #include "moba/cs2utils.h"
 #include "moba/clientmessages.h"
+#include "switchingoutputshandler.h"
 
 #include <thread>
 #include <functional>
@@ -74,11 +75,12 @@ void JsonReader::reset() {
 }
 
 void JsonReader::setSwitch(InterfaceSwitchAccessoryDecoders &&data) {
-    /*
-    cs2writer.send(::setSwitch(convertMMToLocId(addr), r, true));
-    usleep(50000);
-    cs2writer.send(::setSwitch(convertMMToLocId(addr), r, false));
-    */
+    SwitchingOutputsHandler soh{endpoint, cs2writer, std::move(data.switchingOutputs)};
+    
+    std::thread jsonwriterThread{std::move(soh)};
+    jsonwriterThread.detach();
+
+    
 }
 
 void JsonReader::setLocoFunction(InterfaceSetLocoFunction &&data) {
@@ -119,6 +121,7 @@ void JsonReader::operator()() {
             registry.registerHandler<InterfaceResetBrakeVector>(std::bind(&JsonReader::resetBrakeVector, this, std::placeholders::_1));
             registry.registerHandler<InterfaceSetLocoDirection>([this](InterfaceSetLocoDirection &&d) {cs2writer->send(setLocDirection(d.localId, static_cast<std::uint8_t>(d.direction)));});
             registry.registerHandler<InterfaceSetLocoSpeed>([this](InterfaceSetLocoSpeed &&d) {cs2writer->send(setLocSpeed(d.localId, d.speed));});
+            registry.registerHandler<InterfaceSetLocoFunction>(std::bind(&JsonReader::setLocoFunction, this, std::placeholders::_1));            
             registry.registerHandler<InterfaceSwitchAccessoryDecoders>(std::bind(&JsonReader::setSwitch, this, std::placeholders::_1));
             registry.registerHandler<ClientShutdown>([this]{shutdown();});
             registry.registerHandler<ClientReset>([this]{reset();});
