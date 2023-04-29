@@ -34,6 +34,8 @@ cs2reader{cs2reader}, cs2writer{cs2writer}, endpoint{endpoint}, watchdogToken{wa
 }
 
 void JsonWriter::operator()() {
+    // TODO: Sollte die Liste nach einem Reset neu eingelesen werden?
+    //       Bzw. was, wenn neue Lok aufgegleist wurde?
     readFunctionList();
     
     while(true) {
