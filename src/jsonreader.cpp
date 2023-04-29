@@ -65,6 +65,7 @@ void JsonReader::resetBrakeVector(InterfaceResetBrakeVector &&data) {
 }
 
 void JsonReader::shutdown() {
+    // TODO: Vor dem Shutdown sollten schon alle Züge angehalten haben.
     //cs2writer->send(::setHalt());
     closing = true;
 }
@@ -79,8 +80,6 @@ void JsonReader::setSwitch(InterfaceSwitchAccessoryDecoders &&data) {
     
     std::thread jsonwriterThread{std::move(soh)};
     jsonwriterThread.detach();
-
-    
 }
 
 void JsonReader::setLocoFunction(InterfaceSetLocoFunction &&data) {
