@@ -34,6 +34,8 @@ cs2reader{cs2reader}, cs2writer{cs2writer}, endpoint{endpoint}, watchdogToken{wa
 }
 
 void JsonWriter::operator()() {
+    readFunctionList();
+    
     while(true) {
         try {
             CS2CanCommand data = cs2reader->read();
