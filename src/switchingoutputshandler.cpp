@@ -32,6 +32,8 @@ void SwitchingOutputsHandler::operator()() {
     for(auto const& v: switchvector) {
         setSwitch(v.localId, v.differ);
     }
+    // TODO Send ready message!
+    // endpoint->sendMsg();
 }
 
 void SwitchingOutputsHandler::setSwitch(std::uint8_t addr, bool r) {
