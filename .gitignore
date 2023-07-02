@@ -58,20 +58,31 @@ Makefile
 # Executables
 *.out
 *.app
-/src/moba-connector
 /libtool
 /config.status
 /configure.scan
 /autoscan.log
 /response.log
+/src/moba-connector
 /src/.deps/
 core
 
 # misc
-
 .deps/
 .dirstamp
-
 *.o
 *~
 !.gitkeep
+
+# cmake
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
