@@ -26,7 +26,7 @@ target_include_directories(moba-connector PUBLIC "${PROJECT_BINARY_DIR}")
 
 target_link_libraries(moba-connector mobacommon)
 target_link_libraries(moba-connector ${CMAKE_SOURCE_DIR}/modules/lib-msghandling/src/moba/libmsghandling.a)
-target_link_libraries(moba-connector ${CMAKE_SOURCE_DIR}/modules/lib-cs2interface/src/moba/libcs2interface.a)
+target_link_libraries(moba-connector ${CMAKE_SOURCE_DIR}/modules/lib-cs2interface/libmoba-cs2interface.a)
 
 include_directories(${CMAKE_SOURCE_DIR}/modules/lib-msghandling/src)
 include_directories(${CMAKE_SOURCE_DIR}/modules/lib-cs2interface/src)
