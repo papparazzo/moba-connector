@@ -31,7 +31,7 @@ int BrakeVector::trigger(Contact contactId) {
 
     auto tmp = iter->second;
 
-    // Ignore following contacts afterwards (it might be from the same train, E.g. light)
+    // Ignore following contacts afterward (it might be from the same train, E.g. light)
     iter->second = BrakeVector::IGNORE_CONTACT;
     return tmp;
 }
