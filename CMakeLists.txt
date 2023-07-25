@@ -1,9 +1,10 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.25)
+
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 
 project(moba-connector VERSION 1.0.0)
-
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 configure_file(config.h.in config.h)
 
@@ -25,8 +26,8 @@ set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 target_include_directories(moba-connector PUBLIC "${PROJECT_BINARY_DIR}")
 
 target_link_libraries(moba-connector mobacommon)
-target_link_libraries(moba-connector ${CMAKE_SOURCE_DIR}/modules/lib-msghandling/src/moba/libmsghandling.a)
-target_link_libraries(moba-connector ${CMAKE_SOURCE_DIR}/modules/lib-cs2interface/libmoba-cs2interface.a)
+target_link_libraries(moba-connector ${CMAKE_SOURCE_DIR}/modules/lib-msghandling/libmoba-lib-msghandling.a)
+target_link_libraries(moba-connector ${CMAKE_SOURCE_DIR}/modules/lib-cs2interface/libmoba-lib-cs2interface.a)
 
 include_directories(${CMAKE_SOURCE_DIR}/modules/lib-msghandling/src)
 include_directories(${CMAKE_SOURCE_DIR}/modules/lib-cs2interface/src)
