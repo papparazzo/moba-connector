@@ -23,7 +23,7 @@
 class Item {
 public:
     Item() = default;
-    virtual ~Item() noexcept {};
+    virtual ~Item() noexcept = default;
 
     Item(Item&&) = default;
     Item(const Item&) = delete;

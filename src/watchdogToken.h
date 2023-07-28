@@ -44,6 +44,9 @@ public:
         synchronize = false;
     }
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "UnusedLocalVariable"
+#pragma ide diagnostic ignored "UnusedValue"
     void pingStarted() {
         std::lock_guard<std::mutex> l{m};
         pingStartTime = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -51,7 +54,7 @@ public:
         );
     }
 
-    void pingResponsed() {
+    void pingResponded() {
         std::lock_guard<std::mutex> l{m};
         pingResponseTime = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()
@@ -72,7 +75,7 @@ public:
         }
         return TokenState::ERROR;
     }
-
+#pragma clang diagnostic pop
 protected:
     std::mutex m;
     const int IN_TIME = 300;

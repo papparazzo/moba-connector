@@ -37,9 +37,9 @@ public:
     SwitchingOutputsHandler& operator=(const SwitchingOutputsHandler&) = delete;
     
     
-    virtual ~SwitchingOutputsHandler() noexcept = default;
+    ~SwitchingOutputsHandler() noexcept override = default;
     
-    void operator()();
+    void operator()() override;
     
 private:
     EndpointPtr endpoint;

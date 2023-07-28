@@ -48,7 +48,7 @@ void Watchdog::operator()() {
                 lastState = ConnectState::ERROR;
             }
         } catch(const std::exception &e) {
-            std::cerr << "exception occured! <" << e.what() << ">" << std::endl;
+            std::cerr << "exception occurred! <" << e.what() << ">" << std::endl;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds{500});
     }

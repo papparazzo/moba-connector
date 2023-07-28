@@ -24,7 +24,6 @@
 #include <thread>
 
 #include <moba-common/helper.h>
-#include <moba-common/log.h>
 
 #include "config.h"
 #include "jsonreader.h"

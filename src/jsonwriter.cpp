@@ -43,7 +43,7 @@ void JsonWriter::operator()() {
             CS2CanCommand data = cs2reader->read();
 
             if(data.header[1] & 0x01 && data.header[1] == static_cast<uint8_t>(CanCommand::CMD_PING | 0x01)) {
-                watchdogToken->pingResponsed();
+                watchdogToken->pingResponded();
                 continue;
             }
             if(s88report(data)) {
@@ -58,7 +58,7 @@ void JsonWriter::operator()() {
 
             controlSwitch(data);
         } catch(const std::exception &e) {
-            std::cerr << "exception occured! <" << e.what() << ">" << std::endl;
+            std::cerr << "exception occurred! <" << e.what() << ">" << std::endl;
             std::this_thread::sleep_for(std::chrono::milliseconds{500});
         }
     }
