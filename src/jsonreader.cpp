@@ -26,9 +26,10 @@
 
 #include <thread>
 #include <functional>
+#include <utility>
 
 JsonReader::JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, SharedDataPtr sharedData) :
-closing{false}, cs2writer{cs2writer}, endpoint{endpoint}, watchdogToken{watchdogToken}, sharedData{sharedData} {
+closing{false}, cs2writer{std::move(cs2writer)}, endpoint{std::move(endpoint)}, watchdogToken{std::move(watchdogToken)}, sharedData{std::move(sharedData)} {
 }
 
 void JsonReader::setHardwareState(SystemHardwareStateChanged &&data) {

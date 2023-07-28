@@ -21,11 +21,12 @@
 #include "watchdog.h"
 #include "moba/interfacemessages.h"
 #include <thread>
+#include <utility>
 #include "moba/cs2utils.h"
 
 Watchdog::Watchdog(
     WatchdogTokenPtr watchdogToken, CS2WriterPtr cs2writer, EndpointPtr endpoint
-): watchdogToken{watchdogToken}, cs2writer{cs2writer}, endpoint{endpoint}, lastState{ConnectState::ERROR} {
+): watchdogToken{std::move(watchdogToken)}, cs2writer{std::move(cs2writer)}, endpoint{std::move(endpoint)}, lastState{ConnectState::ERROR} {
 }
 
 void Watchdog::operator()() {

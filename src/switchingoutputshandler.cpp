@@ -25,7 +25,7 @@
 #include <utility>
 
 SwitchingOutputsHandler::SwitchingOutputsHandler(EndpointPtr endpoint, CS2WriterPtr cs2writer, SwitchingOutputs && switchvector):
-endpoint{endpoint}, cs2writer{cs2writer}, switchvector{std::move(switchvector)} {
+endpoint{std::move(endpoint)}, cs2writer{std::move(cs2writer)}, switchvector{std::move(switchvector)} {
 }
 
 void SwitchingOutputsHandler::operator()() {

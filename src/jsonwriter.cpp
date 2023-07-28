@@ -20,8 +20,8 @@
 
 #include "jsonwriter.h"
 
-#include <moba-common/log.h>
 #include <thread>
+#include <utility>
 
 #include "moba/systemmessages.h"
 #include "moba/interfacemessages.h"
@@ -30,7 +30,7 @@
 #include "moba/configreader.h"
 
 JsonWriter::JsonWriter(CS2ReaderPtr cs2reader, CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, SharedDataPtr sharedData):
-cs2reader{cs2reader}, cs2writer{cs2writer}, endpoint{endpoint}, watchdogToken{watchdogToken}, sharedData{sharedData} {
+cs2reader{std::move(cs2reader)}, cs2writer{std::move(cs2writer)}, endpoint{std::move(endpoint)}, watchdogToken{std::move(watchdogToken)}, sharedData{std::move(sharedData)} {
 }
 
 void JsonWriter::operator()() {
