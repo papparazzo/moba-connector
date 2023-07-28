@@ -26,6 +26,7 @@ set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 target_include_directories(moba-connector PUBLIC "${PROJECT_BINARY_DIR}")
 
 target_link_libraries(moba-connector mobacommon)
+target_link_libraries(moba-connector z)
 target_link_libraries(moba-connector ${CMAKE_SOURCE_DIR}/modules/lib-msghandling/libmoba-lib-msghandling.a)
 target_link_libraries(moba-connector ${CMAKE_SOURCE_DIR}/modules/lib-cs2interface/libmoba-lib-cs2interface.a)
 
