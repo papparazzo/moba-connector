@@ -36,11 +36,11 @@ void SwitchingOutputsHandler::operator()() {
     // endpoint->sendMsg();
 }
 
-void SwitchingOutputsHandler::setSwitch(std::uint8_t addr, bool r) {
+void SwitchingOutputsHandler::setSwitch(const std::uint8_t addr, const bool r) const {
     using namespace std::chrono_literals;
     
-    cs2writer->send(::setSwitch(::convertMMToLocId(addr), r, true));
+    cs2writer->send(::setSwitch(convertMMToLocId(addr), r, true));
     std::this_thread::sleep_for(50.0ms);
-    cs2writer->send(::setSwitch(::convertMMToLocId(addr), r, false));
+    cs2writer->send(::setSwitch(convertMMToLocId(addr), r, false));
     std::this_thread::sleep_for(250.0ms);
 }
