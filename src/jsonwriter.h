@@ -25,7 +25,6 @@
 #include "moba/cs2writer.h"
 #include "moba/cs2reader.h"
 
-#include "brakevector.h"
 #include "watchdogToken.h"
 #include "sharedData.h"
 
@@ -42,12 +41,12 @@ public:
     void operator()();
 
 protected:
-    bool s88report(const CS2CanCommand &data);
+    bool s88report(const CS2CanCommand &data) const;
     bool systemCommands(const CS2CanCommand &cmd) const;
     bool controlLocoCommands(const CS2CanCommand &cmd) const;
     bool controlSwitch(const CS2CanCommand &cmd) const;
     
-    void readFunctionList();
+    void readFunctionList() const;
 
     CS2ReaderPtr cs2reader;
     CS2WriterPtr cs2writer;
