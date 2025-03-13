@@ -27,7 +27,7 @@
 #include "moba/shared.h"
 #include "item.h"
 
-class SwitchingOutputsHandler: public Item {
+class SwitchingOutputsHandler final : public Item {
 public:
 
     SwitchingOutputsHandler(EndpointPtr endpoint, CS2WriterPtr cs2writer, SwitchingOutputs && switchvector);
@@ -46,5 +46,5 @@ private:
     CS2WriterPtr cs2writer;
     SwitchingOutputs switchvector;
 
-    void setSwitch(std::uint8_t addr, bool r);
+    void setSwitch(std::uint8_t addr, bool r) const;
 };
