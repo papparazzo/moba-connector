@@ -36,7 +36,7 @@
 #include "watchdogToken.h"
 #include "sharedData.h"
 
-class JsonReader {
+class JsonReader final {
 public:
     JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, SharedDataPtr sharedData);
     virtual ~JsonReader() noexcept = default;
@@ -52,10 +52,10 @@ protected:
     void setBrakeVector(InterfaceSetBrakeVector &&data);
     void resetBrakeVector(InterfaceResetBrakeVector &&data);
     void setSwitch(InterfaceSwitchAccessoryDecoders &&data);
-    void setLocoFunction(InterfaceSetLocoFunction &&data);
+    void setLocoFunction(InterfaceSetLocoFunction &&data) const;
     
     void shutdown();
-    void reset();
+    void reset() const;
 
     bool closing;
 

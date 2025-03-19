@@ -71,7 +71,7 @@ void JsonReader::shutdown() {
     closing = true;
 }
 
-void JsonReader::reset() {
+void JsonReader::reset() const {
     //cs2writer->send(::setHalt());
     sharedData->brakeVector.reset();
 }
@@ -83,7 +83,7 @@ void JsonReader::setSwitch(InterfaceSwitchAccessoryDecoders &&data) {
     jsonwriterThread.detach();
 }
 
-void JsonReader::setLocoFunction(InterfaceSetLocoFunction &&data) {
+void JsonReader::setLocoFunction(InterfaceSetLocoFunction &&data) const {
     
     auto iter = locomotives->find(data.localId);
     if(iter == locomotives->end()) {
@@ -96,17 +96,17 @@ void JsonReader::setLocoFunction(InterfaceSetLocoFunction &&data) {
     
     // TODO: Try alternative functions...
     auto iterf = func.find(static_cast<std::uint32_t>(data.function));
-    
+
     if(iterf == func.end()) {
         std::cerr << "no function found for localId <" << data.localId << ">" << std::endl;
         return;
     }
-    
+
     // std::cerr << "localid " << data.localId << " function " << data.function << " on " << data.active << std::endl;
-    
+
     cs2writer->send(::setLocFunction(
-        data.localId, 
-        static_cast<std::uint8_t>(iterf->second), 
+        data.localId,
+        static_cast<std::uint8_t>(iterf->second),
         data.active
     ));
 }
