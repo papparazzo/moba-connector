@@ -48,29 +48,29 @@ public:
 #pragma ide diagnostic ignored "UnusedLocalVariable"
 #pragma ide diagnostic ignored "UnusedValue"
     void pingStarted() {
-        std::lock_guard<std::mutex> l{m};
+        std::lock_guard l{m};
         pingStartTime = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()
         );
     }
 
     void pingResponded() {
-        std::lock_guard<std::mutex> l{m};
+        std::lock_guard l{m};
         pingResponseTime = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()
         );
     }
 
     TokenState getTokenState() {
-        std::lock_guard<std::mutex> l{m};
+        std::lock_guard l{m};
         if(synchronize) {
             return TokenState::SYNCHRONIZE;
         }
-        auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(
+        const auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(
             pingResponseTime - pingStartTime
         ).count();
         
-        if(diff < WatchdogToken::IN_TIME && diff > 0) {
+        if(diff < IN_TIME && diff > 0) {
             return TokenState::CONNECTED;
         }
         return TokenState::ERROR;
