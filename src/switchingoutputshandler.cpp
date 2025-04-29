@@ -24,12 +24,12 @@
 #include <thread>
 #include <utility>
 
-SwitchingOutputsHandler::SwitchingOutputsHandler(EndpointPtr endpoint, CS2WriterPtr cs2writer, SwitchingOutputs && switchvector):
-endpoint{std::move(endpoint)}, cs2writer{std::move(cs2writer)}, switchvector{std::move(switchvector)} {
+SwitchingOutputsHandler::SwitchingOutputsHandler(EndpointPtr endpoint, CS2WriterPtr cs2writer, SwitchingOutputs && switchVector):
+endpoint{std::move(endpoint)}, cs2writer{std::move(cs2writer)}, switchVector{std::move(switchVector)} {
 }
 
 void SwitchingOutputsHandler::operator()() {
-    for(auto const& v: switchvector) {
+    for(auto const& v: switchVector) {
         setSwitch(v.localId, v.differ);
     }
     // TODO Send ready message!
@@ -40,7 +40,7 @@ void SwitchingOutputsHandler::setSwitch(const std::uint8_t addr, const bool r) c
     using namespace std::chrono_literals;
     
     cs2writer->send(::setSwitch(convertMMToLocId(addr), r, true));
-    std::this_thread::sleep_for(50.0ms);
+    std::this_thread::sleep_for(50ms);
     cs2writer->send(::setSwitch(convertMMToLocId(addr), r, false));
-    std::this_thread::sleep_for(250.0ms);
+    std::this_thread::sleep_for(250ms);
 }

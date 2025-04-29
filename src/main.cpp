@@ -14,7 +14,7 @@
  *  GNU Affero General Public License for more details.
  *
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program. If not, see <http://www.gnu.org/licenses/agpl.txt>.
+ *  along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.
  *
  */
 
@@ -54,14 +54,24 @@ int main(int argc, char *argv[]) {
     auto socket = std::make_shared<Socket>(appData.host, appData.port);
     auto endpoint = EndpointPtr{new Endpoint{socket, appData.appName, appData.version, {Message::INTERFACE, Message::SYSTEM, Message::TIMER}}};
 
-    auto cs2Writer = std::make_shared<CS2Writer>();
+    const auto socket = std::make_shared<Socket>(appData.host, appData.port);
+    const auto endpoint = EndpointPtr{
+        new Endpoint{
+            socket,
+            appData.appName,
+            appData.version,
+            {Message::INTERFACE, Message::SYSTEM, Message::TIMER}
+        }
+    };
+
+    const auto cs2Writer = std::make_shared<CS2Writer>();
     cs2Writer->connect("192.168.178.38");
 
-    auto cs2Reader = std::make_shared<CS2Reader>();
+    const auto cs2Reader = std::make_shared<CS2Reader>();
     cs2Reader->connect();
 
-    auto watchdogToken = std::make_shared<WatchdogToken>();
-    auto sharedData = std::make_shared<SharedData>();
+    const auto watchdogToken = std::make_shared<WatchdogToken>();
+    const auto sharedData = std::make_shared<SharedData>();
 
     ///////////////////////////////////////////////////////////////////////////////////
     //

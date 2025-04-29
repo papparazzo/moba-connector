@@ -33,7 +33,7 @@ JsonWriter::JsonWriter(CS2ReaderPtr cs2reader, CS2WriterPtr cs2writer, EndpointP
 cs2reader{std::move(cs2reader)}, cs2writer{std::move(cs2writer)}, endpoint{std::move(endpoint)}, watchdogToken{std::move(watchdogToken)}, sharedData{std::move(sharedData)} {
 }
 
-void JsonWriter::operator()() {
+void JsonWriter::operator()() const {
     // TODO: Sollte die Liste nach einem Reset neu eingelesen werden?
     //       Bzw. was, wenn neue Lok aufgegleist wurde?
     readFunctionList();
@@ -42,7 +42,7 @@ void JsonWriter::operator()() {
         try {
             CS2CanCommand data = cs2reader->read();
 
-            if(data.header[1] & 0x01 && data.header[1] == static_cast<uint8_t>(CanCommand::CMD_PING | 0x01)) {
+            if(data.header[1] & 0x01 && data.header[1] == static_cast<uint8_t>(CMD_PING | 0x01)) {
                 watchdogToken->pingResponded();
                 continue;
             }
@@ -55,8 +55,9 @@ void JsonWriter::operator()() {
             if(controlLocoCommands(data)) {
                 continue;
             }
-
-            controlSwitch(data);
+            if (controlSwitch(data)) {
+                continue;
+            }
         } catch(const std::exception &e) {
             std::cerr << "exception occurred! <" << e.what() << ">" << std::endl;
             std::this_thread::sleep_for(std::chrono::milliseconds{500});
@@ -64,23 +65,25 @@ void JsonWriter::operator()() {
     }
 }
 
-bool JsonWriter::s88report(const CS2CanCommand &cmd) {
-    if(cmd.header[1] != static_cast<uint8_t>(CanCommand::CMD_S88_EVENT | 0x01)) {
+bool JsonWriter::s88report(const CS2CanCommand &data) const {
+    if(data.header[1] != static_cast<uint8_t>(CMD_S88_EVENT | 0x01)) {
         return false;
     }
 
-    auto module = cmd.getWordAt0();
-    auto contact = cmd.getWordAt2();
+    auto module = data.getWordAt0();
+    auto contact = data.getWordAt2();
 
-    auto time = cmd.getWordAt6();
+    const auto time = data.getWordAt6();
 
-    bool active = static_cast<bool>(cmd.data[4]);
-
-    std::cerr << "Feedback module <" << module << "> contact <" << contact << ">" << std::endl;
+    const bool active = static_cast<bool>(data.data[4]);
 
     auto locId = sharedData->brakeVector.trigger({module, contact});
+
+    std::cerr << moba::LogLevel::NOTICE << "Feedback module <" << module << "> contact <" << contact << "> locId <" << locId << ">" << std::endl;
+
     if(locId != BrakeVector::IGNORE_CONTACT) {
-        cs2writer->send(::setLocSpeed(locId, 0));
+        std::cerr << moba::LogLevel::NOTICE << "halt for locId <" << locId << ">" << std::endl;
+        cs2writer->send(setLocSpeed(locId, 0));
         endpoint->sendMsg(InterfaceSetLocoSpeed{static_cast<std::uint32_t>(locId), 0});
     }
 
@@ -94,11 +97,11 @@ bool JsonWriter::systemCommands(const CS2CanCommand &cmd) const {
     }
 
     switch(static_cast<CanSystemSubCommand>(cmd.data[4])) {
-        case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_GO:
+        case SYS_SUB_CMD_SYSTEM_GO:
             endpoint->sendMsg(SystemReleaseEmergencyStop{});
             return true;
 
-        case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_STOP:
+        case SYS_SUB_CMD_SYSTEM_STOP:
             endpoint->sendMsg(SystemTriggerEmergencyStop{SystemTriggerEmergencyStop::EmergencyTriggerReason::CENTRAL_STATION});
             return true;
 
@@ -109,11 +112,11 @@ bool JsonWriter::systemCommands(const CS2CanCommand &cmd) const {
 
 bool JsonWriter::controlLocoCommands(const CS2CanCommand &cmd) const {
     switch(static_cast<CanCommand>(cmd.header[1])) {
-        case CanCommand::CMD_LOCO_DIRECTION:
+        case CMD_LOCO_DIRECTION:
             endpoint->sendMsg(InterfaceSetLocoDirection{cmd.getUID(), cmd.data[4]});
             return true;
 
-        case CanCommand::CMD_LOCO_SPEED:
+        case CMD_LOCO_SPEED:
             endpoint->sendMsg(InterfaceSetLocoSpeed{cmd.getUID(), cmd.getWordAt4()});
             return true;
 
@@ -124,7 +127,7 @@ bool JsonWriter::controlLocoCommands(const CS2CanCommand &cmd) const {
 
 bool JsonWriter::controlSwitch(const CS2CanCommand &cmd) const {
     switch(static_cast<CanCommand>(cmd.header[1])) {
-        case CanCommand::CMD_SET_SWITCH:
+        case CMD_SET_SWITCH:
             if(sharedData->automatic) {
                 cs2writer->send(::setEmergencyStop());
                 endpoint->sendMsg(SystemTriggerEmergencyStop{SystemTriggerEmergencyStop::EmergencyTriggerReason::SELF_ACTING_BY_EXTERN_SWITCHING});
@@ -136,9 +139,9 @@ bool JsonWriter::controlSwitch(const CS2CanCommand &cmd) const {
     }
 }
 
-void JsonWriter::readFunctionList() {
-    cs2writer->send(::getLokList());
-    auto cfgReader = std::make_shared<ConfigLoklistReader>();
+void JsonWriter::readFunctionList() const {
+    cs2writer->send(getLokList());
+    const auto cfgReader = std::make_shared<ConfigLoklistReader>();
 
     ConfigReader configReader{};
     configReader.addHandler(cfgReader);

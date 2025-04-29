@@ -14,26 +14,26 @@
  *  GNU Affero General Public License for more details.
  *
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program. If not, see <http://www.gnu.org/licenses/agpl.txt>.
+ *  along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.
  *
  */
 
 #pragma once
 
 #include "watchdogToken.h"
-#include "moba/cs2cancommand.h"
 #include "moba/cs2writer.h"
 #include "moba/endpoint.h"
 #include "moba/interfacemessages.h"
 
-class Watchdog {
+class Watchdog final {
 public:
     Watchdog(WatchdogTokenPtr watchdogToken, CS2WriterPtr cs2writer, EndpointPtr endpoint);
 
     Watchdog(const Watchdog&) = delete;
     Watchdog(Watchdog&&) = default;
     Watchdog& operator=(const Watchdog&) = delete;
-    virtual ~Watchdog() noexcept = default;
+
+    ~Watchdog() noexcept = default;
 
     void operator()();
 

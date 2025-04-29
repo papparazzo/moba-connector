@@ -14,7 +14,7 @@
  *  GNU Affero General Public License for more details.
  *
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program. If not, see <http://www.gnu.org/licenses/agpl.txt>.
+ *  along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.
  *
  */
 
@@ -29,22 +29,23 @@
 #include "sharedData.h"
 
 // TODO Consider renaming into CS2Reader instead of JsonWriter
-class JsonWriter {
+class JsonWriter final {
 public:
     JsonWriter(CS2ReaderPtr cs2reader, CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdog, SharedDataPtr sharedData);
-    virtual ~JsonWriter() noexcept = default;
+
+    ~JsonWriter() noexcept = default;
 
     JsonWriter(JsonWriter&&) = default;
     JsonWriter(const JsonWriter&) = delete;
     JsonWriter& operator=(const JsonWriter&) = delete;
     
-    void operator()();
+    void operator()() const;
 
 protected:
-    bool s88report(const CS2CanCommand &data) const;
-    bool systemCommands(const CS2CanCommand &cmd) const;
-    bool controlLocoCommands(const CS2CanCommand &cmd) const;
-    bool controlSwitch(const CS2CanCommand &cmd) const;
+    [[nodiscard]] bool s88report(const CS2CanCommand &data) const;
+    [[nodiscard]] bool systemCommands(const CS2CanCommand &cmd) const;
+    [[nodiscard]] bool controlLocoCommands(const CS2CanCommand &cmd) const;
+    [[nodiscard]] bool controlSwitch(const CS2CanCommand &cmd) const;
     
     void readFunctionList() const;
 

@@ -14,7 +14,7 @@
  *  GNU Affero General Public License for more details.
  *
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program. If not, see <http://www.gnu.org/licenses/agpl.txt>.
+ *  along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.
  *
  */
 
@@ -30,7 +30,7 @@ public:
     enum class TokenState {
         CONNECTED,   // got a pong from CS within a reasonable time
         ERROR,       // got no pong or highly delayed
-        SYNCHRONIZE  // send last state again. Important after network failure
+        SYNCHRONIZE  // Send last state again. Important after network failure
     };
 
     WatchdogToken(): pingStartTime{1}, pingResponseTime{0}, synchronize{false} {

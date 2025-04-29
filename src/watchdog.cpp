@@ -37,8 +37,7 @@ void Watchdog::operator()() {
 
             std::this_thread::sleep_for(std::chrono::milliseconds{30});
 
-            auto tokenState = watchdogToken->getTokenState();
-            if(tokenState == WatchdogToken::TokenState::SYNCHRONIZE) {
+            if(const auto tokenState = watchdogToken->getTokenState(); tokenState == WatchdogToken::TokenState::SYNCHRONIZE) {
                 endpoint->sendMsg(InterfaceConnectivityStateChanged{lastState});
                 watchdogToken->synchronizeFinish();
             } else if(tokenState == WatchdogToken::TokenState::CONNECTED && lastState == ConnectState::ERROR) {

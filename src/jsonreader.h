@@ -20,26 +20,22 @@
 
 #pragma once
 
-#include <string>
 #include <memory>
 
-#include "moba/clientmessages.h"
 #include "moba/configloklistreader.h"
 #include "moba/endpoint.h"
 #include "moba/systemmessages.h"
 #include "moba/interfacemessages.h"
-#include "moba/shared.h"
-#include "moba/cs2cancommand.h"
 #include "moba/cs2writer.h"
 
-#include "brakevector.h"
 #include "watchdogToken.h"
 #include "sharedData.h"
 
 class JsonReader final {
 public:
     JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, SharedDataPtr sharedData);
-    virtual ~JsonReader() noexcept = default;
+
+    ~JsonReader() noexcept = default;
 
     JsonReader(const JsonReader&) = delete;
     JsonReader(JsonReader&&) = default;
@@ -48,10 +44,10 @@ public:
     void operator()();
 
 protected:
-    void setHardwareState(SystemHardwareStateChanged &&data);
-    void setBrakeVector(InterfaceSetBrakeVector &&data);
-    void resetBrakeVector(InterfaceResetBrakeVector &&data);
-    void setSwitch(InterfaceSwitchAccessoryDecoders &&data);
+    void setHardwareState(SystemHardwareStateChanged &&data) const;
+    void setBrakeVector(InterfaceSetBrakeVector &&data) const;
+    void resetBrakeVector(InterfaceResetBrakeVector &&data) const;
+    void setSwitch(InterfaceSwitchAccessoryDecoders &&data) const;
     void setLocoFunction(InterfaceSetLocoFunction &&data) const;
     
     void shutdown();

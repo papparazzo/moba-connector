@@ -21,7 +21,6 @@
 #pragma once
 
 #include <map>
-#include <exception>
 #include <mutex>
 #include <memory>
 
@@ -34,14 +33,14 @@ public:
     
     ~BrakeVector() = default;
     
-    static const int IGNORE_CONTACT = 0;
+    static constexpr int IGNORE_CONTACT = 0;
 
     using Contact = std::pair<int, int>;
     using Vector = std::map<Contact, int>;
 
-    int trigger(Contact contactId);
+    int trigger(const Contact &contactId);
 
-    void handleContact(Contact contactId, int locId);
+    void handleContact(const Contact &contactId, int locId);
     void reset();
 
 protected:

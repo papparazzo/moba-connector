@@ -14,7 +14,7 @@
  *  GNU Affero General Public License for more details.
  * 
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program. If not, see <http://www.gnu.org/licenses/agpl.txt>.
+ *  along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.
  * 
  */
 
@@ -30,7 +30,7 @@
 class SwitchingOutputsHandler final : public Item {
 public:
 
-    SwitchingOutputsHandler(EndpointPtr endpoint, CS2WriterPtr cs2writer, SwitchingOutputs && switchvector);
+    SwitchingOutputsHandler(EndpointPtr endpoint, CS2WriterPtr cs2writer, SwitchingOutputs && switchVector);
     SwitchingOutputsHandler(SwitchingOutputsHandler&&) = default;
     
     SwitchingOutputsHandler(const SwitchingOutputsHandler&) = delete;
@@ -44,7 +44,7 @@ public:
 private:
     EndpointPtr endpoint;
     CS2WriterPtr cs2writer;
-    SwitchingOutputs switchvector;
+    SwitchingOutputs switchVector;
 
     void setSwitch(std::uint8_t addr, bool r) const;
 };

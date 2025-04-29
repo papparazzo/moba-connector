@@ -25,14 +25,13 @@
 #include "switchingoutputshandler.h"
 
 #include <thread>
-#include <functional>
-#include <utility>
+#include <moba-common/loggerprefix.h>
 
 JsonReader::JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, SharedDataPtr sharedData) :
 closing{false}, cs2writer{std::move(cs2writer)}, endpoint{std::move(endpoint)}, watchdogToken{std::move(watchdogToken)}, sharedData{std::move(sharedData)} {
 }
 
-void JsonReader::setHardwareState(SystemHardwareStateChanged &&data) {
+void JsonReader::setHardwareState(SystemHardwareStateChanged &&data) const {
     switch(data.hardwareState) {
         case SystemHardwareStateChanged::HardwareState::ERROR:
             return;
@@ -47,19 +46,19 @@ void JsonReader::setHardwareState(SystemHardwareStateChanged &&data) {
     }
 }
 
-void JsonReader::setBrakeVector(InterfaceSetBrakeVector &&data) {
+void JsonReader::setBrakeVector(InterfaceSetBrakeVector &&data) const {
     for(auto iter: data.items) {
         sharedData->brakeVector.handleContact(
-            {iter.contact.modulAddr, iter.contact.contactNb},
+            {iter.contact.moduleAddr, iter.contact.contactNb},
             iter.localId
         );
     }
 }
 
-void JsonReader::resetBrakeVector(InterfaceResetBrakeVector &&data) {
+void JsonReader::resetBrakeVector(InterfaceResetBrakeVector &&data) const {
     for(auto iter: data.items) {
         sharedData->brakeVector.handleContact(
-            {iter.contact.modulAddr, iter.contact.contactNb},
+            {iter.contact.moduleAddr, iter.contact.contactNb},
             BrakeVector::IGNORE_CONTACT
         );        
     }
@@ -76,7 +75,7 @@ void JsonReader::reset() const {
     sharedData->brakeVector.reset();
 }
 
-void JsonReader::setSwitch(InterfaceSwitchAccessoryDecoders &&data) {
+void JsonReader::setSwitch(InterfaceSwitchAccessoryDecoders &&data) const {
     SwitchingOutputsHandler soh{endpoint, cs2writer, std::move(data.switchingOutputs)};
     
     std::thread jsonwriterThread{std::move(soh)};
@@ -84,10 +83,10 @@ void JsonReader::setSwitch(InterfaceSwitchAccessoryDecoders &&data) {
 }
 
 void JsonReader::setLocoFunction(InterfaceSetLocoFunction &&data) const {
-    
-    auto iter = locomotives->find(data.localId);
+
+    const auto iter = locomotives->find(data.localId);
     if(iter == locomotives->end()) {
-        std::cerr << "given localId <" << data.localId << "> does not exist" << std::endl;
+        std::cerr << moba::LogLevel::NOTICE << "given localId <" << data.localId << "> does not exist" << std::endl;
         endpoint->sendMsg(ClientError{ErrorId::INVALID_VALUE_GIVEN, "given localId does not exist"});
         return;
     }
@@ -98,11 +97,14 @@ void JsonReader::setLocoFunction(InterfaceSetLocoFunction &&data) const {
     auto iterf = func.find(static_cast<std::uint32_t>(data.function));
 
     if(iterf == func.end()) {
-        std::cerr << "no function found for localId <" << data.localId << ">" << std::endl;
+        std::cerr << moba::LogLevel::WARNING << "no function found for localId <" << data.localId << ">" << std::endl;
         return;
     }
 
-    // std::cerr << "localid " << data.localId << " function " << data.function << " on " << data.active << std::endl;
+    std::cerr <<
+        moba::LogLevel::NOTICE <<
+        "localid " << data.localId << " function " <<
+        controllableFunctionEnumToString(data.function) << " on " << data.active << std::endl;
 
     cs2writer->send(::setLocFunction(
         data.localId,
@@ -132,7 +134,9 @@ void JsonReader::operator()() {
             }
         } catch(const std::exception &e) {
             watchdogToken->synchronizeStart();
-            std::cerr << "exception occurred! <" << e.what() << ">" << std::endl;
+            std::cerr <<
+                moba::LogLevel::CRITICAL << "exception in JsonReader::operator()() occurred! <" <<
+                e.what() << ">" << std::endl;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds{500});
     }

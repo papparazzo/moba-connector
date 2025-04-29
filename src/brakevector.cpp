@@ -20,27 +20,27 @@
 
 #include "brakevector.h"
 
-int BrakeVector::trigger(Contact contactId) {
-    std::lock_guard<std::mutex> guard{mutex};
-    auto iter = vector.find(contactId);
+int BrakeVector::trigger(const Contact &contactId) {
+    std::lock_guard guard{mutex};
+    const auto iter = vector.find(contactId);
 
     if(iter == vector.end()) {
-        return BrakeVector::IGNORE_CONTACT;
+        return IGNORE_CONTACT;
     }
 
-    auto tmp = iter->second;
+    const auto tmp = iter->second;
 
-    // Ignore following contacts afterward (it might be from the same train, E.g. light)
-    iter->second = BrakeVector::IGNORE_CONTACT;
+    // Ignore the following contacts afterward (it might be from the same train, E.g. light)
+    iter->second = IGNORE_CONTACT;
     return tmp;
 }
 
-void BrakeVector::handleContact(Contact contactId, int locId) {
-    std::lock_guard<std::mutex> guard{mutex};
+void BrakeVector::handleContact(const Contact &contactId, const int locId) {
+    std::lock_guard guard{mutex};
     vector[contactId] = locId;
 }
 
 void BrakeVector::reset() {
-    std::lock_guard<std::mutex> guard{mutex};
+    std::lock_guard guard{mutex};
     vector.clear();
 }
