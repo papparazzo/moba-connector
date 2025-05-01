@@ -18,8 +18,6 @@
  *
  */
 
-#include <iostream>
-#include <functional>
 #include <memory>
 #include <thread>
 
@@ -32,7 +30,6 @@
 
 #include "moba/cs2reader.h"
 #include "moba/cs2writer.h"
-#include "moba/cs2cancommand.h"
 
 #include "moba/socket.h"
 #include "moba/endpoint.h"
@@ -51,8 +48,9 @@ namespace {
 }
 
 int main(int argc, char *argv[]) {
-    auto socket = std::make_shared<Socket>(appData.host, appData.port);
-    auto endpoint = EndpointPtr{new Endpoint{socket, appData.appName, appData.version, {Message::INTERFACE, Message::SYSTEM, Message::TIMER}}};
+    if(argc == 2) {
+        appData.host = std::string(argv[1]);
+    }
 
     const auto socket = std::make_shared<Socket>(appData.host, appData.port);
     const auto endpoint = EndpointPtr{

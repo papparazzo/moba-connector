@@ -21,8 +21,9 @@
 #include "watchdog.h"
 #include "moba/interfacemessages.h"
 #include <thread>
-#include <utility>
 #include "moba/cs2utils.h"
+#include "moba/messagingmessages.h"
+#include <moba-common/loggerprefix.h>
 
 Watchdog::Watchdog(
     WatchdogTokenPtr watchdogToken, CS2WriterPtr cs2writer, EndpointPtr endpoint
@@ -48,7 +49,14 @@ void Watchdog::operator()() {
                 lastState = ConnectState::ERROR;
             }
         } catch(const std::exception &e) {
-            std::cerr << "exception occurred! <" << e.what() << ">" << std::endl;
+            endpoint->sendMsg(MessagingNotifyIncident{IncidentData{
+                IncidentLevel::ERROR,
+                IncidentType::EXCEPTION,
+                "Watchdog Exception",
+                e.what(),
+                "Watchdog::operator()()"
+            }});
+            std::cerr << moba::LogLevel::CRITICAL << "Watchdog exception: <" << e.what() << ">" << std::endl;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds{500});
     }

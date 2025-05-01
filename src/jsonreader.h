@@ -31,6 +31,7 @@
 #include "watchdogToken.h"
 #include "sharedData.h"
 
+// TODO Consider renaming into CS2Writer instead of JsonReader
 class JsonReader final {
 public:
     JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, SharedDataPtr sharedData);

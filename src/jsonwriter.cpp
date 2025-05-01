@@ -22,13 +22,16 @@
 
 #include <thread>
 #include <utility>
+#include <moba-common/loggerprefix.h>
 
 #include "moba/systemmessages.h"
 #include "moba/interfacemessages.h"
 #include "moba/cs2utils.h"
 #include "moba/configloklistreader.h"
 #include "moba/configreader.h"
+#include "moba/messagingmessages.h"
 
+// TODO Consider renaming into CS2Reader instead of JsonWriter
 JsonWriter::JsonWriter(CS2ReaderPtr cs2reader, CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, SharedDataPtr sharedData):
 cs2reader{std::move(cs2reader)}, cs2writer{std::move(cs2writer)}, endpoint{std::move(endpoint)}, watchdogToken{std::move(watchdogToken)}, sharedData{std::move(sharedData)} {
 }
@@ -59,7 +62,15 @@ void JsonWriter::operator()() const {
                 continue;
             }
         } catch(const std::exception &e) {
-            std::cerr << "exception occurred! <" << e.what() << ">" << std::endl;
+            endpoint->sendMsg(MessagingNotifyIncident{IncidentData{
+                IncidentLevel::ERROR,
+                IncidentType::EXCEPTION,
+                "JsonWriter Exception",
+                e.what(),
+                "JsonWriter::operator()()"
+            }});
+
+            std::cerr << moba::LogLevel::CRITICAL << "exception occurred! <" << e.what() << ">" << std::endl;
             std::this_thread::sleep_for(std::chrono::milliseconds{500});
         }
     }
@@ -87,12 +98,14 @@ bool JsonWriter::s88report(const CS2CanCommand &data) const {
         endpoint->sendMsg(InterfaceSetLocoSpeed{static_cast<std::uint32_t>(locId), 0});
     }
 
+   // cs2writer->send(setLocoHalt(locId));
+
     endpoint->sendMsg(InterfaceContactTriggered{ContactTriggerData{module, contact, active, time}});
     return true;
 }
 
 bool JsonWriter::systemCommands(const CS2CanCommand &cmd) const {
-    if(static_cast<CanCommand>(cmd.header[1]) != CanCommand::CMD_SYSTEM) {
+    if(static_cast<CanCommand>(cmd.header[1]) != CMD_SYSTEM) {
         return false;
     }
 
@@ -129,8 +142,12 @@ bool JsonWriter::controlSwitch(const CS2CanCommand &cmd) const {
     switch(static_cast<CanCommand>(cmd.header[1])) {
         case CMD_SET_SWITCH:
             if(sharedData->automatic) {
-                cs2writer->send(::setEmergencyStop());
-                endpoint->sendMsg(SystemTriggerEmergencyStop{SystemTriggerEmergencyStop::EmergencyTriggerReason::SELF_ACTING_BY_EXTERN_SWITCHING});
+                cs2writer->send(setEmergencyStop());
+                endpoint->sendMsg(
+                    SystemTriggerEmergencyStop{
+                        SystemTriggerEmergencyStop::EmergencyTriggerReason::SELF_ACTING_BY_EXTERN_SWITCHING
+                    }
+                );
             }
             return true;
 

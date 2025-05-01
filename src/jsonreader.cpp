@@ -26,7 +26,9 @@
 
 #include <thread>
 #include <moba-common/loggerprefix.h>
+#include <iostream>
 
+// TODO Consider renaming into CS2Writer instead of JsonReader
 JsonReader::JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, SharedDataPtr sharedData) :
 closing{false}, cs2writer{std::move(cs2writer)}, endpoint{std::move(endpoint)}, watchdogToken{std::move(watchdogToken)}, sharedData{std::move(sharedData)} {
 }
