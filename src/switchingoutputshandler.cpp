@@ -14,7 +14,7 @@
  *  GNU Affero General Public License for more details.
  * 
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program. If not, see <http://www.gnu.org/licenses/agpl.txt>.
+ *  along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.
  * 
  */
 
@@ -32,8 +32,8 @@ void SwitchingOutputsHandler::operator()() {
     for(auto const& v: switchVector) {
         setSwitch(v.localId, v.differ);
     }
-    // TODO Send ready message!
-    // endpoint->sendMsg();
+    // TODO: Hier noch eine Response-Id mit übergeben...
+    //endpoint->sendMsg(InterfaceSwitchAccessoryDecodersComplete);
 }
 
 void SwitchingOutputsHandler::setSwitch(const std::uint8_t addr, const bool r) const {

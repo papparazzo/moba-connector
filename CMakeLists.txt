@@ -21,8 +21,6 @@ add_executable(
 
 install(TARGETS moba-connector)
 
-set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
-
 target_include_directories(moba-connector PUBLIC "${PROJECT_BINARY_DIR}")
 
 target_link_libraries(moba-connector ncurses)

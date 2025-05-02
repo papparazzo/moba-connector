@@ -14,7 +14,7 @@
  *  GNU Affero General Public License for more details.
  *
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program. If not, see <http://www.gnu.org/licenses/agpl.txt>.
+ *  along with this program. If not, see <https://www.gnu.org/licenses/agpl.txt>.
  *
  */
 
@@ -88,7 +88,7 @@ bool JsonWriter::s88report(const CS2CanCommand &data) const {
 
     const bool active = static_cast<bool>(data.data[4]);
 
-    auto locId = sharedData->brakeVector.trigger({module, contact});
+    const auto locId = sharedData->brakeVector.trigger({module, contact});
 
     std::cerr << moba::LogLevel::NOTICE << "Feedback module <" << module << "> contact <" << contact << "> locId <" << locId << ">" << std::endl;
 
@@ -98,7 +98,8 @@ bool JsonWriter::s88report(const CS2CanCommand &data) const {
         endpoint->sendMsg(InterfaceSetLocoSpeed{static_cast<std::uint32_t>(locId), 0});
     }
 
-   // cs2writer->send(setLocoHalt(locId));
+    // TODO: halt senden!
+    // cs2writer->send(setLocoHalt(locId));
 
     endpoint->sendMsg(InterfaceContactTriggered{ContactTriggerData{module, contact, active, time}});
     return true;
