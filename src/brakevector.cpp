@@ -30,7 +30,7 @@ int BrakeVector::trigger(const Contact &contactId) {
 
     const auto tmp = iter->second;
 
-    // Ignore the following contacts afterward (it might be from the same train, E.g. light)
+    // Ignore the following contacts afterward (it might be from the same train, E.g., light)
     iter->second = IGNORE_CONTACT;
     return tmp;
 }

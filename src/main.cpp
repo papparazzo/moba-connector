@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
             socket,
             appData.appName,
             appData.version,
-            {Message::INTERFACE, Message::SYSTEM, Message::TIMER}
+            {Message::INTERFACE, Message::SYSTEM}
         }
     };
 
