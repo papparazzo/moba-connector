@@ -26,8 +26,9 @@
 #include <moba-common/loggerprefix.h>
 
 Watchdog::Watchdog(
-    WatchdogTokenPtr watchdogToken, CS2WriterPtr cs2writer, EndpointPtr endpoint
-): watchdogToken{std::move(watchdogToken)}, cs2writer{std::move(cs2writer)}, endpoint{std::move(endpoint)}, lastState{ConnectState::ERROR} {
+    WatchdogTokenPtr watchdogToken, CS2WriterPtr cs2writer, EndpointPtr endpoint, MonitorPtr monitor
+): watchdogToken{std::move(watchdogToken)}, cs2writer{std::move(cs2writer)},
+   endpoint{std::move(endpoint)}, monitor{std::move(monitor)}, lastState{ConnectState::ERROR} {
 }
 
 void Watchdog::operator()() {
@@ -56,7 +57,7 @@ void Watchdog::operator()() {
                 e.what(),
                 "Watchdog::operator()()"
             }});
-            std::cerr << moba::LogLevel::CRITICAL << "Watchdog exception: <" << e.what() << ">" << std::endl;
+            monitor->printException("Watchdog::operator()()", e.what());
         }
         std::this_thread::sleep_for(std::chrono::milliseconds{500});
     }

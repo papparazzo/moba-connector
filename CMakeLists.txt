@@ -17,6 +17,7 @@ add_executable(
     src/jsonwriter.cpp
     src/switchingoutputshandler.cpp
     src/watchdog.cpp
+    src/monitor.cpp
 )
 
 install(TARGETS moba-connector)

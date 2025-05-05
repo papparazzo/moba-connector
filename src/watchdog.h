@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include "monitor.h"
 #include "watchdogToken.h"
 #include "moba/cs2writer.h"
 #include "moba/endpoint.h"
@@ -27,7 +28,7 @@
 
 class Watchdog final {
 public:
-    Watchdog(WatchdogTokenPtr watchdogToken, CS2WriterPtr cs2writer, EndpointPtr endpoint);
+    Watchdog(WatchdogTokenPtr watchdogToken, CS2WriterPtr cs2writer, EndpointPtr endpoint, MonitorPtr monitor);
 
     Watchdog(const Watchdog&) = delete;
     Watchdog(Watchdog&&) = default;
@@ -43,6 +44,7 @@ protected:
     WatchdogTokenPtr watchdogToken;
     CS2WriterPtr     cs2writer;
     EndpointPtr      endpoint;
+    MonitorPtr       monitor;
     ConnectState     lastState;
 };
 

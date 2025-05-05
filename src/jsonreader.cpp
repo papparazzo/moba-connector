@@ -25,15 +25,23 @@
 #include "switchingoutputshandler.h"
 
 #include <thread>
+#include <functional>
+#include <utility>
 #include <moba-common/loggerprefix.h>
-#include <iostream>
 
 // TODO Consider renaming into CS2Writer instead of JsonReader
-JsonReader::JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, SharedDataPtr sharedData) :
-closing{false}, cs2writer{std::move(cs2writer)}, endpoint{std::move(endpoint)}, watchdogToken{std::move(watchdogToken)}, sharedData{std::move(sharedData)} {
+JsonReader::JsonReader(
+    CS2WriterPtr cs2writer,
+    EndpointPtr endpoint,
+    WatchdogTokenPtr watchdogToken,
+    SharedDataPtr sharedData,
+    MonitorPtr monitor
+) : closing{false}, cs2writer{std::move(cs2writer)}, endpoint{std::move(endpoint)},
+watchdogToken{std::move(watchdogToken)}, sharedData{std::move(sharedData)}, monitor{std::move(monitor)} {
 }
 
 void JsonReader::setHardwareState(SystemHardwareStateChanged &&data) const {
+    monitor->printStatus(data.hardwareState);
     switch(data.hardwareState) {
         case SystemHardwareStateChanged::HardwareState::ERROR:
             return;
@@ -55,6 +63,7 @@ void JsonReader::setBrakeVector(InterfaceSetBrakeVector &&data) const {
             iter.localId
         );
     }
+    monitor->printBrakeVector(sharedData->brakeVector.getVector());
 }
 
 void JsonReader::resetBrakeVector(InterfaceResetBrakeVector &&data) const {
@@ -64,6 +73,7 @@ void JsonReader::resetBrakeVector(InterfaceResetBrakeVector &&data) const {
             BrakeVector::IGNORE_CONTACT
         );        
     }
+    monitor->printBrakeVector(sharedData->brakeVector.getVector());
 }
 
 void JsonReader::shutdown() {
@@ -88,7 +98,10 @@ void JsonReader::setLocoFunction(InterfaceSetLocoFunction &&data) const {
 
     const auto iter = locomotives->find(data.localId);
     if(iter == locomotives->end()) {
-        std::cerr << moba::LogLevel::NOTICE << "given localId <" << data.localId << "> does not exist" << std::endl;
+        monitor->appendAction(
+            moba::LogLevel::NOTICE,
+            "given localId <" + std::to_string(data.localId) + "> does not exist"
+        );
         endpoint->sendMsg(ClientError{ErrorId::INVALID_VALUE_GIVEN, "given localId does not exist"});
         return;
     }
@@ -99,14 +112,17 @@ void JsonReader::setLocoFunction(InterfaceSetLocoFunction &&data) const {
     auto iterf = func.find(static_cast<std::uint32_t>(data.function));
 
     if(iterf == func.end()) {
-        std::cerr << moba::LogLevel::WARNING << "no function found for localId <" << data.localId << ">" << std::endl;
+        monitor->appendAction(
+            moba::LogLevel::WARNING,
+            "no function found for localId <" + std::to_string(data.localId) + ">"
+        );
         return;
     }
-
-    std::cerr <<
-        moba::LogLevel::NOTICE <<
-        "localid " << data.localId << " function " <<
-        controllableFunctionEnumToString(data.function) << " on " << data.active << std::endl;
+    monitor->appendAction(
+        moba::LogLevel::NOTICE,
+        "set function " + controllableFunctionEnumToString(data.function) + " for localid <" +
+        std::to_string(data.localId) +  "> " + (data.active ? "on" : "off")
+    );
 
     cs2writer->send(::setLocFunction(
         data.localId,
@@ -136,9 +152,7 @@ void JsonReader::operator()() {
             }
         } catch(const std::exception &e) {
             watchdogToken->synchronizeStart();
-            std::cerr <<
-                moba::LogLevel::CRITICAL << "exception in JsonReader::operator()() occurred! <" <<
-                e.what() << ">" << std::endl;
+            monitor->printException("JsonReader::operator()()", e.what());
         }
         std::this_thread::sleep_for(std::chrono::milliseconds{500});
     }

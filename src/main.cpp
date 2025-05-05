@@ -34,6 +34,7 @@
 #include "moba/socket.h"
 #include "moba/endpoint.h"
 #include "jsonwriter.h"
+#include "monitor.h"
 #include "sharedData.h"
 
 namespace {
@@ -48,6 +49,8 @@ namespace {
 }
 
 int main(int argc, char *argv[]) {
+    auto debug = false;
+
     if(argc == 2) {
         appData.host = std::string(argv[1]);
     }
@@ -70,21 +73,22 @@ int main(int argc, char *argv[]) {
 
     const auto watchdogToken = std::make_shared<WatchdogToken>();
     const auto sharedData = std::make_shared<SharedData>();
+    const auto monitor = std::make_shared<Monitor>(debug);
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
-    JsonWriter jsonwriter{cs2Reader, cs2Writer, endpoint, watchdogToken, sharedData};
+    JsonWriter jsonwriter{cs2Reader, cs2Writer, endpoint, watchdogToken, sharedData, monitor};
     std::thread jsonwriterThread{std::move(jsonwriter)};
     jsonwriterThread.detach();
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
-    std::thread watchDogThread{Watchdog{watchdogToken, cs2Writer, endpoint}};
+    std::thread watchDogThread{Watchdog{watchdogToken, cs2Writer, endpoint, monitor}};
     watchDogThread.detach();
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
-    JsonReader jsonReader{cs2Writer, endpoint, watchdogToken, sharedData};
+    JsonReader jsonReader{cs2Writer, endpoint, watchdogToken, sharedData, monitor};
     std::thread jsonReaderThread{std::move(jsonReader)};
     jsonReaderThread.join();
 

@@ -43,6 +43,8 @@ public:
     void handleContact(const Contact &contactId, int locId);
     void reset();
 
+    const Vector& getVector() {return vector;};
+
 protected:
     Vector vector;
     std::mutex mutex;

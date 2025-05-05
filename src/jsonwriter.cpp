@@ -32,8 +32,15 @@
 #include "moba/messagingmessages.h"
 
 // TODO Consider renaming into CS2Reader instead of JsonWriter
-JsonWriter::JsonWriter(CS2ReaderPtr cs2reader, CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, SharedDataPtr sharedData):
-cs2reader{std::move(cs2reader)}, cs2writer{std::move(cs2writer)}, endpoint{std::move(endpoint)}, watchdogToken{std::move(watchdogToken)}, sharedData{std::move(sharedData)} {
+JsonWriter::JsonWriter(
+    CS2ReaderPtr cs2reader,
+    CS2WriterPtr cs2writer,
+    EndpointPtr endpoint,
+    WatchdogTokenPtr watchdogToken,
+    SharedDataPtr sharedData,
+    MonitorPtr monitor
+): cs2reader{std::move(cs2reader)}, cs2writer{std::move(cs2writer)}, endpoint{std::move(endpoint)},
+watchdogToken{std::move(watchdogToken)}, sharedData{std::move(sharedData)}, monitor{std::move(monitor)} {
 }
 
 void JsonWriter::operator()() const {
@@ -70,7 +77,7 @@ void JsonWriter::operator()() const {
                 "JsonWriter::operator()()"
             }});
 
-            std::cerr << moba::LogLevel::CRITICAL << "exception occurred! <" << e.what() << ">" << std::endl;
+            monitor->printException("JsonWriter::operator()()", e.what());
             std::this_thread::sleep_for(std::chrono::milliseconds{500});
         }
     }
@@ -90,12 +97,13 @@ bool JsonWriter::s88report(const CS2CanCommand &data) const {
 
     const auto locId = sharedData->brakeVector.trigger({module, contact});
 
-    std::cerr << moba::LogLevel::NOTICE << "Feedback module <" << module << "> contact <" << contact << "> locId <" << locId << ">" << std::endl;
+    monitor->feedbackContactTriggered(module, contact, time, active);
 
     if(locId != BrakeVector::IGNORE_CONTACT) {
-        std::cerr << moba::LogLevel::NOTICE << "halt for locId <" << locId << ">" << std::endl;
+        monitor->appendAction(moba::LogLevel::NOTICE, "halt for locId <" + std::to_string(locId) + ">");
         cs2writer->send(setLocSpeed(locId, 0));
         endpoint->sendMsg(InterfaceSetLocoSpeed{static_cast<std::uint32_t>(locId), 0});
+        monitor->printBrakeVector(sharedData->brakeVector.getVector());
     }
 
     // TODO: halt senden!

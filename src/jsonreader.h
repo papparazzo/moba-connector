@@ -22,6 +22,7 @@
 
 #include <memory>
 
+#include "monitor.h"
 #include "moba/configloklistreader.h"
 #include "moba/endpoint.h"
 #include "moba/systemmessages.h"
@@ -34,7 +35,13 @@
 // TODO Consider renaming into CS2Writer instead of JsonReader
 class JsonReader final {
 public:
-    JsonReader(CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdogToken, SharedDataPtr sharedData);
+    JsonReader(
+        CS2WriterPtr cs2writer,
+        EndpointPtr endpoint,
+        WatchdogTokenPtr watchdogToken,
+        SharedDataPtr sharedData,
+        MonitorPtr monitor
+    );
 
     ~JsonReader() noexcept = default;
 
@@ -60,5 +67,6 @@ protected:
     EndpointPtr      endpoint;
     WatchdogTokenPtr watchdogToken;
     SharedDataPtr    sharedData;
+    MonitorPtr       monitor;
     LocomotivesPtr   locomotives;
 };

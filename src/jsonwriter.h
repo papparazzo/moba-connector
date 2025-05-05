@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include "monitor.h"
 #include "moba/cs2cancommand.h"
 #include "moba/endpoint.h"
 #include "moba/cs2writer.h"
@@ -31,7 +32,14 @@
 // TODO Consider renaming into CS2Reader instead of JsonWriter
 class JsonWriter final {
 public:
-    JsonWriter(CS2ReaderPtr cs2reader, CS2WriterPtr cs2writer, EndpointPtr endpoint, WatchdogTokenPtr watchdog, SharedDataPtr sharedData);
+    JsonWriter(
+        CS2ReaderPtr cs2reader,
+        CS2WriterPtr cs2writer,
+        EndpointPtr endpoint,
+        WatchdogTokenPtr watchdog,
+        SharedDataPtr sharedData,
+        MonitorPtr monitor
+    );
 
     ~JsonWriter() noexcept = default;
 
@@ -54,4 +62,5 @@ protected:
     EndpointPtr endpoint;
     WatchdogTokenPtr watchdogToken;
     SharedDataPtr sharedData;
+    MonitorPtr monitor;
 };
