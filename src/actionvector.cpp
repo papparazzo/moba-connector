@@ -18,36 +18,29 @@
  *
  */
 
-#pragma once
+#include "brakevector.h"
 
-#include <map>
-#include <mutex>
-#include <memory>
+int ActionVector::trigger(const Contact &contactId) {
+    std::lock_guard guard{mutex};
+    const auto iter = vector.find(contactId);
 
-class BrakeVector {
-public:
-    BrakeVector() = default;
-    
-    BrakeVector(const BrakeVector&) = delete;
-    BrakeVector& operator=(const BrakeVector&) = delete;
-    
-    ~BrakeVector() = default;
-    
-    static constexpr int IGNORE_CONTACT = 0;
+    if(iter == vector.end()) {
+        return IGNORE_CONTACT;
+    }
 
-    using Contact = std::pair<int, int>;
-    using Vector = std::map<Contact, int>;
+    const auto tmp = iter->second;
 
-    int trigger(const Contact &contactId);
+    // Ignore the following contacts afterward (it might be from the same train, E.g., light)
+    iter->second = IGNORE_CONTACT;
+    return tmp;
+}
 
-    void handleContact(const Contact &contactId, int locId);
-    void reset();
+void ActionVector::handleContact(const Contact &contactId, const int locId) {
+    std::lock_guard guard{mutex};
+    vector[contactId] = locId;
+}
 
-    const Vector& getVector() {return vector;};
-
-protected:
-    Vector vector;
-    std::mutex mutex;
-};
-
-using BrakeVectorPtr = std::shared_ptr<BrakeVector>;
+void ActionVector::reset() {
+    std::lock_guard guard{mutex};
+    vector.clear();
+}

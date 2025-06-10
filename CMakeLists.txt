@@ -11,7 +11,7 @@ configure_file(config.h.in config.h)
 add_executable(
     moba-connector 
 
-    src/brakevector.cpp
+    src/actionvector.cpp
     src/main.cpp
     src/jsonreader.cpp
     src/jsonwriter.cpp
