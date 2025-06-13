@@ -24,15 +24,12 @@
 #include <moba-common/loggerprefix.h>
 #include <moba-common/screen.h>
 
-#include "brakevector.h"
 #include "moba/systemmessages.h"
 
 class Monitor final {
 public:
     explicit Monitor(const bool debug): screen{"moba-connector", debug} {}
     ~Monitor() = default;
-
-    void printBrakeVector(const BrakeVector::Vector &vec);
 
     void appendAction(moba::LogLevel level, const std::string &action);
 

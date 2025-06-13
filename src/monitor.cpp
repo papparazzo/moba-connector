@@ -41,7 +41,7 @@ void Monitor::printException(const std::string &where, const std::string &what) 
     screen.printException(where, what);
 }
 
-void Monitor::feedbackContactTriggered(const std::uint16_t module, const std::uint16_t contact, const std::uint16_t time, bool active) {
+void Monitor::feedbackContactTriggered(const std::uint16_t module, const std::uint16_t contact, const std::uint16_t time, const bool active) {
     std::lock_guard l{m};
 
     std::stringstream ss;
@@ -61,7 +61,7 @@ void Monitor::appendCanBusAction(const std::string &action) {
     screen.printBuffer(5, 2, canBusActions);
 }
 
-void Monitor::printStatus(SystemHardwareStateChanged::HardwareState status) {
+void Monitor::printStatus(const SystemHardwareStateChanged::HardwareState status) {
     switch(status) {
         case SystemHardwareStateChanged::HardwareState::ERROR:
             return screen.printStatus("Keine Verbindung zur Hardware", true);
