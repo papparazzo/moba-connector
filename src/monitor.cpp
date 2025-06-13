@@ -23,29 +23,9 @@
 #include <iomanip>
 #include <chrono>
 #include <ctime>
-
 #include <string>
-
 #include <sstream>
 
-namespace {
-    // TODO: Put this into moba-lib-common
-    std::string getTimeStamp() {
-        const auto now = std::chrono::system_clock::now();
-        const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
-        const auto timer = std::chrono::system_clock::to_time_t(now);
-
-        std::tm bt{};
-
-        localtime_r(&timer, &bt);
-
-        std::stringstream ss;
-        ss <<
-            std::put_time(&bt, "%Y-%m-%d %H:%M:%S.") << std::right <<
-            std::setw(3) << std::setfill('0') << ms.count();
-        return ss.str();
-    }
-}
 
 void Monitor::printBrakeVector(const BrakeVector::Vector &vec) {
     std::lock_guard l{m};
@@ -96,7 +76,7 @@ void Monitor::feedbackContactTriggered(const std::uint16_t module, const std::ui
 }
 
 void Monitor::appendCanBusAction(const std::string &action) {
-    std::string msg = getTimeStamp() + " " + action;
+    const std::string msg = moba::getTimeStamp() + " " + action;
     canBusActions.push_back(msg.c_str());
     screen.printBuffer(5, 2, canBusActions);
 }
