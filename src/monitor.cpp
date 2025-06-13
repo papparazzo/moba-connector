@@ -26,26 +26,6 @@
 #include <string>
 #include <sstream>
 
-
-void Monitor::printBrakeVector(const BrakeVector::Vector &vec) {
-    std::lock_guard l{m};
-
-    int y = 5;
-    for(auto &[fst, snd]: vec) {
-        if(snd == BrakeVector::IGNORE_CONTACT) {
-            continue;
-        }
-        std::stringstream ss;
-        ss << "[" << fst.first << ":" << fst.second << "] -> " << snd;
-        screen.mvprintw(y++, 80, ss.str());
-    }
-    while(y < 20) {
-        screen.mvprintw(y++, 80, "                                ");
-    }
-
-    screen.refresh();
-}
-
 void Monitor::appendAction(const moba::LogLevel level, const std::string &action) {
     std::lock_guard l{m};
 
