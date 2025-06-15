@@ -20,31 +20,32 @@
 
 #pragma once
 
-#include <vector>
-
 #include "moba/cs2writer.h"
 #include "moba/endpoint.h"
-#include "moba/shared.h"
-#include "item.h"
+#include "actionabstract.h"
 
-class SwitchingOutputsHandler final : public Item {
-public:
+#include <thread>
+#include <utility>
 
-    SwitchingOutputsHandler(EndpointPtr endpoint, CS2WriterPtr cs2writer, SwitchingOutputs && switchVector);
-    SwitchingOutputsHandler(SwitchingOutputsHandler&&) = default;
-    
-    SwitchingOutputsHandler(const SwitchingOutputsHandler&) = delete;
-    SwitchingOutputsHandler& operator=(const SwitchingOutputsHandler&) = delete;
-    
-    
-    ~SwitchingOutputsHandler() noexcept override = default;
-    
-    void operator()() override;
-    
+#include "moba/cs2utils.h"
+
+struct ActionSwitching final : ActionAbstract {
+	ActionSwitching(CS2WriterPtr cs2writer, const std::uint32_t localId, const bool r): cs2writer{std::move(cs2writer)},
+        differ(false), localId{localId}, r{r} {
+    }
+
+    void operator()() override {
+        using namespace std::chrono_literals;
+
+        cs2writer->send(::setSwitch(localId, r, true));
+        std::this_thread::sleep_for(50ms);
+        cs2writer->send(::setSwitch(localId, r, false));
+        std::this_thread::sleep_for(250ms);
+    }
+
 private:
-    EndpointPtr endpoint;
-    CS2WriterPtr cs2writer;
-    SwitchingOutputs switchVector;
-
-    void setSwitch(std::uint8_t addr, bool r) const;
+    CS2WriterPtr  cs2writer;
+    bool          differ;
+    std::uint32_t localId;
+    bool          r;
 };
