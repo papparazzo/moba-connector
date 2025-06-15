@@ -21,7 +21,6 @@
 #include "monitor.h"
 
 #include <iomanip>
-#include <chrono>
 #include <ctime>
 #include <string>
 #include <sstream>
@@ -55,13 +54,25 @@ void Monitor::feedbackContactTriggered(const std::uint16_t module, const std::ui
     appendCanBusAction(ss.str());
 }
 
+void Monitor::locCommandsTriggered(const std::string& cmd, const std::uint32_t addr, const int value) {
+    std::lock_guard l{m};
+
+    std::stringstream ss;
+    ss <<
+        cmd << " [" <<
+        std::setw(4) << std::setfill('0') << addr << ":" <<
+        std::setw(4) << std::setfill('0') << value << "]";
+
+    appendCanBusAction(ss.str());
+}
+
 void Monitor::appendCanBusAction(const std::string &action) {
     const std::string msg = moba::getTimeStamp() + " " + action;
     canBusActions.push_back(msg.c_str());
     screen.printBuffer(5, 2, canBusActions);
 }
 
-void Monitor::printStatus(const SystemHardwareStateChanged::HardwareState status) {
+void Monitor::printStatus(const SystemHardwareStateChanged::HardwareState status) const {
     switch(status) {
         case SystemHardwareStateChanged::HardwareState::ERROR:
             return screen.printStatus("Keine Verbindung zur Hardware", true);

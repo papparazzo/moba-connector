@@ -88,8 +88,8 @@ bool JsonWriter::s88report(const CS2CanCommand &data) const {
         return false;
     }
 
-    auto module = data.getWordAt0();
-    auto contact = data.getWordAt2();
+    const auto module = data.getWordAt0();
+    const auto contact = data.getWordAt2();
 
     const auto time = data.getWordAt6();
 
@@ -135,11 +135,11 @@ bool JsonWriter::systemCommands(const CS2CanCommand &cmd) const {
 bool JsonWriter::controlLocoCommands(const CS2CanCommand &cmd) const {
     switch(static_cast<CanCommand>(cmd.header[1])) {
         case CMD_LOCO_DIRECTION:
-            endpoint->sendMsg(InterfaceSetLocoDirection{cmd.getUID(), cmd.data[4]});
+            monitor->locCommandsTriggered("Fahrtrichtungswechsel", cmd.getUID(), cmd.data[4]);
             return true;
 
         case CMD_LOCO_SPEED:
-            endpoint->sendMsg(InterfaceSetLocoSpeed{cmd.getUID(), cmd.getWordAt4()});
+            monitor->locCommandsTriggered("Geschwindigkeitsänderung", cmd.getUID(), cmd.getWordAt4());
             return true;
 
         default:

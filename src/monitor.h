@@ -37,7 +37,9 @@ public:
 
     void feedbackContactTriggered(std::uint16_t module, std::uint16_t contact, std::uint16_t time, bool active);
 
-    void printStatus(SystemHardwareStateChanged::HardwareState status);
+    void locCommandsTriggered(const std::string& cmd, std::uint32_t addr, int value);
+
+    void printStatus(SystemHardwareStateChanged::HardwareState status) const;
 
 private:
     std::mutex m;

@@ -36,7 +36,7 @@ public:
         CS2ReaderPtr cs2reader,
         CS2WriterPtr cs2writer,
         EndpointPtr endpoint,
-        WatchdogTokenPtr watchdog,
+        WatchdogTokenPtr watchdogToken,
         SharedDataPtr sharedData,
         MonitorPtr monitor
     );
