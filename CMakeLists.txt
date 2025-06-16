@@ -15,7 +15,6 @@ add_executable(
     src/main.cpp
     src/jsonreader.cpp
     src/jsonwriter.cpp
-    src/switchingoutputshandler.cpp
     src/watchdog.cpp
     src/monitor.cpp
 )
