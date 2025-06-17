@@ -18,29 +18,38 @@
  *
  */
 
-#include "brakevector.h"
+#pragma once
+#include <mutex>
 
-int ActionVector::trigger(const Contact &contactId) {
-    std::lock_guard guard{mutex};
-    const auto iter = vector.find(contactId);
+#include "actionabstract.h"
+#include "moba/shared.h"
 
-    if(iter == vector.end()) {
-        return IGNORE_CONTACT;
-    }
+class ActionListHandler final {
+public:
+    using ActionList = std::vector<ActionAbstractPtr>;
 
-    const auto tmp = iter->second;
+    ActionListHandler() = default;
 
-    // Ignore the following contacts afterward (it might be from the same train, E.g., light)
-    iter->second = IGNORE_CONTACT;
-    return tmp;
-}
+    ActionListHandler(const ActionListHandler&) = delete;
+    ActionListHandler& operator=(const ActionListHandler&) = delete;
 
-void ActionVector::handleContact(const Contact &contactId, const int locId) {
-    std::lock_guard guard{mutex};
-    vector[contactId] = locId;
-}
+    ~ActionListHandler() = default;
 
-void ActionVector::reset() {
-    std::lock_guard guard{mutex};
-    vector.clear();
-}
+    using Vector = std::map<ContactData, int>;
+
+    const Vector& getVector() {return vector;};
+
+
+    void insertActionList();
+    void removeActionList(int id);
+
+    int trigger(const ContactData &contactId);
+    void handleContact(const Contact &contactId, int locId);
+
+
+private:
+    Vector vector;
+    ActionList actionList;
+
+    std::mutex mutex;
+};

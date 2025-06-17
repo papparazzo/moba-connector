@@ -11,12 +11,12 @@ configure_file(config.h.in config.h)
 add_executable(
     moba-connector 
 
-    src/actionvector.cpp
     src/main.cpp
     src/jsonreader.cpp
     src/jsonwriter.cpp
     src/watchdog.cpp
     src/monitor.cpp
+    src/actionlisthandler.cpp
 )
 
 install(TARGETS moba-connector)

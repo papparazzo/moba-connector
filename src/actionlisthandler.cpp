@@ -18,39 +18,37 @@
  *
  */
 
-#pragma once
+#include "actionlisthandler.h"
 
-#include <map>
 #include <mutex>
-#include <memory>
 
-class ActionVector {
-public:
-    ActionVector() = default;
-    
-    ActionVector(const ActionVector&) = delete;
-    ActionVector& operator=(const ActionVector&) = delete;
-    
-    ~ActionVector() = default;
-    
-    static constexpr int IGNORE_CONTACT = 0;
+int ActionListHandler::trigger(const ContactData &contactId) {
+    std::lock_guard guard{mutex};
 
 
 
+    const auto iter = vector.find(contactId);
 
-    using Contact = std::pair<int, int>;
-    using Vector = std::map<Contact, int>;
+    if(iter == vector.end()) {
+        return IGNORE_CONTACT;
+    }
 
-    int trigger(const Contact &contactId);
+    const auto tmp = iter->second;
 
-    void handleContact(const Contact &contactId, int locId);
-    void reset();
+    // Ignore the following contacts afterward (it might be from the same train, E.g., light)
+    iter->second = IGNORE_CONTACT;
+    return tmp;
+}
 
-    const Vector& getVector() {return vector;};
+void ActionListHandler::insertActionList(const Contact &contactId, ) {
+    std::lock_guard guard{mutex};
+    vector[contactId] = locId;
 
-protected:
-    Vector vector;
-    std::mutex mutex;
-};
+}
 
-using ActionVectorPtr = std::shared_ptr<ActionVector>;
+void ActionListHandler::removeActionList(int id) {
+    std::lock_guard guard{mutex};
+    vector.clear();
+
+}
+
