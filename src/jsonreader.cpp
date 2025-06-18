@@ -22,12 +22,26 @@
 #include "moba/registry.h"
 #include "moba/cs2utils.h"
 #include "moba/clientmessages.h"
-#include "switchingoutputshandler.h"
 
 #include <thread>
 #include <functional>
 #include <utility>
 #include <moba-common/loggerprefix.h>
+
+#include "actionabstract.h"
+#include "actiondelay.h"
+#include "actionlocdirection.h"
+#include "actionlocfunction.h"
+#include "actionlocspeed.h"
+#include "actionlocstop.h"
+#include "actionsendblockreleased.h"
+#include "actionsendroutereleased.h"
+#include "actionsendrouteswitched.h"
+#include "actionsendswitchroute.h"
+#include "actionswitching.h"
+#include "actionvoid.h"
+#include "moba/enumactiontype.h"
+#include "moba/enumfunction.h"
 
 // TODO Consider renaming into CS2Writer instead of JsonReader
 JsonReader::JsonReader(
@@ -56,26 +70,6 @@ void JsonReader::setHardwareState(SystemHardwareStateChanged &&data) const {
     }
 }
 
-void JsonReader::setBrakeVector(InterfaceSetBrakeVector &&data) const {
-    for(auto iter: data.items) {
-        sharedData->brakeVector.handleContact(
-            {iter.contact.moduleAddr, iter.contact.contactNb},
-            iter.localId
-        );
-    }
-    monitor->printBrakeVector(sharedData->brakeVector.getVector());
-}
-
-void JsonReader::resetBrakeVector(InterfaceResetBrakeVector &&data) const {
-    for(auto iter: data.items) {
-        sharedData->brakeVector.handleContact(
-            {iter.contact.moduleAddr, iter.contact.contactNb},
-            BrakeVector::IGNORE_CONTACT
-        );        
-    }
-    monitor->printBrakeVector(sharedData->brakeVector.getVector());
-}
-
 void JsonReader::shutdown() {
     // TODO: Vor dem Shutdown sollten schon alle Züge angehalten haben.
     //cs2writer->send(::setHalt());
@@ -83,15 +77,103 @@ void JsonReader::shutdown() {
 }
 
 void JsonReader::reset() const {
-    //cs2writer->send(::setHalt());
-    sharedData->brakeVector.reset();
+    cs2writer->send(setHalt());
 }
 
-void JsonReader::setSwitch(InterfaceSwitchAccessoryDecoders &&data) const {
+void JsonReader::setActionList(const nlohmann::json &d) const {
+    const int id = d["id"].get<int>();
+
+    // TODO: Prüfen ob id schon hinterlegt ist
+
+    std::vector<ActionAbstractPtr> actionList;
+
+    std::uint32_t localId = 0;
+
+    for(auto &iter: d["actionList"]) {
+        switch(auto action = iter["action"].get<std::string>(); stringToActionTypeEnum(action)) {
+            case ActionType::VOID:
+                actionList.emplace_back(std::make_shared<ActionVoid>());
+                continue;
+
+            case ActionType::DELAY:
+                actionList.emplace_back(std::make_shared<ActionDelay>(iter["data"].get<int>));
+                continue;
+
+            case ActionType::LOCO_HALT:
+                actionList.emplace_back(std::make_shared<ActionLocStop>(cs2writer, localId));
+                continue;
+
+            case ActionType::LOCO_SPEED:
+                actionList.emplace_back(std::make_shared<ActionLocSpeed>(cs2writer, localId, iter["data"].get<int>));
+                continue;
+
+            case ActionType::LOCO_DIRECTION_BACKWARD:
+                actionList.emplace_back(std::make_shared<ActionLocDirection>(cs2writer, localId, moba::DrivingDirection::BACKWARD));
+                continue;
+
+            case ActionType::LOCO_DIRECTION_FORWARD:
+                actionList.emplace_back(std::make_shared<ActionLocDirection>(cs2writer, localId, moba::DrivingDirection::FORWARD));
+                continue;
+
+            case ActionType::LOCO_FUNCTION_ON:
+                actionList.emplace_back(getFunctionAction(localId, iter["data"].get<std::string>, true));
+                continue;
+
+            case ActionType::LOCO_FUNCTION_OFF:
+                actionList.emplace_back(getFunctionAction(localId, iter["data"].get<std::string>, false));
+                continue;
+
+            case ActionType::SWITCHING_RED:
+                actionList.emplace_back(std::make_shared<ActionSwitching>(cs2writer, localId, true));
+                continue;
+
+            case ActionType::SWITCHING_GREEN:
+                actionList.emplace_back(std::make_shared<ActionSwitching>(cs2writer, localId, false));
+                continue;
+
+            case ActionType::SEND_SWITCH_ROUTE:
+                actionList.emplace_back(std::make_shared<ActionSendSwitchRoute>(iter["data"].get<std::string>, true));
+                continue;
+
+            case ActionType::SEND_ROUTE_SWITCHED:
+                actionList.emplace_back(std::make_shared<ActionSendRouteSwitched>(iter["data"].get<std::string>, true));
+                continue;
+
+            case ActionType::SEND_ROUTE_RELEASED:
+                actionList.emplace_back(std::make_shared<ActionSendRouteReleased>(iter["data"].get<std::string>, true));
+                continue;
+
+            case ActionType::SEND_BLOCK_RELEASED:
+                actionList.emplace_back(std::make_shared<ActionSendBlockReleased>(iter["data"].get<std::string>, true));
+                continue;
+
+            default:
+                monitor->appendAction(moba::LogLevel::WARNING, "unknown action type <" + action + "> for id <" + std::to_string(id) + ">");
+                // TODO Send Error to moba-server
+                continue;
+        }
+
+        sharedData->actionListHandler.insertActionList();
+       // sharedData->actionListHandler.trigger(ActionData{id, actionList});
+
+    }
+
+/*
+    Integer	id		1	1	Eindeutige Id
+    ContactTrigger	trigger		0	1	
+    ActionData	actionList		1	-1	
+
     SwitchingOutputsHandler soh{endpoint, cs2writer, std::move(data.switchingOutputs)};
-    
     std::thread jsonwriterThread{std::move(soh)};
     jsonwriterThread.detach();
+
+    explicit InterfaceHandleActionList(const nlohmann::json &d) {
+        if (!d["trigger"].is_null()) {
+            contactTrigger = ContactTrigger{d["trigger"]};
+        }
+
+    }
+    */
 }
 
 void JsonReader::setLocoFunction(InterfaceSetLocoFunction &&data) const {

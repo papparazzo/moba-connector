@@ -26,11 +26,11 @@
 #include "moba/configloklistreader.h"
 #include "moba/endpoint.h"
 #include "moba/systemmessages.h"
-#include "moba/interfacemessages.h"
 #include "moba/cs2writer.h"
 
 #include "watchdogToken.h"
 #include "sharedData.h"
+#include "actionabstract.h"
 
 // TODO Consider renaming into CS2Writer instead of JsonReader
 class JsonReader final {
@@ -53,10 +53,8 @@ public:
 
 protected:
     void setHardwareState(SystemHardwareStateChanged &&data) const;
-    void setBrakeVector(InterfaceSetBrakeVector &&data) const;
-    void resetBrakeVector(InterfaceResetBrakeVector &&data) const;
-    void setSwitch(InterfaceSwitchAccessoryDecoders &&data) const;
-    void setLocoFunction(InterfaceSetLocoFunction &&data) const;
+    void setActionList(const nlohmann::json &d) const ;
+    [[nodiscard]] ActionAbstractPtr getFunctionAction(std::uint32_t localId, const std::string &function, bool active) const;
 
     void shutdown();
     void reset() const;
