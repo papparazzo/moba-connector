@@ -34,16 +34,14 @@ using namespace std::literals::chrono_literals;
 
 struct ActionLocStop final: ActionAbstract {
 
-	ActionLocStop(CS2WriterPtr cs2writer, const std::uint32_t localId):
-    cs2writer{std::move(cs2writer)}, localId{localId} {
+	explicit ActionLocStop(CS2WriterPtr cs2writer): cs2writer{std::move(cs2writer)} {
 	}
 
-    void operator()() override {
-		std::this_thread::sleep_for(250ms);
+    void operator()(const std::uint32_t localId) override {
+		localId > 0 && std::this_thread::sleep_for(250ms);
 		cs2writer->send(::setLocoHalt(localId));
     }
 
 private:
     CS2WriterPtr  cs2writer;
-    std::uint32_t localId;
 };

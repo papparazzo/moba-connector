@@ -34,16 +34,15 @@ using namespace std::literals::chrono_literals;
 
 struct ActionLocDirection final: ActionAbstract {
 
-    ActionLocDirection(CS2WriterPtr cs2writer, const std::uint32_t localId, const moba::DrivingDirection direction):
-    cs2writer{std::move(cs2writer)}, localId{localId}, direction{direction} {
+    ActionLocDirection(CS2WriterPtr cs2writer, const moba::DrivingDirection direction):
+    cs2writer{std::move(cs2writer)}, direction{direction} {
     }
 
-    void operator()() override {
-        cs2writer->send(::setLocDirection(localId, direction.drivingDirection));
+    void operator()(const std::uint32_t localId) override {
+        localId > 0 && cs2writer->send(::setLocDirection(localId, direction.drivingDirection));
     }
 
 private:
     CS2WriterPtr           cs2writer;
-    std::uint32_t          localId;
     moba::DrivingDirection direction;
 };

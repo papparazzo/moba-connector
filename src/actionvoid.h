@@ -23,7 +23,7 @@
 #include "actionabstract.h"
 
 struct ActionVoid final: ActionAbstract {
-    void operator()() override {
+    void operator()(const std::uint32_t localId) override {
 		// noop
     }
 };

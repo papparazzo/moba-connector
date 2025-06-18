@@ -28,7 +28,7 @@
 struct ActionDelay final: ActionAbstract {
     explicit ActionDelay(const std::chrono::milliseconds duration) : duration{duration} {};
 
-    void operator()() override {
+    void operator()(const std::uint32_t localId) override {
 		std::this_thread::sleep_for(duration);
     }
 

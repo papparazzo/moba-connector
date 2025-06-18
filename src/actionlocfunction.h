@@ -33,17 +33,16 @@ using namespace std::literals::chrono_literals;
 
 struct ActionLocFunction final: ActionAbstract {
 
-    ActionLocFunction(CS2WriterPtr cs2writer, const std::uint32_t localId, const std::uint8_t function, const bool on):
-    cs2writer{std::move(cs2writer)}, localId{localId}, function{function}, on{on} {
+    ActionLocFunction(CS2WriterPtr cs2writer, const std::uint8_t function, const bool on):
+    cs2writer{std::move(cs2writer)}, function{function}, on{on} {
     }
 
-    void operator()() override {
-        cs2writer->send(::setLocFunction(localId, function, on));
+    void operator()(const std::uint32_t localId) override {
+        localId > 0 && cs2writer->send(::setLocFunction(localId, function, on));
     }
 
 private:
     CS2WriterPtr  cs2writer;
-    std::uint32_t localId;
     std::uint8_t  function;
     bool          on;
 };

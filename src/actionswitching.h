@@ -34,7 +34,7 @@ struct ActionSwitching final : ActionAbstract {
         differ(false), localId{localId}, r{r} {
     }
 
-    void operator()() override {
+    void operator()(const std::uint32_t localId) override {
         using namespace std::chrono_literals;
 
         cs2writer->send(::setSwitch(localId, r, true));

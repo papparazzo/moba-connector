@@ -28,7 +28,7 @@ struct ActionSendBlockReleased final: ActionAbstract {
     ActionSendBlockReleased(EndpointPtr endpoint, const unsigned long id) : id{id}, endpoint{std::move(endpoint)} {
     }
 
-    void operator()() override {
+    void operator()(const std::uint32_t localId) override {
         endpoint->sendMsg(InterfaceBlockReleased{id});
     }
 

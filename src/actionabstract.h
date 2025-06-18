@@ -30,7 +30,7 @@ struct ActionAbstract {
     ActionAbstract(const ActionAbstract&) = delete;
     ActionAbstract& operator=(const ActionAbstract&) = delete;
 
-    virtual void operator()() = 0;
+    virtual void operator()(std::uint32_t localId) = 0;
 };
 
 using ActionAbstractPtr = std::shared_ptr<ActionAbstract>;

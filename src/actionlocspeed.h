@@ -30,16 +30,15 @@
 
 struct ActionLocSpeed final: ActionAbstract {
 
-    ActionLocSpeed(CS2WriterPtr cs2writer, const std::uint32_t localId, const std::uint16_t speed):
-    cs2writer{std::move(cs2writer)}, localId{localId}, speed {speed} {
+    ActionLocSpeed(CS2WriterPtr cs2writer, const std::uint16_t speed):
+    cs2writer{std::move(cs2writer)}, speed {speed} {
     }
 
-    void operator()() override {
-        cs2writer->send(::setLocSpeed(localId, speed));
+    void operator()(const std::uint32_t localId) override {
+        localId > 0 && cs2writer->send(::setLocSpeed(localId, speed));
     }
 
 private:
     CS2WriterPtr  cs2writer;
-    std::uint32_t localId;
     std::uint16_t speed;
 };
