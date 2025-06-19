@@ -176,41 +176,32 @@ void JsonReader::setActionList(const nlohmann::json &d) const {
     */
 }
 
-void JsonReader::setLocoFunction(InterfaceSetLocoFunction &&data) const {
+ActionAbstractPtr JsonReader::getFunctionAction(std::uint32_t localId, const std::string &function, bool active) const {
 
-    const auto iter = locomotives->find(data.localId);
+    const auto iter = locomotives->find(localId);
     if(iter == locomotives->end()) {
-        monitor->appendAction(
-            moba::LogLevel::NOTICE,
-            "given localId <" + std::to_string(data.localId) + "> does not exist"
-        );
-        endpoint->sendMsg(ClientError{ErrorId::INVALID_VALUE_GIVEN, "given localId does not exist"});
-        return;
+        monitor->appendAction(moba::LogLevel::NOTICE, "given localId <" + std::to_string(localId) + "> does not exist");
+        return std::make_shared<ActionVoid>();
     }
-    
-    auto &func = iter->second->functions;
-    
-    // TODO: Try alternative functions...
-    auto iterf = func.find(static_cast<std::uint32_t>(data.function));
 
-    if(iterf == func.end()) {
-        monitor->appendAction(
-            moba::LogLevel::WARNING,
-            "no function found for localId <" + std::to_string(data.localId) + ">"
-        );
-        return;
+    auto funcEnum = stringToControllableFunctionEnum(function);
+
+    auto &func = iter->second->functions;
+
+    // TODO: Try alternative functions...
+    const auto funcIter = func.find(static_cast<int>(funcEnum));
+
+    if(funcIter == func.end()) {
+        monitor->appendAction(moba::LogLevel::WARNING, "no function found for localId <" + std::to_string(localId) + ">");
+        return std::make_shared<ActionVoid>();
     }
     monitor->appendAction(
         moba::LogLevel::NOTICE,
-        "set function " + controllableFunctionEnumToString(data.function) + " for localid <" +
-        std::to_string(data.localId) +  "> " + (data.active ? "on" : "off")
+        "set function " + function + " for localId <" +
+        std::to_string(localId) +  "> " + (active ? "on" : "off")
     );
 
-    cs2writer->send(::setLocFunction(
-        data.localId,
-        static_cast<std::uint8_t>(iterf->second),
-        data.active
-    ));
+    return std::make_shared<ActionLocFunction>(cs2writer, localId, funcIter->second, active);
 }
 
 void JsonReader::operator()() {
