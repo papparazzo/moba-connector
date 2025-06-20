@@ -23,7 +23,7 @@
 #include <memory>
 
 struct ActionAbstract {
-    ActionAbstract() = default;
+    explicit ActionAbstract(MonitorPtr monitor): monitor{std::move(monitor)} {};
     virtual ~ActionAbstract() noexcept = default;
 
     ActionAbstract(ActionAbstract&&) = default;
@@ -31,6 +31,9 @@ struct ActionAbstract {
     ActionAbstract& operator=(const ActionAbstract&) = delete;
 
     virtual void operator()(std::uint32_t localId) = 0;
+
+protected:
+    MonitorPtr monitor;
 };
 
 using ActionAbstractPtr = std::shared_ptr<ActionAbstract>;
