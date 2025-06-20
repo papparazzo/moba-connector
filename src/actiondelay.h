@@ -22,14 +22,16 @@
 
 #include <chrono>
 #include <thread>
+#include <utility>
 
 #include "actionabstract.h"
 
 struct ActionDelay final: ActionAbstract {
-    explicit ActionDelay(const std::chrono::milliseconds duration) : duration{duration} {};
+    explicit ActionDelay(MonitorPtr monitor, const std::chrono::milliseconds duration): ActionAbstract{std::move(monitor)}, duration{duration} {};
 
     void operator()(const std::uint32_t localId) override {
-		std::this_thread::sleep_for(duration);
+        monitor->appendAction(moba::LogLevel::NOTICE, "[ActionDelay]: delaying for " + std::to_string(duration.count()) + "ms");
+        std::this_thread::sleep_for(duration);
     }
 
 private:

@@ -34,7 +34,7 @@ using namespace std::literals::chrono_literals;
 
 struct ActionLocStop final: ActionAbstract {
 
-	explicit ActionLocStop(CS2WriterPtr cs2writer): cs2writer{std::move(cs2writer)} {
+	ActionLocStop(MonitorPtr monitor, CS2WriterPtr cs2writer): ActionAbstract{std::move(monitor)}, cs2writer{std::move(cs2writer)} {
 	}
 
     void operator()(const std::uint32_t localId) override {

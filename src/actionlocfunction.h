@@ -21,20 +21,22 @@
 #pragma once
 
 #include "moba/cs2writer.h"
+#include "moba/cs2utils.h"
+#include "moba/enumfunction.h"
+#include "moba/configloklistreader.h"
+
 #include "actionabstract.h"
 
 #include <utility>
 #include <chrono>
 #include <memory>
 
-#include "moba/cs2utils.h"
-
 using namespace std::literals::chrono_literals;
 
 struct ActionLocFunction final: ActionAbstract {
 
-    ActionLocFunction(CS2WriterPtr cs2writer, const std::uint8_t function, const bool on):
-    cs2writer{std::move(cs2writer)}, function{function}, on{on} {
+    ActionLocFunction(MonitorPtr monitor, CS2WriterPtr cs2writer, LocomotivesPtr locomotives, std::string function, const bool active):
+    ActionAbstract{std::move(monitor)}, cs2writer{std::move(cs2writer)}, locomotives{std::move(locomotives)}, function{std::move(function)}, active{active} {
     }
 
     void operator()(const std::uint32_t localId) override {
@@ -42,7 +44,8 @@ struct ActionLocFunction final: ActionAbstract {
     }
 
 private:
-    CS2WriterPtr  cs2writer;
-    std::uint8_t  function;
-    bool          on;
+    CS2WriterPtr   cs2writer;
+    LocomotivesPtr locomotives;
+    std::string    function;
+    bool           active;
 };

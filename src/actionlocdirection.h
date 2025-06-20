@@ -34,8 +34,8 @@ using namespace std::literals::chrono_literals;
 
 struct ActionLocDirection final: ActionAbstract {
 
-    ActionLocDirection(CS2WriterPtr cs2writer, const moba::DrivingDirection direction):
-    cs2writer{std::move(cs2writer)}, direction{direction} {
+    ActionLocDirection(MonitorPtr monitor, CS2WriterPtr cs2writer, const moba::DrivingDirection direction):
+    ActionAbstract{std::move(monitor)}, cs2writer{std::move(cs2writer)}, direction{direction} {
     }
 
     void operator()(const std::uint32_t localId) override {
