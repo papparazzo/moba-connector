@@ -34,14 +34,22 @@ using namespace std::literals::chrono_literals;
 
 struct ActionLocStop final: ActionAbstract {
 
-	ActionLocStop(MonitorPtr monitor, CS2WriterPtr cs2writer): ActionAbstract{std::move(monitor)}, cs2writer{std::move(cs2writer)} {
+	ActionLocStop(MonitorPtr monitor, CS2WriterPtr cs2writer, const std::uint32_t localId):
+	ActionAbstract{std::move(monitor)}, cs2writer{std::move(cs2writer)}, localId{localId} {
+		if (localId == 0) {
+			throw std::invalid_argument("given localId is invalid");
+		}
 	}
 
-    void operator()(const std::uint32_t localId) override {
-		localId > 0 && std::this_thread::sleep_for(250ms);
+    void operator()() override {
+
+		//monitor->appendAction()
+
+		std::this_thread::sleep_for(250ms);
 		cs2writer->send(::setLocoHalt(localId));
     }
 
 private:
     CS2WriterPtr  cs2writer;
+	std::uint32_t localId;
 };

@@ -29,8 +29,8 @@
 struct ActionDelay final: ActionAbstract {
     explicit ActionDelay(MonitorPtr monitor, const std::chrono::milliseconds duration): ActionAbstract{std::move(monitor)}, duration{duration} {};
 
-    void operator()(const std::uint32_t localId) override {
-        monitor->appendAction(moba::LogLevel::NOTICE, "[ActionDelay]: delaying for " + std::to_string(duration.count()) + "ms");
+    void operator()() override {
+        //monitor->appendAction("[ActionDelay]: delaying for " + std::to_string(duration.count()) + "ms");
         std::this_thread::sleep_for(duration);
     }
 

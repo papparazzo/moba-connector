@@ -22,6 +22,8 @@
 
 #include <memory>
 
+#include "monitor.h"
+
 struct ActionAbstract {
     explicit ActionAbstract(MonitorPtr monitor): monitor{std::move(monitor)} {};
     virtual ~ActionAbstract() noexcept = default;
@@ -30,7 +32,7 @@ struct ActionAbstract {
     ActionAbstract(const ActionAbstract&) = delete;
     ActionAbstract& operator=(const ActionAbstract&) = delete;
 
-    virtual void operator()(std::uint32_t localId) = 0;
+    virtual void operator()() = 0;
 
 protected:
     MonitorPtr monitor;

@@ -35,17 +35,20 @@ using namespace std::literals::chrono_literals;
 
 struct ActionLocFunction final: ActionAbstract {
 
-    ActionLocFunction(MonitorPtr monitor, CS2WriterPtr cs2writer, LocomotivesPtr locomotives, std::string function, const bool active):
-    ActionAbstract{std::move(monitor)}, cs2writer{std::move(cs2writer)}, locomotives{std::move(locomotives)}, function{std::move(function)}, active{active} {
+    ActionLocFunction(MonitorPtr monitor, CS2WriterPtr cs2writer, const std::uint32_t localId, Function function, const bool active):
+    ActionAbstract{std::move(monitor)}, cs2writer{std::move(cs2writer)}, function{std::move(function)}, localId{localId}, active{active} {
+        if (localId == 0) {
+            throw std::invalid_argument("given localId is invalid");
+        }
     }
 
-    void operator()(const std::uint32_t localId) override {
-        localId > 0 && cs2writer->send(::setLocFunction(localId, function, on));
+    void operator()() override {
+        cs2writer->send(::setLocFunction(localId, static_cast<std::uint8_t>(function), active));
     }
 
 private:
     CS2WriterPtr   cs2writer;
-    LocomotivesPtr locomotives;
-    std::string    function;
+    Function       function;
+    std::uint32_t  localId;
     bool           active;
 };

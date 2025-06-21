@@ -30,12 +30,15 @@
 #include "moba/cs2utils.h"
 
 struct ActionSwitching final : ActionAbstract {
-	ActionSwitching(CS2WriterPtr cs2writer, const std::uint32_t localId, const bool r): cs2writer{std::move(cs2writer)},
+	ActionSwitching(MonitorPtr monitor, CS2WriterPtr cs2writer, const std::uint32_t localId, const bool r):
+    ActionAbstract{std::move(monitor)}, cs2writer{std::move(cs2writer)},
         differ(false), localId{localId}, r{r} {
     }
 
-    void operator()(const std::uint32_t localId) override {
+    void operator()() override {
         using namespace std::chrono_literals;
+
+        //monitor->appendAction();
 
         cs2writer->send(::setSwitch(localId, r, true));
         std::this_thread::sleep_for(50ms);

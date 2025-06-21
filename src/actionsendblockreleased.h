@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <utility>
+
 #include "actionabstract.h"
 #include "moba/endpoint.h"
 #include "moba/interfacemessages.h"
@@ -28,7 +30,8 @@ struct ActionSendBlockReleased final: ActionAbstract {
     ActionSendBlockReleased(MonitorPtr monitor, EndpointPtr endpoint, const unsigned long id): ActionAbstract{std::move(monitor)}, id{id}, endpoint{std::move(endpoint)} {
     }
 
-    void operator()(const std::uint32_t localId) override {
+    void operator()() override {
+        //monitor->appendAction(moba::LogLevel::NOTICE, "[ActionSendBlockReleased]: sending block released for " + std::to_string(id));
         endpoint->sendMsg(InterfaceBlockReleased{id});
     }
 

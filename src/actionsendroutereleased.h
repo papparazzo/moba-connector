@@ -25,10 +25,10 @@
 #include "moba/interfacemessages.h"
 
 struct ActionSendRouteReleased final: ActionAbstract {
-    ActionSendRouteReleased(EndpointPtr endpoint, const unsigned long id) : id{id}, endpoint{std::move(endpoint)} {
+    ActionSendRouteReleased(MonitorPtr monitor, EndpointPtr endpoint, const unsigned long id): ActionAbstract{monitor}, id{id}, endpoint{std::move(endpoint)} {
     }
 
-    void operator()(const std::uint32_t localId) override {
+    void operator()() override {
         endpoint->sendMsg(InterfaceRouteReleased{id});
     }
 
