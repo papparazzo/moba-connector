@@ -91,10 +91,6 @@ void JsonReader::setActionList(const nlohmann::json &d) const {
 
     for(auto &iter: d["actionList"]) {
         switch(auto action = iter["action"].get<std::string>(); stringToActionTypeEnum(action)) {
-            case ActionType::VOID:
-                actionList.emplace_back(std::make_shared<ActionVoid>());
-                continue;
-
             case ActionType::DELAY:
                 actionList.emplace_back(std::make_shared<ActionDelay>(iter["data"].get<int>));
                 continue;
