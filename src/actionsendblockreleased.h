@@ -31,7 +31,7 @@ struct ActionSendBlockReleased final: ActionAbstract {
     }
 
     void operator()() override {
-        //monitor->appendAction(moba::LogLevel::NOTICE, "[ActionSendBlockReleased]: sending block released for " + std::to_string(id));
+        monitor->appendAction("ActionSendBlockReleased", "sending block released for id <" + std::to_string(id) + ">");
         endpoint->sendMsg(InterfaceBlockReleased{id});
     }
 

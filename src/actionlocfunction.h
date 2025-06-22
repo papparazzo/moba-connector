@@ -43,7 +43,11 @@ struct ActionLocFunction final: ActionAbstract {
     }
 
     void operator()() override {
-        cs2writer->send(::setLocFunction(localId, static_cast<std::uint8_t>(function), active));
+        monitor->appendAction(
+            "ActionLocFunction",
+            "set function " + controllableFunctionEnumToString(function) + " for localId <" + std::to_string(localId) +  "> " + (active ? "on" : "off")
+        );
+        cs2writer->send(setLocFunction(localId, static_cast<std::uint8_t>(function), active));
     }
 
 private:

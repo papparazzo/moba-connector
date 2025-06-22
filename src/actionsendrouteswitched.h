@@ -29,6 +29,7 @@ struct ActionSendRouteSwitched final: ActionAbstract {
     }
 
     void operator()() override {
+        monitor->appendAction("ActionSendRouteSwitched", "sending route switched for id <" + std::to_string(id) + ">");
         endpoint->sendMsg(InterfaceRouteSwitched{id});
     }
 
