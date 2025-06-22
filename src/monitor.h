@@ -31,6 +31,8 @@ public:
     explicit Monitor(const bool debug): screen{"moba-connector", debug} {}
     ~Monitor() = default;
 
+    void appendAction(const std::string &action, const std::string &message);
+
     void appendAction(moba::LogLevel level, const std::string &action);
 
     void printException(const std::string &where, const std::string &what);

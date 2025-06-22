@@ -25,6 +25,16 @@
 #include <string>
 #include <sstream>
 
+void Monitor::appendAction(const std::string &action, const std::string &message) {
+    std::lock_guard l{m};
+
+    std::stringstream ss;
+    ss << "[" << action << "] " << message;
+
+    actions.push_back(ss.str());
+    screen.printBuffer(30, 2, actions);
+}
+
 void Monitor::appendAction(const moba::LogLevel level, const std::string &action) {
     std::lock_guard l{m};
 
