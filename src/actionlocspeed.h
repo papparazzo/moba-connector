@@ -32,6 +32,9 @@ struct ActionLocSpeed final: ActionAbstract {
 
     ActionLocSpeed(MonitorPtr monitor, CS2WriterPtr cs2writer, const std::uint32_t localId, const std::uint16_t speed):
     ActionAbstract{std::move(monitor)}, cs2writer{std::move(cs2writer)}, localId{localId}, speed{speed} {
+        if (localId == 0) {
+            throw std::invalid_argument("given localId is invalid");
+        }
     }
 
     void operator()() override {

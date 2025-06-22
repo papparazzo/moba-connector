@@ -21,7 +21,6 @@
 #pragma once
 
 #include "moba/cs2writer.h"
-#include "moba/endpoint.h"
 #include "actionabstract.h"
 
 #include <thread>
@@ -31,9 +30,11 @@
 
 struct ActionSwitching final : ActionAbstract {
 	ActionSwitching(MonitorPtr monitor, CS2WriterPtr cs2writer, const std::uint32_t localId, const bool r):
-    ActionAbstract{std::move(monitor)}, cs2writer{std::move(cs2writer)},
-        differ(false), localId{localId}, r{r} {
-    }
+    ActionAbstract{std::move(monitor)}, cs2writer{std::move(cs2writer)}, differ(false), localId{localId}, r{r} {
+	    if (localId == 0) {
+	        throw std::invalid_argument("given localId is invalid");
+	    }
+	}
 
     void operator()() override {
         using namespace std::chrono_literals;
