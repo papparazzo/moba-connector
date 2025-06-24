@@ -22,6 +22,7 @@
 #include <mutex>
 
 #include "actionabstract.h"
+#include "actionlistcollection.h"
 #include "moba/shared.h"
 
 class ActionListHandler final {
@@ -35,21 +36,14 @@ public:
 
     ~ActionListHandler() = default;
 
-    using Vector = std::map<ContactData, int>;
+    void replaceActionList(ContactData &&contact, ActionListCollection &&actionListCollection);
 
-    const Vector& getVector() {return vector;};
+    void insertActionList(ContactData &&contact, ActionListCollection &&actionListCollection);
 
+    void removeActionListByContact(ContactData &&contact);
 
-    void insertActionList();
-    void removeActionList(int id);
-
-    int trigger(const ContactData &contactId);
-    void handleContact(const Contact &contactId, int locId);
-
+    void trigger(const ContactData &contact);
 
 private:
-    Vector vector;
-    ActionList actionList;
-
-    std::mutex mutex;
+    std::map<ContactData, ActionListCollection> actionListCollections;
 };

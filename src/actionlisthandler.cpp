@@ -22,33 +22,26 @@
 
 #include <mutex>
 
-int ActionListHandler::trigger(const ContactData &contactId) {
-    std::lock_guard guard{mutex};
+void ActionListHandler::replaceActionList(ContactData &&contact, ActionListCollection &&actionListCollection) {
+    removeActionListByContact(std::move(contact));
+    insertActionList(std::move(contact), std::move(actionListCollection));
+}
 
+void ActionListHandler::insertActionList(ContactData &&contact, ActionListCollection &&actionListCollection) {
+    actionListCollections.emplace(std::move(contact), std::move(actionListCollection));
+}
 
+void ActionListHandler::removeActionListByContact(ContactData &&contact) {
+    if (!actionListCollections.erase(contact)) {
+        throw std::runtime_error("contact not found");
+    }
+}
 
-    const auto iter = vector.find(contactId);
-
-    if(iter == vector.end()) {
-        return IGNORE_CONTACT;
+void ActionListHandler::trigger(const ContactData &contact) {
+    const auto iter = actionListCollections.find(contact);
+    if (iter == actionListCollections.end()) {
+        throw std::runtime_error("contact not found");
     }
 
-    const auto tmp = iter->second;
-
-    // Ignore the following contacts afterward (it might be from the same train, E.g., light)
-    iter->second = IGNORE_CONTACT;
-    return tmp;
+    iter->second.execute();
 }
-
-void ActionListHandler::insertActionList(const Contact &contactId, ) {
-    std::lock_guard guard{mutex};
-    vector[contactId] = locId;
-
-}
-
-void ActionListHandler::removeActionList(int id) {
-    std::lock_guard guard{mutex};
-    vector.clear();
-
-}
-
