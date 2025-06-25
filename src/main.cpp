@@ -65,11 +65,11 @@ int main(int argc, char *argv[]) {
         }
     };
 
-    const auto cs2Writer = std::make_shared<CS2Writer>();
-    cs2Writer->connect("192.168.178.38");
+    const auto cs2WriterPtr = std::make_shared<CS2Writer>();
+    cs2WriterPtr->connect("192.168.178.38");
 
-    const auto cs2Reader = std::make_shared<CS2Reader>();
-    cs2Reader->connect();
+    const auto cs2ReaderPtr = std::make_shared<CS2Reader>();
+    cs2ReaderPtr->connect();
 
     const auto watchdogToken = std::make_shared<WatchdogToken>();
     const auto sharedData = std::make_shared<SharedData>();
@@ -77,18 +77,18 @@ int main(int argc, char *argv[]) {
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
-    JsonWriter jsonwriter{cs2Reader, cs2Writer, endpoint, watchdogToken, sharedData, monitor};
+    JsonWriter jsonwriter{cs2ReaderPtr, cs2WriterPtr, endpoint, watchdogToken, sharedData, monitor};
     std::thread jsonwriterThread{std::move(jsonwriter)};
     jsonwriterThread.detach();
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
-    std::thread watchDogThread{Watchdog{watchdogToken, cs2Writer, endpoint, monitor}};
+    std::thread watchDogThread{Watchdog{watchdogToken, cs2WriterPtr, endpoint, monitor}};
     watchDogThread.detach();
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
-    JsonReader jsonReader{cs2Writer, endpoint, watchdogToken, sharedData, monitor};
+    JsonReader jsonReader{cs2WriterPtr, endpoint, watchdogToken, sharedData, monitor};
     std::thread jsonReaderThread{std::move(jsonReader)};
     jsonReaderThread.join();
 
