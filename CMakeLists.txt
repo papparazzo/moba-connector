@@ -17,6 +17,10 @@ add_executable(
     src/watchdog.cpp
     src/monitor.cpp
     src/actionlisthandler.cpp
+    src/actionlist.cpp
+    src/actionlist.h
+    src/actionlistcollection.cpp
+    src/actionlistcollection.h
 )
 
 install(TARGETS moba-connector)
