@@ -23,13 +23,13 @@
 #include <atomic>
 #include <memory>
 
-#include "brakevector.h"
+#include "actionlisthandler.h"
 
 struct SharedData {
     SharedData(): automatic{false} {
     }
 
-    BrakeVector brakeVector;
+    ActionListHandler actionListHandler;
     std::atomic_bool automatic;
 };
 
