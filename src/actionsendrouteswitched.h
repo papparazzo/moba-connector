@@ -20,12 +20,14 @@
 
 #pragma once
 
+#include <utility>
+
 #include "actionabstract.h"
 #include "moba/endpoint.h"
 #include "moba/interfacemessages.h"
 
 struct ActionSendRouteSwitched final: ActionAbstract {
-    ActionSendRouteSwitched(MonitorPtr monitor, EndpointPtr endpoint, const unsigned long id): ActionAbstract{monitor}, id{id}, endpoint{std::move(endpoint)} {
+    ActionSendRouteSwitched(MonitorPtr monitor, EndpointPtr endpoint, const unsigned long id): ActionAbstract{std::move(monitor)}, id{id}, endpoint{std::move(endpoint)} {
     }
 
     void operator()() override {
