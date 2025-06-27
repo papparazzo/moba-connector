@@ -35,8 +35,8 @@ using namespace std::literals::chrono_literals;
 
 struct ActionLocFunction final: ActionAbstract {
 
-    ActionLocFunction(MonitorPtr monitor, CS2WriterPtr cs2writer, const std::uint32_t localId, Function function, const bool active):
-    ActionAbstract{std::move(monitor)}, cs2writer{std::move(cs2writer)}, function{std::move(function)}, localId{localId}, active{active} {
+    ActionLocFunction(MonitorPtr monitor, CS2WriterPtr cs2writer, const std::uint32_t localId, const Function function, const bool active):
+    ActionAbstract{std::move(monitor)}, cs2writer{std::move(cs2writer)}, function{function}, localId{localId}, active{active} {
         if (localId == 0) {
             throw std::invalid_argument("given localId is invalid");
         }

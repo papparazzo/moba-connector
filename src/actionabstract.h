@@ -25,7 +25,7 @@
 #include "monitor.h"
 
 struct ActionAbstract {
-    explicit ActionAbstract(MonitorPtr monitor): monitor{std::move(monitor)} {};
+    explicit ActionAbstract(MonitorPtr &&monitor): monitor{std::move(monitor)} {};
     virtual ~ActionAbstract() noexcept = default;
 
     ActionAbstract(ActionAbstract&&) = default;
