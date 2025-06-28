@@ -28,9 +28,10 @@ struct ActionAbstract {
     explicit ActionAbstract(MonitorPtr &&monitor): monitor{std::move(monitor)} {};
     virtual ~ActionAbstract() noexcept = default;
 
-    ActionAbstract(ActionAbstract&&) = default;
+    ActionAbstract(ActionAbstract&&) noexcept = default;
     ActionAbstract(const ActionAbstract&) = delete;
     ActionAbstract& operator=(const ActionAbstract&) = delete;
+    ActionAbstract& operator=(ActionAbstract&&) noexcept = default;
 
     virtual void operator()() = 0;
 

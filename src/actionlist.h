@@ -32,6 +32,7 @@ public:
     ActionList& operator=(const ActionList&) = delete;
 
     ActionList(ActionList&&) = default;
+    ActionList& operator=(ActionList&&) = default;
 
     ~ActionList() = default;
 

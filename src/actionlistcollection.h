@@ -29,6 +29,8 @@ public:
     ActionListCollection(ActionListCollection&&) noexcept = default;
 
     ActionListCollection(const ActionListCollection&) = delete;
+
+    ActionListCollection& operator=(ActionListCollection&&) = default;
     ActionListCollection& operator=(const ActionListCollection&) = delete;
 
     ~ActionListCollection() = default;
