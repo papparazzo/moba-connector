@@ -33,14 +33,14 @@ void ActionListHandler::insertActionList(ContactData &&contact, ActionListCollec
 
 void ActionListHandler::removeActionListByContact(ContactData &&contact) {
     if (!actionListCollections.erase(contact)) {
-        throw std::runtime_error("contact not found");
+        throw std::runtime_error("could not erase contact <" + static_cast<std::string>(contact) + "> from map.");
     }
 }
 
 void ActionListHandler::trigger(const ContactData &contact) {
     const auto iter = actionListCollections.find(contact);
     if (iter == actionListCollections.end()) {
-        throw std::runtime_error("contact not found");
+        throw std::runtime_error("could not find contact <" + static_cast<std::string>(contact) + "> in map.");
     }
 
     iter->second.execute();
