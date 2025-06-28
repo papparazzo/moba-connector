@@ -26,7 +26,7 @@ void ActionList::append(ActionAbstractPtr action) {
     list.emplace_back(std::move(action));
 }
 
-bool ActionList::hasActions() const {
+bool ActionList::hasActions() const noexcept {
     return !list.empty();
 }
 

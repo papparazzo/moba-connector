@@ -37,7 +37,7 @@ public:
     ~ActionList() = default;
 
     [[nodiscard]]
-    bool hasActions() const;
+    bool hasActions() const noexcept;
 
     void operator()() const;
 
