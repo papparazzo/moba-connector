@@ -51,7 +51,7 @@ public:
     
     void operator()();
 
-protected:
+private:
     void setHardwareState(SystemHardwareStateChanged &&data) const;
     void setActionList(const nlohmann::json &d) const ;
     [[nodiscard]] ActionAbstractPtr getFunctionAction(std::uint32_t localId, const std::string &function, bool active) const;

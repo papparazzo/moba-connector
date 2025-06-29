@@ -26,8 +26,8 @@
 class ActionListCollection {
 public:
     ActionListCollection() = default;
-    ActionListCollection(ActionListCollection&&) noexcept = default;
 
+    ActionListCollection(ActionListCollection&&) noexcept = default;
     ActionListCollection(const ActionListCollection&) = delete;
 
     ActionListCollection& operator=(ActionListCollection&&) = default;
