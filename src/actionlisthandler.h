@@ -32,15 +32,18 @@ public:
     ActionListHandler() = default;
 
     ActionListHandler(const ActionListHandler&) = delete;
+    ActionListHandler(ActionListHandler&&) = default;
+
     ActionListHandler& operator=(const ActionListHandler&) = delete;
+    ActionListHandler& operator=(ActionListHandler&&) = default;
 
     ~ActionListHandler() = default;
 
-    void replaceActionList(ContactData &&contact, ActionListCollection &&actionListCollection);
+    void replaceActionList(ContactData &contact, ActionListCollection &actionListCollection);
 
-    void insertActionList(ContactData &&contact, ActionListCollection &&actionListCollection);
+    void insertActionList(ContactData &contact, ActionListCollection &actionListCollection);
 
-    void removeActionListByContact(ContactData &&contact);
+    void removeActionListByContact(const ContactData &contact);
 
     void trigger(const ContactData &contact);
 

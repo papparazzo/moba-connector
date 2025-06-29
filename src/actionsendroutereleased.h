@@ -25,7 +25,7 @@
 #include "moba/interfacemessages.h"
 
 struct ActionSendRouteReleased final: ActionAbstract {
-    ActionSendRouteReleased(MonitorPtr monitor, EndpointPtr endpoint, const unsigned long id): ActionAbstract{monitor}, id{id}, endpoint{std::move(endpoint)} {
+    ActionSendRouteReleased(MonitorPtr monitor, EndpointPtr endpoint, const unsigned long id): ActionAbstract{std::move(monitor)}, id{id}, endpoint{std::move(endpoint)} {
     }
 
     void operator()() override {

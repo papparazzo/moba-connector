@@ -22,16 +22,16 @@
 
 #include <mutex>
 
-void ActionListHandler::replaceActionList(ContactData &&contact, ActionListCollection &&actionListCollection) {
-    removeActionListByContact(std::move(contact));
-    insertActionList(std::move(contact), std::move(actionListCollection));
+void ActionListHandler::replaceActionList(ContactData &contact, ActionListCollection &actionListCollection) {
+    removeActionListByContact(contact);
+    insertActionList(contact, actionListCollection);
 }
 
-void ActionListHandler::insertActionList(ContactData &&contact, ActionListCollection &&actionListCollection) {
-    actionListCollections.emplace(std::move(contact), std::move(actionListCollection));
+void ActionListHandler::insertActionList(ContactData &contact, ActionListCollection &actionListCollection) {
+    actionListCollections.emplace(contact, std::move(actionListCollection));
 }
 
-void ActionListHandler::removeActionListByContact(ContactData &&contact) {
+void ActionListHandler::removeActionListByContact(const ContactData &contact) {
     if (!actionListCollections.erase(contact)) {
         throw std::runtime_error("could not erase contact <" + static_cast<std::string>(contact) + "> from map.");
     }
