@@ -22,7 +22,7 @@
 
 #include <thread>
 
-void ActionList::append(ActionAbstractPtr action) {
+void ActionList::append(ActionAbstractPtr &&action) {
     list.emplace_back(std::move(action));
 }
 

@@ -41,7 +41,7 @@ public:
 
     void operator()() const;
 
-    void append(ActionAbstractPtr action);
+    void append(ActionAbstractPtr &&action);
 
 private:
     std::vector<ActionAbstractPtr> list;
