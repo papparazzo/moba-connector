@@ -20,24 +20,37 @@
 
 #include "actionlisthandler.h"
 
-#include <mutex>
+void ActionListHandler::replaceActionList(const ContactData &contact, const ActionListCollectionPtr &actionListCollection) {
+    std::lock_guard guard{mutex};
 
-void ActionListHandler::replaceActionList(ContactData &contact, ActionListCollection &actionListCollection) {
-    removeActionListByContact(contact);
-    insertActionList(contact, actionListCollection);
+    if (!actionListCollections.erase(contact)) {
+        throw std::runtime_error("could not erase contact <" + static_cast<std::string>(contact) + "> from map.");
+    }
+
+    actionListCollections.emplace(contact, actionListCollection);
 }
 
-void ActionListHandler::insertActionList(ContactData &contact, ActionListCollection &actionListCollection) {
-    actionListCollections.emplace(contact, std::move(actionListCollection));
+void ActionListHandler::insertActionList(const ContactData &contact, const ActionListCollectionPtr &actionListCollection) {
+    std::lock_guard guard{mutex};
+
+    if (actionListCollections.contains(contact)) {
+        throw std::runtime_error("entry for contact <" + static_cast<std::string>(contact) + "> already in map.");
+    }
+
+    actionListCollections.emplace(contact, actionListCollection);
 }
 
 void ActionListHandler::removeActionListByContact(const ContactData &contact) {
+    std::lock_guard guard{mutex};
+
     if (!actionListCollections.erase(contact)) {
         throw std::runtime_error("could not erase contact <" + static_cast<std::string>(contact) + "> from map.");
     }
 }
 
 void ActionListHandler::trigger(const ContactData &contact) {
+    std::lock_guard guard{mutex};
+
     const auto iter = actionListCollections.find(contact);
     if (iter == actionListCollections.end()) {
         throw std::runtime_error("could not find contact <" + static_cast<std::string>(contact) + "> in map.");

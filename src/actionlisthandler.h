@@ -32,21 +32,22 @@ public:
     ActionListHandler() = default;
 
     ActionListHandler(const ActionListHandler&) = delete;
-    ActionListHandler(ActionListHandler&&) = default;
+    ActionListHandler(ActionListHandler&&) = delete;
 
     ActionListHandler& operator=(const ActionListHandler&) = delete;
-    ActionListHandler& operator=(ActionListHandler&&) = default;
+    ActionListHandler& operator=(ActionListHandler&&) = delete;
 
     ~ActionListHandler() = default;
 
-    void replaceActionList(ContactData &contact, ActionListCollection &actionListCollection);
+    void replaceActionList(const ContactData &contact, const ActionListCollectionPtr &actionListCollection);
 
-    void insertActionList(ContactData &contact, ActionListCollection &actionListCollection);
+    void insertActionList(const ContactData &contact, const ActionListCollectionPtr &actionListCollection);
 
     void removeActionListByContact(const ContactData &contact);
 
     void trigger(const ContactData &contact);
 
 private:
-    std::map<ContactData, ActionListCollection> actionListCollections;
+    std::map<ContactData, ActionListCollectionPtr> actionListCollections;
+    std::mutex mutex;
 };
