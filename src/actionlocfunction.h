@@ -23,7 +23,6 @@
 #include "moba/cs2writer.h"
 #include "moba/cs2utils.h"
 #include "moba/enumfunction.h"
-#include "moba/configloklistreader.h"
 
 #include "actionabstract.h"
 
@@ -43,6 +42,10 @@ struct ActionLocFunction final: ActionAbstract {
     }
 
     void operator()() override {
+        if (function == Function::NONE) {
+            return;
+        }
+
         monitor->appendAction(
             "ActionLocFunction",
             "set function " + controllableFunctionEnumToString(function) + " for localId <" + std::to_string(localId) +  "> " + (active ? "on" : "off")

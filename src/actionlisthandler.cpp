@@ -56,5 +56,5 @@ void ActionListHandler::trigger(const ContactData &contact) {
         throw std::runtime_error("could not find contact <" + static_cast<std::string>(contact) + "> in map.");
     }
 
-    iter->second.execute();
+    iter->second->execute();
 }

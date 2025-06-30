@@ -36,4 +36,3 @@ void ActionListCollection::execute() {
     queue.pop();
 }
 
-
