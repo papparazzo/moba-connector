@@ -30,7 +30,7 @@
 
 #include "watchdogToken.h"
 #include "sharedData.h"
-#include "actionabstract.h"
+#include "actionlist.h"
 
 // TODO Consider renaming into CS2Writer instead of JsonReader
 class JsonReader final {
@@ -53,11 +53,16 @@ public:
 
 private:
     void setHardwareState(SystemHardwareStateChanged &&data) const;
-    void setActionList(const nlohmann::json &d) const ;
-    [[nodiscard]] ActionAbstractPtr getFunctionAction(std::uint32_t localId, const std::string &function, bool active) const;
+    void setActionList(const nlohmann::json &d, bool replace) const;
 
     void shutdown();
     void reset() const;
+
+    [[nodiscard]]
+    ActionAbstractPtr getFunctionAction(std::uint32_t localId, const std::string &function, bool active) const;
+
+    [[nodiscard]]
+    ActionList getActionList(const nlohmann::json &d, std::uint32_t localId) const;
 
     bool closing;
 

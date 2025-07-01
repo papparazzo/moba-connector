@@ -26,10 +26,10 @@
 #include <thread>
 #include <functional>
 #include <utility>
-#include <moba-common/loggerprefix.h>
 
 #include "actionabstract.h"
 #include "actiondelay.h"
+#include "actionlist.h"
 #include "actionlocdirection.h"
 #include "actionlocfunction.h"
 #include "actionlocspeed.h"
@@ -39,9 +39,7 @@
 #include "actionsendrouteswitched.h"
 #include "actionsendswitchroute.h"
 #include "actionswitching.h"
-#include "actionvoid.h"
 #include "moba/enumactiontype.h"
-#include "moba/enumfunction.h"
 
 // TODO Consider renaming into CS2Writer instead of JsonReader
 JsonReader::JsonReader(
@@ -162,56 +160,35 @@ ActionList JsonReader::getActionList(const nlohmann::json &d, std::uint32_t loca
             default:
                 throw std::runtime_error("unknown action type <" + action + ">");
         }
-
-        sharedData->actionListHandler.insertActionList();
-       // sharedData->actionListHandler.trigger(ActionData{id, actionList});
-
     }
-
-/*
-    Integer	id		1	1	Eindeutige Id
-    ContactTrigger	trigger		0	1	
-    ActionData	actionList		1	-1	
-
-    SwitchingOutputsHandler soh{endpoint, cs2writer, std::move(data.switchingOutputs)};
-    std::thread jsonwriterThread{std::move(soh)};
-    jsonwriterThread.detach();
-
-    explicit InterfaceHandleActionList(const nlohmann::json &d) {
-        if (!d["trigger"].is_null()) {
-            contactTrigger = ContactTrigger{d["trigger"]};
-        }
-
-    }
-    */
+    return actionList;
 }
 
-ActionAbstractPtr JsonReader::getFunctionAction(std::uint32_t localId, const std::string &function, bool active) const {
+void JsonReader::setActionList(const nlohmann::json &d, bool replace) const {
+    const std::uint32_t localId = d["localId"].get<std::uint32_t>();
 
-    const auto iter = locomotives->find(localId);
-    if(iter == locomotives->end()) {
-        monitor->appendAction(moba::LogLevel::NOTICE, "given localId <" + std::to_string(localId) + "> does not exist");
-        return std::make_shared<ActionVoid>();
+    if(d["trigger"].is_null()) {
+        for(auto &iter: d["actionLists"]) {
+            auto actionList = getActionList(d, localId);
+            std::thread jsonwriterThread{std::move(actionList)};
+            jsonwriterThread.detach();
+        }
+        return;
     }
 
-    auto funcEnum = stringToControllableFunctionEnum(function);
+    const auto triggerContact = ContactData{d["trigger"]};
+    const auto listCollection = std::make_shared<ActionListCollection>();
 
-    auto &func = iter->second->functions;
-
-    // TODO: Try alternative functions...
-    const auto funcIter = func.find(static_cast<int>(funcEnum));
-
-    if(funcIter == func.end()) {
-        monitor->appendAction(moba::LogLevel::WARNING, "no function found for localId <" + std::to_string(localId) + ">");
-        return std::make_shared<ActionVoid>();
+    for(auto &iter: d["actionLists"]) {
+        auto actionList = getActionList(d, localId);
+        listCollection->push(std::move(actionList));
     }
-    monitor->appendAction(
-        moba::LogLevel::NOTICE,
-        "set function " + function + " for localId <" +
-        std::to_string(localId) +  "> " + (active ? "on" : "off")
-    );
 
-    return std::make_shared<ActionLocFunction>(cs2writer, localId, funcIter->second, active);
+    if(replace) {
+        sharedData->actionListHandler.replaceActionList(triggerContact, listCollection);
+    } else {
+        sharedData->actionListHandler.insertActionList(triggerContact, listCollection);
+    }
 }
 
 void JsonReader::operator()() {
@@ -220,12 +197,8 @@ void JsonReader::operator()() {
             endpoint->connect();
             Registry registry;
             registry.registerHandler<SystemHardwareStateChanged>(std::bind(&JsonReader::setHardwareState, this, std::placeholders::_1));
-            registry.registerHandler<InterfaceSetBrakeVector>(std::bind(&JsonReader::setBrakeVector, this, std::placeholders::_1));
-            registry.registerHandler<InterfaceResetBrakeVector>(std::bind(&JsonReader::resetBrakeVector, this, std::placeholders::_1));
-            registry.registerHandler<InterfaceSetLocoDirection>([this](InterfaceSetLocoDirection &&d) {cs2writer->send(setLocDirection(d.localId, static_cast<std::uint8_t>(d.direction)));});
-            registry.registerHandler<InterfaceSetLocoSpeed>([this](InterfaceSetLocoSpeed &&d) {cs2writer->send(setLocSpeed(d.localId, d.speed));});
-            registry.registerHandler<InterfaceSetLocoFunction>(std::bind(&JsonReader::setLocoFunction, this, std::placeholders::_1));            
-            registry.registerHandler<InterfaceSwitchAccessoryDecoders>(std::bind(&JsonReader::setSwitch, this, std::placeholders::_1));
+            registry.registerHandler(InterfaceMessage::GROUP_ID, InterfaceMessage::REPLACE_ACTION_LIST, std::bind(&JsonReader::setActionList, this, std::placeholders::_1, true));
+            registry.registerHandler(InterfaceMessage::GROUP_ID, InterfaceMessage::SET_ACTION_LIST, std::bind(&JsonReader::setActionList, this, std::placeholders::_1, false));
             registry.registerHandler<ClientShutdown>([this]{shutdown();});
             registry.registerHandler<ClientReset>([this]{reset();});
             registry.registerHandler<SystemSetAutomaticMode>([this](SystemSetAutomaticMode &&d) {sharedData->automatic = d.automaticActive;});
@@ -236,6 +209,8 @@ void JsonReader::operator()() {
         } catch(const std::exception &e) {
             watchdogToken->synchronizeStart();
             monitor->printException("JsonReader::operator()()", e.what());
+            endpoint->sendMsg(SystemTriggerEmergencyStop{SystemTriggerEmergencyStop::EmergencyTriggerReason::SOFTWARE_ERROR});
+            cs2writer->send(setEmergencyStop());
         }
         std::this_thread::sleep_for(std::chrono::milliseconds{500});
     }
