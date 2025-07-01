@@ -22,10 +22,8 @@
 
 #include <thread>
 #include <utility>
-#include <moba-common/loggerprefix.h>
 
 #include "moba/systemmessages.h"
-#include "moba/interfacemessages.h"
 #include "moba/cs2utils.h"
 #include "moba/configloklistreader.h"
 #include "moba/configreader.h"
@@ -95,21 +93,9 @@ bool JsonWriter::s88report(const CS2CanCommand &data) const {
 
     const bool active = static_cast<bool>(data.data[4]);
 
-    const auto locId = sharedData->brakeVector.trigger({module, contact});
-
     monitor->feedbackContactTriggered(module, contact, time, active);
 
-    if(locId != BrakeVector::IGNORE_CONTACT) {
-        monitor->appendAction(moba::LogLevel::NOTICE, "halt for locId <" + std::to_string(locId) + ">");
-        cs2writer->send(setLocSpeed(locId, 0));
-        endpoint->sendMsg(InterfaceSetLocoSpeed{static_cast<std::uint32_t>(locId), 0});
-        monitor->printBrakeVector(sharedData->brakeVector.getVector());
-    }
-
-    // TODO: halt senden!
-    // cs2writer->send(setLocoHalt(locId));
-
-    endpoint->sendMsg(InterfaceContactTriggered{ContactTriggerData{module, contact, active, time}});
+    sharedData->actionListHandler.trigger(ContactData{module, contact});
     return true;
 }
 
