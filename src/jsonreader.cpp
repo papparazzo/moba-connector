@@ -80,73 +80,87 @@ void JsonReader::reset() const {
     cs2writer->send(setHalt());
 }
 
-void JsonReader::setActionList(const nlohmann::json &d) const {
-    const int id = d["id"].get<int>();
+ActionAbstractPtr JsonReader::getFunctionAction(std::uint32_t localId, const std::string &function, bool active) const {
 
-    // TODO: Prüfen ob id schon hinterlegt ist
+    const auto iter = locomotives->find(localId);
+    if(iter == locomotives->end()) {
+        throw std::runtime_error("given localId <" + std::to_string(localId) + "> does not exist");
+    }
 
-    std::vector<ActionAbstractPtr> actionList;
+    auto funcEnum = stringToControllableFunctionEnum(function);
 
-    std::uint32_t localId = 0;
+    auto &func = iter->second->functions;
 
-    for(auto &iter: d["actionList"]) {
+    // TODO: Try alternative functions...
+    const auto funcIter = func.find(static_cast<int>(funcEnum));
+
+    if(funcIter == func.end()) {
+        return std::make_shared<ActionLocFunction>(monitor, cs2writer, localId, Function::NONE, active);
+    }
+
+    return std::make_shared<ActionLocFunction>(monitor, cs2writer, localId, static_cast<Function>(funcIter->second), active);
+}
+
+
+ActionList JsonReader::getActionList(const nlohmann::json &d, std::uint32_t localId) const {
+    ActionList actionList;
+
+    for(auto &iter: d["actions"]) {
         switch(auto action = iter["action"].get<std::string>(); stringToActionTypeEnum(action)) {
             case ActionType::DELAY:
-                actionList.emplace_back(std::make_shared<ActionDelay>(iter["data"].get<int>));
+                actionList.append(std::make_shared<ActionDelay>(monitor, std::chrono::milliseconds(iter["data"].get<int>())));
                 continue;
 
             case ActionType::LOCO_HALT:
-                actionList.emplace_back(std::make_shared<ActionLocStop>(cs2writer, localId));
+                actionList.append(std::make_shared<ActionLocStop>(monitor, cs2writer, localId));
                 continue;
 
             case ActionType::LOCO_SPEED:
-                actionList.emplace_back(std::make_shared<ActionLocSpeed>(cs2writer, localId, iter["data"].get<int>));
+                actionList.append(std::make_shared<ActionLocSpeed>(monitor, cs2writer, localId, iter["data"].get<int>()));
                 continue;
 
             case ActionType::LOCO_DIRECTION_BACKWARD:
-                actionList.emplace_back(std::make_shared<ActionLocDirection>(cs2writer, localId, moba::DrivingDirection::BACKWARD));
+                actionList.append(std::make_shared<ActionLocDirection>(monitor, cs2writer, localId, moba::DrivingDirection::BACKWARD));
                 continue;
 
             case ActionType::LOCO_DIRECTION_FORWARD:
-                actionList.emplace_back(std::make_shared<ActionLocDirection>(cs2writer, localId, moba::DrivingDirection::FORWARD));
+                actionList.append(std::make_shared<ActionLocDirection>(monitor, cs2writer, localId, moba::DrivingDirection::FORWARD));
                 continue;
 
             case ActionType::LOCO_FUNCTION_ON:
-                actionList.emplace_back(getFunctionAction(localId, iter["data"].get<std::string>, true));
+                actionList.append(getFunctionAction(localId, iter["data"].get<std::string>(), true));
                 continue;
 
             case ActionType::LOCO_FUNCTION_OFF:
-                actionList.emplace_back(getFunctionAction(localId, iter["data"].get<std::string>, false));
+                actionList.append(getFunctionAction(localId, iter["data"].get<std::string>(), false));
                 continue;
 
             case ActionType::SWITCHING_RED:
-                actionList.emplace_back(std::make_shared<ActionSwitching>(cs2writer, localId, true));
+                actionList.append(std::make_shared<ActionSwitching>(monitor, cs2writer, iter["data"].get<int>(), true));
                 continue;
 
             case ActionType::SWITCHING_GREEN:
-                actionList.emplace_back(std::make_shared<ActionSwitching>(cs2writer, localId, false));
+                actionList.append(std::make_shared<ActionSwitching>(monitor, cs2writer, iter["data"].get<int>(), false));
                 continue;
 
             case ActionType::SEND_SWITCH_ROUTE:
-                actionList.emplace_back(std::make_shared<ActionSendSwitchRoute>(iter["data"].get<std::string>, true));
+                actionList.append(std::make_shared<ActionSendSwitchRoute>(monitor, endpoint, iter["data"].get<int>()));
                 continue;
 
             case ActionType::SEND_ROUTE_SWITCHED:
-                actionList.emplace_back(std::make_shared<ActionSendRouteSwitched>(iter["data"].get<std::string>, true));
+                actionList.append(std::make_shared<ActionSendRouteSwitched>(monitor, endpoint, iter["data"].get<int>()));
                 continue;
 
             case ActionType::SEND_ROUTE_RELEASED:
-                actionList.emplace_back(std::make_shared<ActionSendRouteReleased>(iter["data"].get<std::string>, true));
+                actionList.append(std::make_shared<ActionSendRouteReleased>(monitor, endpoint, iter["data"].get<int>()));
                 continue;
 
             case ActionType::SEND_BLOCK_RELEASED:
-                actionList.emplace_back(std::make_shared<ActionSendBlockReleased>(iter["data"].get<std::string>, true));
+                actionList.append(std::make_shared<ActionSendBlockReleased>(monitor, endpoint, iter["data"].get<int>()));
                 continue;
 
             default:
-                monitor->appendAction(moba::LogLevel::WARNING, "unknown action type <" + action + "> for id <" + std::to_string(id) + ">");
-                // TODO Send Error to moba-server
-                continue;
+                throw std::runtime_error("unknown action type <" + action + ">");
         }
 
         sharedData->actionListHandler.insertActionList();
