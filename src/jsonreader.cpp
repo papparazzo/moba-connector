@@ -103,7 +103,7 @@ ActionAbstractPtr JsonReader::getFunctionAction(std::uint32_t localId, const std
 ActionList JsonReader::getActionList(const nlohmann::json &d, std::uint32_t localId) const {
     ActionList actionList;
 
-    for(auto &iter: d["actions"]) {
+    for(auto &iter: d) {
         switch(auto action = iter["action"].get<std::string>(); stringToActionTypeEnum(action)) {
             case ActionType::DELAY:
                 actionList.append(std::make_shared<ActionDelay>(monitor, std::chrono::milliseconds(iter["data"].get<int>())));
@@ -169,7 +169,7 @@ void JsonReader::setActionList(const nlohmann::json &d, bool replace) const {
 
     if(d["trigger"].is_null()) {
         for(auto &iter: d["actionLists"]) {
-            auto actionList = getActionList(d, localId);
+            auto actionList = getActionList(iter, localId);
             std::thread jsonwriterThread{std::move(actionList)};
             jsonwriterThread.detach();
         }

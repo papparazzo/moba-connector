@@ -74,9 +74,7 @@ void JsonWriter::operator()() const {
                 e.what(),
                 "JsonWriter::operator()()"
             }});
-
             monitor->printException("JsonWriter::operator()()", e.what());
-            std::this_thread::sleep_for(std::chrono::milliseconds{500});
         }
     }
 }

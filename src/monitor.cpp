@@ -79,8 +79,9 @@ void Monitor::locCommandsTriggered(const std::string& cmd, const std::uint32_t a
 }
 
 void Monitor::appendCanBusAction(const std::string &action) {
-    const std::string msg = moba::getTimeStamp() + " " + action;
-    canBusActions.push_back(msg.c_str());
+    std::string msg = moba::getTimeStamp() + " " + action;
+
+    canBusActions.push_back(std::move(msg));
     screen.printBuffer(5, 2, canBusActions);
 }
 
