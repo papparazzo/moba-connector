@@ -165,30 +165,31 @@ ActionList JsonReader::getActionList(const nlohmann::json &d, std::uint32_t loca
 }
 
 void JsonReader::setActionList(const nlohmann::json &d, bool replace) const {
-    const std::uint32_t localId = d["localId"].get<std::uint32_t>();
 
-    if(d["trigger"].is_null()) {
+    std::uint32_t localId = 0;
+    if(!d["localId"].is_null()) {
+        localId = d["localId"].get<std::uint32_t>();
+    }
+
+    for(auto &c: d["triggerList"]) {
+        const auto triggerContact = ContactData{c["trigger"]};
+        const auto listCollection = std::make_shared<ActionListCollection>();
+
         for(auto &iter: d["actionLists"]) {
             auto actionList = getActionList(iter, localId);
-            std::thread jsonwriterThread{std::move(actionList)};
-            jsonwriterThread.detach();
+            listCollection->push(std::move(actionList));
         }
-        return;
+
+        if(replace) {
+            sharedData->actionListHandler.replaceActionList(triggerContact, listCollection);
+        } else {
+            sharedData->actionListHandler.insertActionList(triggerContact, listCollection);
+        }
     }
 
-    const auto triggerContact = ContactData{d["trigger"]};
-    const auto listCollection = std::make_shared<ActionListCollection>();
-
-    for(auto &iter: d["actionLists"]) {
-        auto actionList = getActionList(d, localId);
-        listCollection->push(std::move(actionList));
-    }
-
-    if(replace) {
-        sharedData->actionListHandler.replaceActionList(triggerContact, listCollection);
-    } else {
-        sharedData->actionListHandler.insertActionList(triggerContact, listCollection);
-    }
+    auto actionList = getActionList(d["actionList"], localId);
+    std::thread jsonwriterThread{std::move(actionList)};
+    jsonwriterThread.detach();
 }
 
 void JsonReader::operator()() {
