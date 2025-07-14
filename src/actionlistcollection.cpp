@@ -28,11 +28,13 @@ void ActionListCollection::push(ActionList &&actionList) {
 
 void ActionListCollection::execute() {
     if(queue.empty()) {
-        // Should never happen!
-        throw std::runtime_error("list-collection is empty");
+        return;
     }
     std::thread jsonwriterThread{std::move(queue.front())};
     jsonwriterThread.detach();
     queue.pop();
 }
 
+bool ActionListCollection::empty() const {
+    return queue.empty();
+}

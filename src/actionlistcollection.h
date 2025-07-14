@@ -39,6 +39,7 @@ public:
 
     void execute();
 
+    bool empty() const;
 private:
     std::queue<ActionList> queue;
 };

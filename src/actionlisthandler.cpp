@@ -57,4 +57,10 @@ void ActionListHandler::trigger(const ContactData &contact) {
     }
 
     iter->second->execute();
+
+    if(iter->second->empty() && !actionListCollections.erase(contact)) {
+        throw std::runtime_error(
+        "could not erase contact <" + static_cast<std::string>(contact) + "> from map after trigger."
+        );
+    }
 }
