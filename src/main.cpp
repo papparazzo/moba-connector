@@ -49,8 +49,6 @@ namespace {
 }
 
 int main(int argc, char *argv[]) {
-    auto debug = false;
-
     if(argc == 2) {
         appData.host = std::string(argv[1]);
     }
@@ -73,7 +71,7 @@ int main(int argc, char *argv[]) {
 
     const auto watchdogToken = std::make_shared<WatchdogToken>();
     const auto sharedData = std::make_shared<SharedData>();
-    const auto monitor = std::make_shared<Monitor>(debug);
+    const auto monitor = std::make_shared<Monitor>();
 
     ///////////////////////////////////////////////////////////////////////////////////
     //

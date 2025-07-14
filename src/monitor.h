@@ -28,9 +28,6 @@
 
 class Monitor final {
 public:
-    explicit Monitor(const bool debug): screen{"moba-connector", debug} {}
-    ~Monitor() = default;
-
     void appendAction(const std::string &action, const std::string &message);
 
     void appendAction(moba::LogLevel level, const std::string &action);
@@ -41,15 +38,12 @@ public:
 
     void locCommandsTriggered(const std::string& cmd, std::uint32_t addr, int value);
 
-    void printStatus(SystemHardwareStateChanged::HardwareState status) const;
+    static void printStatus(SystemHardwareStateChanged::HardwareState status) ;
 
 private:
     std::mutex m;
     boost::circular_buffer<std::string> actions{20};
     boost::circular_buffer<std::string> canBusActions{20};
-    moba::Screen screen;
-
-    void appendCanBusAction(const std::string &action);
 };
 
 using MonitorPtr = std::shared_ptr<Monitor>;

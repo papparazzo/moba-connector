@@ -53,7 +53,7 @@ watchdogToken{std::move(watchdogToken)}, sharedData{std::move(sharedData)}, moni
 }
 
 void JsonReader::setHardwareState(SystemHardwareStateChanged &&data) const {
-    monitor->printStatus(data.hardwareState);
+    Monitor::printStatus(data.hardwareState);
     switch(data.hardwareState) {
         case SystemHardwareStateChanged::HardwareState::ERROR:
             return;

@@ -21,85 +21,69 @@
 #include "monitor.h"
 
 #include <iomanip>
-#include <ctime>
 #include <string>
 #include <sstream>
 
 void Monitor::appendAction(const std::string &action, const std::string &message) {
     std::lock_guard l{m};
 
-    std::stringstream ss;
-    // TODO: Make this better!!
-    ss << "[" << action << "] " << message;
-
-    actions.push_back(ss.str());
-    screen.printBuffer(30, 2, actions);
-
+    std::cerr << moba::LogLevel::NOTICE << "[" << action << "] " << message << std::endl;
 }
 
 void Monitor::appendAction(const moba::LogLevel level, const std::string &action) {
     std::lock_guard l{m};
 
-    std::stringstream ss;
-    ss << level << action;
-
-    actions.push_back(ss.str());
-    screen.printBuffer(30, 2, actions);
+    std::cerr << level << action << std::endl;
 }
 
 void Monitor::printException(const std::string &where, const std::string &what) {
     std::lock_guard l{m};
-    screen.printException(where, what);
+    std::cerr << moba::LogLevel::CRITICAL << where << " " << what << std::endl;
 }
 
 void Monitor::feedbackContactTriggered(const std::uint16_t module, const std::uint16_t contact, const std::uint16_t time, const bool active) {
     std::lock_guard l{m};
 
-    std::stringstream ss;
-    ss <<
+    std::cerr <<
+        moba::LogLevel::NOTICE <<
         "Feedback module [" <<
         std::setw(4) << std::setfill('0') << module << ":" <<
         std::setw(4) << std::setfill('0') << contact << "] time " <<
         std::setw(5) << std::setfill(' ') << time << " ms " <<
-        (active ? "[ on]" : "[off]");
+        (active ? "[ on]" : "[off]")  << std::endl;
 
-    appendCanBusAction(ss.str());
 }
 
 void Monitor::locCommandsTriggered(const std::string& cmd, const std::uint32_t addr, const int value) {
     std::lock_guard l{m};
 
-    std::stringstream ss;
-    ss <<
+    std::cerr <<
+        moba::LogLevel::NOTICE <<
         cmd << " [" <<
         std::setw(4) << std::setfill('0') << addr << ":" <<
-        std::setw(4) << std::setfill('0') << value << "]";
-
-    appendCanBusAction(ss.str());
+        std::setw(4) << std::setfill('0') << value << "]" << std::endl;
 }
 
-void Monitor::appendCanBusAction(const std::string &action) {
-    std::string msg = moba::getTimeStamp() + " " + action;
-
-    canBusActions.push_back(std::move(msg));
-    screen.printBuffer(5, 2, canBusActions);
-}
-
-void Monitor::printStatus(const SystemHardwareStateChanged::HardwareState status) const {
+void Monitor::printStatus(const SystemHardwareStateChanged::HardwareState status) {
     switch(status) {
         case SystemHardwareStateChanged::HardwareState::ERROR:
-            return screen.printStatus("Keine Verbindung zur Hardware", true);
+            std::cerr << moba::LogLevel::NOTICE << "Keine Verbindung zur Hardware" << std::endl;
+            break;
 
         case SystemHardwareStateChanged::HardwareState::AUTOMATIC:
-            return screen.printStatus("automatisch", false);
+            std::cerr << moba::LogLevel::NOTICE << "automatisch" << std::endl;
+            break;
 
         case SystemHardwareStateChanged::HardwareState::EMERGENCY_STOP:
-            return screen.printStatus("Nothalt ausgelöst", true);
+            std::cerr << moba::LogLevel::NOTICE << "Nothalt ausgelöst" << std::endl;
+            break;
 
         case SystemHardwareStateChanged::HardwareState::MANUEL:
-            return screen.printStatus("manuell", false);
+            std::cerr << moba::LogLevel::NOTICE << "manuell" << std::endl;
+            break;
 
         case SystemHardwareStateChanged::HardwareState::STANDBY:
-            return screen.printStatus("Energiesparmodus", false);
+            std::cerr << moba::LogLevel::NOTICE << "Energiesparmodus" << std::endl;
+            break;
     }
 }
