@@ -71,5 +71,4 @@ private:
     WatchdogTokenPtr watchdogToken;
     SharedDataPtr    sharedData;
     MonitorPtr       monitor;
-    LocomotivesPtr   locomotives;
 };

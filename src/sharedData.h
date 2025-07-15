@@ -24,13 +24,15 @@
 #include <memory>
 
 #include "actionlisthandler.h"
+#include "moba/locomotivefunctions.h"
 
 struct SharedData {
-    SharedData(): automatic{false} {
+    SharedData(): locomotives{std::make_shared<LocomotiveFunctions>()}, automatic{false} {
     }
 
-    ActionListHandler actionListHandler;
-    std::atomic_bool automatic;
+    LocomotiveFunctionsPtr locomotives;
+    ActionListHandler      actionListHandler;
+    std::atomic_bool       automatic;
 };
 
 using SharedDataPtr = std::shared_ptr<SharedData>;

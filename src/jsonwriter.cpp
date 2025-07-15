@@ -151,7 +151,7 @@ bool JsonWriter::controlSwitch(const CS2CanCommand &cmd) const {
 
 void JsonWriter::readFunctionList() const {
     cs2writer->send(getLokList());
-    const auto cfgReader = std::make_shared<ConfigLoklistReader>();
+    const auto cfgReader = std::make_shared<ConfigLoklistReader>(sharedData->locomotives);
 
     ConfigReader configReader{};
     configReader.addHandler(cfgReader);

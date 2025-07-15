@@ -80,25 +80,12 @@ void JsonReader::reset() const {
 
 ActionAbstractPtr JsonReader::getFunctionAction(std::uint32_t localId, const std::string &function, bool active) const {
 
-    const auto iter = locomotives->find(localId);
-    if(iter == locomotives->end()) {
-        throw std::runtime_error("given localId <" + std::to_string(localId) + "> does not exist");
-    }
-
     auto funcEnum = stringToControllableFunctionEnum(function);
 
-    auto &func = iter->second->functions;
+    auto func = sharedData->locomotives->getFunction(localId, static_cast<int>(funcEnum));
 
-    // TODO: Try alternative functions...
-    const auto funcIter = func.find(static_cast<int>(funcEnum));
-
-    if(funcIter == func.end()) {
-        return std::make_shared<ActionLocFunction>(monitor, cs2writer, localId, Function::NONE, active);
-    }
-
-    return std::make_shared<ActionLocFunction>(monitor, cs2writer, localId, static_cast<Function>(funcIter->second), active);
+    return std::make_shared<ActionLocFunction>(monitor, cs2writer, localId, static_cast<Function>(func), active);
 }
-
 
 ActionList JsonReader::getActionList(const nlohmann::json &d, std::uint32_t localId) const {
     ActionList actionList;
