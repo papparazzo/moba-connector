@@ -50,10 +50,17 @@ public:
     void operator()() const;
 
 protected:
-    [[nodiscard]] bool s88report(const CS2CanCommand &data) const;
-    [[nodiscard]] bool systemCommands(const CS2CanCommand &cmd) const;
-    [[nodiscard]] bool controlLocoCommands(const CS2CanCommand &cmd) const;
-    [[nodiscard]] bool controlSwitch(const CS2CanCommand &cmd) const;
+    [[nodiscard]]
+    bool s88report(const CS2CanCommand &data) const;
+
+    [[nodiscard]]
+    bool systemCommands(const CS2CanCommand &cmd) const;
+
+    [[nodiscard]]
+    bool controlLocoCommands(const CS2CanCommand &cmd) const;
+
+    [[nodiscard]]
+    bool controlSwitch(const CS2CanCommand &cmd) const;
     
     void readFunctionList() const;
 
