@@ -64,26 +64,6 @@ void Monitor::locCommandsTriggered(const std::string& cmd, const std::uint32_t a
         std::setw(4) << std::setfill('0') << value << "]" << std::endl;
 }
 
-void Monitor::printStatus(const SystemHardwareStateChanged::HardwareState status) {
-    switch(status) {
-        case SystemHardwareStateChanged::HardwareState::ERROR:
-            std::cerr << moba::LogLevel::NOTICE << "Keine Verbindung zur Hardware" << std::endl;
-            break;
-
-        case SystemHardwareStateChanged::HardwareState::AUTOMATIC:
-            std::cerr << moba::LogLevel::NOTICE << "automatisch" << std::endl;
-            break;
-
-        case SystemHardwareStateChanged::HardwareState::EMERGENCY_STOP:
-            std::cerr << moba::LogLevel::NOTICE << "Nothalt ausgelöst" << std::endl;
-            break;
-
-        case SystemHardwareStateChanged::HardwareState::MANUEL:
-            std::cerr << moba::LogLevel::NOTICE << "manuell" << std::endl;
-            break;
-
-        case SystemHardwareStateChanged::HardwareState::STANDBY:
-            std::cerr << moba::LogLevel::NOTICE << "Energiesparmodus" << std::endl;
-            break;
-    }
+void Monitor::printStatus(const std::string &status) {
+    std::cerr << moba::LogLevel::NOTICE << "Status switched to <" << status << ">" << std::endl;
 }

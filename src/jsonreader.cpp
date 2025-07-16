@@ -53,18 +53,26 @@ watchdogToken{std::move(watchdogToken)}, sharedData{std::move(sharedData)}, moni
 }
 
 void JsonReader::setHardwareState(SystemHardwareStateChanged &&data) const {
-    Monitor::printStatus(data.hardwareState);
     switch(data.hardwareState) {
         case SystemHardwareStateChanged::HardwareState::ERROR:
+            Monitor::printStatus("ERROR");
             return;
 
-        case SystemHardwareStateChanged::HardwareState::STANDBY:
+        case SystemHardwareStateChanged::HardwareState::AUTOMATIC:
+            Monitor::printStatus("AUTOMATIC");
+            return cs2writer->send(setEmergencyStopClearing());
+
         case SystemHardwareStateChanged::HardwareState::EMERGENCY_STOP:
+            Monitor::printStatus("EMERGENCY_STOP");
             return cs2writer->send(setEmergencyStop());
 
         case SystemHardwareStateChanged::HardwareState::MANUEL:
-        case SystemHardwareStateChanged::HardwareState::AUTOMATIC:
+            Monitor::printStatus("MANUEL");
             return cs2writer->send(setEmergencyStopClearing());
+
+        case SystemHardwareStateChanged::HardwareState::STANDBY:
+            Monitor::printStatus("STANDBY");
+            return cs2writer->send(setEmergencyStop());
     }
 }
 

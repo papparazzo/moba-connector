@@ -38,7 +38,7 @@ public:
 
     void locCommandsTriggered(const std::string& cmd, std::uint32_t addr, int value);
 
-    static void printStatus(SystemHardwareStateChanged::HardwareState status) ;
+    static void printStatus(const std::string &status);
 
 private:
     std::mutex m;
