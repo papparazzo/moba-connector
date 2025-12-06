@@ -27,16 +27,18 @@
 #include "moba/endpoint.h"
 #include "moba/interfacemessages.h"
 
-struct ActionSendSwitchRoute final: ActionAbstract {
-    ActionSendSwitchRoute(MonitorPtr monitor, EndpointPtr endpoint, const unsigned long id): ActionAbstract{std::move(monitor)}, id{id}, endpoint{std::move(endpoint)} {
+struct ActionSendPushTrain final: ActionAbstract {
+    ActionSendPushTrain(MonitorPtr monitor, EndpointPtr endpoint, const unsigned long trainId, const unsigned long toBlockId):
+    ActionAbstract{std::move(monitor)}, trainId{trainId}, toBlockId{toBlockId}, endpoint{std::move(endpoint)} {
     }
 
     void operator()() override {
         monitor->appendAction("ActionSendSwitchRoute", "sending switch route for id <" + std::to_string(id) + ">");
-        endpoint->sendMsg(InterfaceSwitchRoute{id});
+        endpoint->sendMsg(InterfacePushTrain{trainId, toBlockId});
     }
 
 protected:
-    unsigned long id;
+    unsigned long trainId;
+    unsigned long toBlockId;
     EndpointPtr endpoint;
 };

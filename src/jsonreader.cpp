@@ -33,11 +33,11 @@
 #include "actionlocdirection.h"
 #include "actionlocfunction.h"
 #include "actionlocspeed.h"
-#include "actionlocstop.h"
+#include "ActionLocHalt.h"
 #include "actionsendblockreleased.h"
 #include "actionsendroutereleased.h"
 #include "actionsendrouteswitched.h"
-#include "actionsendswitchroute.h"
+#include "actionsendpushtrain.h"
 #include "actionswitching.h"
 #include "moba/enumactiontype.h"
 
@@ -105,7 +105,7 @@ ActionList JsonReader::getActionList(const nlohmann::json &d, std::uint32_t loca
                 continue;
 
             case ActionType::LOCO_HALT:
-                actionList.append(std::make_shared<ActionLocStop>(monitor, cs2writer, localId));
+                actionList.append(std::make_shared<ActionLocHalt>(monitor, cs2writer, localId));
                 continue;
 
             case ActionType::LOCO_SPEED:
@@ -136,8 +136,8 @@ ActionList JsonReader::getActionList(const nlohmann::json &d, std::uint32_t loca
                 actionList.append(std::make_shared<ActionSwitching>(monitor, cs2writer, iter["data"].get<int>(), false));
                 continue;
 
-            case ActionType::SEND_SWITCH_ROUTE:
-                actionList.append(std::make_shared<ActionSendSwitchRoute>(monitor, endpoint, iter["data"].get<int>()));
+            case ActionType::SEND_PUSH_TRAIN:
+                actionList.append(std::make_shared<ActionSendPushTrain>(monitor, endpoint, iter));
                 continue;
 
             case ActionType::SEND_ROUTE_SWITCHED:

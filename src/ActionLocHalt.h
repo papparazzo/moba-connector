@@ -32,9 +32,9 @@
 
 using namespace std::literals::chrono_literals;
 
-struct ActionLocStop final: ActionAbstract {
+struct ActionLocHalt final: ActionAbstract {
 
-	ActionLocStop(MonitorPtr monitor, CS2WriterPtr cs2writer, const std::uint32_t localId):
+	ActionLocHalt(MonitorPtr monitor, CS2WriterPtr cs2writer, const std::uint32_t localId):
 	ActionAbstract{std::move(monitor)}, cs2writer{std::move(cs2writer)}, localId{localId} {
 		if (localId == 0) {
 			throw std::invalid_argument("given localId is invalid");
@@ -43,8 +43,6 @@ struct ActionLocStop final: ActionAbstract {
 
     void operator()() override {
 		monitor->appendAction("ActionLocStop", "stopping localId <" + std::to_string(localId) +  ">");
-
-		std::this_thread::sleep_for(250ms);
 		cs2writer->send(::setLocoHalt(localId));
     }
 
