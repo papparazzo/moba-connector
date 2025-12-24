@@ -33,7 +33,7 @@ struct ActionSendPushTrain final: ActionAbstract {
     }
 
     void operator()() override {
-        monitor->appendAction("ActionSendSwitchRoute", "sending switch route for id <" + std::to_string(id) + ">");
+        monitor->appendAction("ActionSendPushTrain", "sending push train <" + std::to_string(trainId) + "> to block <" + std::to_string(toBlockId) + ">");
         endpoint->sendMsg(InterfacePushTrain{trainId, toBlockId});
     }
 

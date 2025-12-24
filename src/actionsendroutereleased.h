@@ -31,7 +31,7 @@ struct ActionSendRouteReleased final: ActionAbstract {
     }
 
     void operator()() override {
-        monitor->appendAction("ActionSendRouteReleased", "sending route released for id <" + std::to_string(id) + ">");
+        monitor->appendAction("ActionSendRouteReleased", "sending route released for routeId <" + std::to_string(id) + ">");
         endpoint->sendMsg(InterfaceRouteReleased{id});
     }
 

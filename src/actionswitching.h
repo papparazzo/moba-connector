@@ -29,8 +29,8 @@
 #include "moba/cs2utils.h"
 
 struct ActionSwitching final : ActionAbstract {
-	ActionSwitching(MonitorPtr monitor, CS2WriterPtr cs2writer, const std::uint32_t localId, const bool r):
-    ActionAbstract{std::move(monitor)}, cs2writer{std::move(cs2writer)}, differ(false), localId{localId}, r{r} {
+	ActionSwitching(MonitorPtr monitor, CS2WriterPtr cs2writer, const std::uint32_t localId, const std::string& stand):
+    ActionAbstract{std::move(monitor)}, cs2writer{std::move(cs2writer)}, differ(false), localId{localId}, stand{stand} {
 	    if (localId == 0) {
 	        throw std::invalid_argument("given localId is invalid");
 	    }
@@ -39,17 +39,27 @@ struct ActionSwitching final : ActionAbstract {
     void operator()() override {
         using namespace std::chrono_literals;
 
-		monitor->appendAction("ActionSwitching", "switch actor");
+		monitor->appendAction("ActionSwitching", "switching actor to <" + stand + ">");
 
-        cs2writer->send(::setSwitch(localId, r, true));
+        cs2writer->send(::setSwitch(localId, convert(stand), true));
         std::this_thread::sleep_for(50ms);
-        cs2writer->send(::setSwitch(localId, r, false));
+        cs2writer->send(::setSwitch(localId, convert(stand), false));
         std::this_thread::sleep_for(250ms);
     }
 
 private:
-    CS2WriterPtr  cs2writer;
-    bool          differ;
-    std::uint32_t localId;
-    bool          r;
+	static bool convert(const std::string &s) {
+		if(s == "STRAIGHT") {
+			return true;
+		}
+		if(s == "BEND") {
+			return false;
+		}
+		throw moba::UnsupportedOperationException{"SwitchStand: invalid value given"};
+	}
+
+    CS2WriterPtr   cs2writer;
+    bool           differ;
+    std::uint32_t  localId;
+    std::string    stand;
 };

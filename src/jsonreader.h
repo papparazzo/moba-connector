@@ -23,7 +23,6 @@
 #include <memory>
 
 #include "monitor.h"
-#include "moba/configloklistreader.h"
 #include "moba/endpoint.h"
 #include "moba/systemmessages.h"
 #include "moba/cs2writer.h"
@@ -31,6 +30,7 @@
 #include "watchdogToken.h"
 #include "sharedData.h"
 #include "actionlist.h"
+#include "moba/enumfunction.h"
 
 // TODO Consider renaming into CS2Writer instead of JsonReader
 class JsonReader final {
@@ -59,7 +59,7 @@ private:
     void reset() const;
 
     [[nodiscard]]
-    ActionAbstractPtr getFunctionAction(std::uint32_t localId, const std::string &function, bool active) const;
+    Function getFunction(std::uint32_t localId, const std::string &function) const;
 
     [[nodiscard]]
     ActionList getActionList(const nlohmann::json &d, std::uint32_t localId) const;

@@ -20,37 +20,31 @@
 
 #pragma once
 
-#include "moba/cs2writer.h"
 #include "actionabstract.h"
 
 #include <utility>
-#include <chrono>
 #include <memory>
-#include <moba-common/drivingdirection.h>
 
-#include "moba/cs2utils.h"
+#include "moba/endpoint.h"
+#include "moba/environmentmessages.h"
 
 using namespace std::literals::chrono_literals;
 
-struct ActionLocDirection final: ActionAbstract {
+struct ActionFunction final: ActionAbstract {
 
-    ActionLocDirection(MonitorPtr monitor, CS2WriterPtr cs2writer, const std::uint32_t localId, const moba::DrivingDirection direction):
-    ActionAbstract{std::move(monitor)}, cs2writer{std::move(cs2writer)}, localId{localId}, direction{direction} {
-        if (localId == 0) {
-            throw std::invalid_argument("given localId is invalid");
-        }
+    ActionFunction(MonitorPtr monitor, EndpointPtr endpoint, const FunctionStateData function):
+    ActionAbstract{std::move(monitor)}, endpoint{std::move(endpoint)}, function{function} {
     }
 
     void operator()() override {
         monitor->appendAction(
-            "ActionLocDirection",
-            "switch direction to <" + direction.getDrivingDirection() + "> for localId <" + std::to_string(localId) + "> "
-        );
-        cs2writer->send(::setLocDirection(localId, direction.drivingDirection));
+            "ActionFunction",
+            "set function <" + std::to_string(function.address.deviceId) + "/" + std::to_string(function.address.address.controller) + ":" +
+            std::to_string(function.address.address.port) + "> to <" + functionStateEnumToString(function.functionState)  +  "> ");
+        endpoint->sendMsg(EnvironmentSetFunctions{function});
     }
 
 private:
-    CS2WriterPtr           cs2writer;
-    std::uint32_t          localId;
-    moba::DrivingDirection direction;
+    EndpointPtr       endpoint;
+    FunctionStateData function;
 };

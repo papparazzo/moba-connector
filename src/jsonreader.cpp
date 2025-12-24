@@ -29,11 +29,13 @@
 
 #include "actionabstract.h"
 #include "actiondelay.h"
+#include "actionfunction.h"
 #include "actionlist.h"
 #include "actionlocdirection.h"
 #include "actionlocfunction.h"
 #include "actionlocspeed.h"
-#include "ActionLocHalt.h"
+#include "actionlochalt.h"
+#include "actionlocfunctiontrigger.h"
 #include "actionsendblockreleased.h"
 #include "actionsendroutereleased.h"
 #include "actionsendrouteswitched.h"
@@ -54,31 +56,39 @@ watchdogToken{std::move(watchdogToken)}, sharedData{std::move(sharedData)}, moni
 
 void JsonReader::setHardwareState(SystemHardwareStateChanged &&data) const {
     switch(data.hardwareState) {
-        case SystemHardwareStateChanged::HardwareState::ERROR:
-            Monitor::printStatus("ERROR");
-            return;
+        case SystemHardwareStateChanged::HardwareState::INCIDENT:
+            Monitor::printStatus("INCIDENT");
+            return cs2writer->send(setEmergencyStop());
+
+        case SystemHardwareStateChanged::HardwareState::STANDBY:
+            Monitor::printStatus("STANDBY");
+            return cs2writer->send(setEmergencyStop());
+
+        case SystemHardwareStateChanged::HardwareState::MANUAL:
+            Monitor::printStatus("MANUAL");
+            return cs2writer->send(setEmergencyStopClearing());
 
         case SystemHardwareStateChanged::HardwareState::AUTOMATIC:
             Monitor::printStatus("AUTOMATIC");
             return cs2writer->send(setEmergencyStopClearing());
 
-        case SystemHardwareStateChanged::HardwareState::EMERGENCY_STOP:
-            Monitor::printStatus("EMERGENCY_STOP");
+        case SystemHardwareStateChanged::HardwareState::SHUTDOWN:
+            Monitor::printStatus("SHUTDOWN");
             return cs2writer->send(setEmergencyStop());
 
-        case SystemHardwareStateChanged::HardwareState::MANUEL:
-            Monitor::printStatus("MANUEL");
+        case SystemHardwareStateChanged::HardwareState::READY:
+            Monitor::printStatus("READY");
             return cs2writer->send(setEmergencyStopClearing());
 
-        case SystemHardwareStateChanged::HardwareState::STANDBY:
-            Monitor::printStatus("STANDBY");
+        case SystemHardwareStateChanged::HardwareState::NO_CONNECTION:
+            Monitor::printStatus("NO_CONNECTION");
             return cs2writer->send(setEmergencyStop());
     }
 }
 
 void JsonReader::shutdown() {
     // TODO: Vor dem Shutdown sollten schon alle Züge angehalten haben.
-    //cs2writer->send(::setHalt());
+    //cs2writer->send(setHalt());
     closing = true;
 }
 
@@ -86,13 +96,13 @@ void JsonReader::reset() const {
     cs2writer->send(setHalt());
 }
 
-ActionAbstractPtr JsonReader::getFunctionAction(std::uint32_t localId, const std::string &function, bool active) const {
+Function JsonReader::getFunction(const std::uint32_t localId, const std::string &function) const {
 
     auto funcEnum = stringToControllableFunctionEnum(function);
 
     auto func = sharedData->locomotives->getFunction(localId, static_cast<int>(funcEnum));
 
-    return std::make_shared<ActionLocFunction>(monitor, cs2writer, localId, static_cast<Function>(func), active);
+    return static_cast<Function>(func);
 }
 
 ActionList JsonReader::getActionList(const nlohmann::json &d, std::uint32_t localId) const {
@@ -101,7 +111,11 @@ ActionList JsonReader::getActionList(const nlohmann::json &d, std::uint32_t loca
     for(auto &iter: d["actions"]) {
         switch(auto action = iter["action"].get<std::string>(); stringToActionTypeEnum(action)) {
             case ActionType::DELAY:
-                actionList.append(std::make_shared<ActionDelay>(monitor, std::chrono::milliseconds(iter["data"].get<int>())));
+                actionList.append(std::make_shared<ActionDelay>(monitor, std::chrono::milliseconds(iter["delay"].get<int>())));
+                continue;
+
+            case ActionType::FUNCTION:
+                actionList.append(std::make_shared<ActionFunction>(monitor, endpoint, FunctionStateData{iter["function"]}));
                 continue;
 
             case ActionType::LOCO_HALT:
@@ -109,35 +123,23 @@ ActionList JsonReader::getActionList(const nlohmann::json &d, std::uint32_t loca
                 continue;
 
             case ActionType::LOCO_SPEED:
-                actionList.append(std::make_shared<ActionLocSpeed>(monitor, cs2writer, localId, iter["data"].get<int>()));
+                actionList.append(std::make_shared<ActionLocSpeed>(monitor, cs2writer, localId, iter["speed"].get<int>()));
                 continue;
 
-            case ActionType::LOCO_DIRECTION_BACKWARD:
-                actionList.append(std::make_shared<ActionLocDirection>(monitor, cs2writer, localId, moba::DrivingDirection::BACKWARD));
+            case ActionType::LOCO_DIRECTION:
+                actionList.append(std::make_shared<ActionLocDirection>(monitor, cs2writer, localId, moba::DrivingDirection(iter["direction"].get<std::string>())));
                 continue;
 
-            case ActionType::LOCO_DIRECTION_FORWARD:
-                actionList.append(std::make_shared<ActionLocDirection>(monitor, cs2writer, localId, moba::DrivingDirection::FORWARD));
+            case ActionType::LOCO_FUNCTION:
+                actionList.append(std::make_shared<ActionLocFunction>(monitor, cs2writer, localId, getFunction(localId, iter["function"].get<std::string>()), iter["active"].get<bool>()));
                 continue;
 
-            case ActionType::LOCO_FUNCTION_ON:
-                actionList.append(getFunctionAction(localId, iter["data"].get<std::string>(), true));
+            case ActionType::LOCO_FUNCTION_TRIGGER:
+                actionList.append(std::make_shared<ActionLocFunctionTrigger>(monitor, cs2writer, localId, getFunction(localId, iter["function"].get<std::string>()), iter["duration"].get<int>()));
                 continue;
 
-            case ActionType::LOCO_FUNCTION_OFF:
-                actionList.append(getFunctionAction(localId, iter["data"].get<std::string>(), false));
-                continue;
-
-            case ActionType::SWITCHING_RED:
-                actionList.append(std::make_shared<ActionSwitching>(monitor, cs2writer, iter["data"].get<int>(), true));
-                continue;
-
-            case ActionType::SWITCHING_GREEN:
-                actionList.append(std::make_shared<ActionSwitching>(monitor, cs2writer, iter["data"].get<int>(), false));
-                continue;
-
-            case ActionType::SEND_PUSH_TRAIN:
-                actionList.append(std::make_shared<ActionSendPushTrain>(monitor, endpoint, iter));
+            case ActionType::SWITCHING:
+                actionList.append(std::make_shared<ActionSwitching>(monitor, cs2writer, iter["address"].get<int>(), iter["stand"].get<std::string>()));
                 continue;
 
             case ActionType::SEND_ROUTE_SWITCHED:
