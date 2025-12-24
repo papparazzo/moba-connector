@@ -28,7 +28,7 @@
 Watchdog::Watchdog(
     WatchdogTokenPtr watchdogToken, CS2WriterPtr cs2writer, EndpointPtr endpoint, MonitorPtr monitor
 ): watchdogToken{std::move(watchdogToken)}, cs2writer{std::move(cs2writer)},
-   endpoint{std::move(endpoint)}, monitor{std::move(monitor)}, lastState{ConnectState::ERROR} {
+   endpoint{std::move(endpoint)}, monitor{std::move(monitor)}, lastState{Connectivity::ERROR} {
 }
 
 void Watchdog::operator()() {
@@ -40,14 +40,14 @@ void Watchdog::operator()() {
             std::this_thread::sleep_for(std::chrono::milliseconds{30});
 
             if(const auto tokenState = watchdogToken->getTokenState(); tokenState == WatchdogToken::TokenState::SYNCHRONIZE) {
-                endpoint->sendMsg(InterfaceConnectivityStateChanged{lastState});
+                endpoint->sendMsg(InterfaceConnected{true});
                 watchdogToken->synchronizeFinish();
-            } else if(tokenState == WatchdogToken::TokenState::CONNECTED && lastState == ConnectState::ERROR) {
-                endpoint->sendMsg(InterfaceConnectivityStateChanged{ConnectState::CONNECTED});
-                lastState = ConnectState::CONNECTED;
-            } else if(tokenState == WatchdogToken::TokenState::ERROR && lastState == ConnectState::CONNECTED) {
-                endpoint->sendMsg(InterfaceConnectivityStateChanged{ConnectState::ERROR});
-                lastState = ConnectState::ERROR;
+            } else if(tokenState == WatchdogToken::TokenState::CONNECTED && lastState == Connectivity::ERROR) {
+                endpoint->sendMsg(InterfaceConnected{false});
+                lastState = Connectivity::CONNECTED;
+            } else if(tokenState == WatchdogToken::TokenState::ERROR && lastState == Connectivity::CONNECTED) {
+                endpoint->sendMsg(InterfaceConnectionLost{});
+                lastState = Connectivity::ERROR;
             }
         } catch(const std::exception &e) {
             endpoint->sendMsg(MessagingNotifyIncident{IncidentData{

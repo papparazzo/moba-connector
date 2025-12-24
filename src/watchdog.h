@@ -24,7 +24,6 @@
 #include "watchdogToken.h"
 #include "moba/cs2writer.h"
 #include "moba/endpoint.h"
-#include "moba/interfacemessages.h"
 
 class Watchdog final {
 public:
@@ -39,12 +38,15 @@ public:
     void operator()();
 
 protected:
-    using ConnectState = InterfaceConnectivityStateChanged::Connectivity;
+    enum class Connectivity {
+        CONNECTED,
+        ERROR
+    };
 
     WatchdogTokenPtr watchdogToken;
     CS2WriterPtr     cs2writer;
     EndpointPtr      endpoint;
     MonitorPtr       monitor;
-    ConnectState     lastState;
+    Connectivity     lastState;
 };
 

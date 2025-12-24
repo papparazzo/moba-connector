@@ -58,6 +58,7 @@ int main(int argc, char *argv[]) {
         new Endpoint{
             socket,
             appData.appName,
+            "connector",
             appData.version,
             {Message::INTERFACE, Message::SYSTEM}
         }
