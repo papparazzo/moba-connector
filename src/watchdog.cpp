@@ -50,9 +50,9 @@ void Watchdog::operator()() {
                 lastState = Connectivity::ERROR;
             }
         } catch(const std::exception &e) {
-            endpoint->sendMsg(MessagingNotifyIncident{IncidentData{
-                IncidentLevel::ERROR,
-                IncidentType::EXCEPTION,
+            endpoint->sendMsg(MessagingSendNotification{NotificationData{
+                NotificationLevel::ERROR,
+                NotificationType::EXCEPTION,
                 "Watchdog Exception",
                 e.what(),
                 "Watchdog::operator()()"

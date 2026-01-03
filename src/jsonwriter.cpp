@@ -67,9 +67,16 @@ void JsonWriter::operator()() const {
                 continue;
             }
         } catch(const std::exception &e) {
-            endpoint->sendMsg(MessagingNotifyIncident{IncidentData{
-                IncidentLevel::ERROR,
-                IncidentType::EXCEPTION,
+            cs2writer->send(setEmergencyStop());
+            endpoint->sendMsg(
+                SystemTriggerEmergencyStop{
+                    SystemTriggerEmergencyStop::EmergencyTriggerReason::SOFTWARE_ERROR,
+                    "exception <" + std::string(e.what()) + "> occurred while reading CAN bus. Emergency stop set."
+                }
+            );
+            endpoint->sendMsg(MessagingSendNotification{NotificationData{
+                NotificationLevel::ERROR,
+                NotificationType::EXCEPTION,
                 "JsonWriter Exception",
                 e.what(),
                 "JsonWriter::operator()()"
@@ -141,7 +148,8 @@ bool JsonWriter::controlSwitch(const CS2CanCommand &cmd) const {
                 cs2writer->send(setEmergencyStop());
                 endpoint->sendMsg(
                     SystemTriggerEmergencyStop{
-                        SystemTriggerEmergencyStop::EmergencyTriggerReason::SELF_ACTING_BY_EXTERN_SWITCHING
+                        SystemTriggerEmergencyStop::EmergencyTriggerReason::SELF_ACTING_BY_EXTERN_SWITCHING,
+                        "address <" + std::to_string(cmd.getDoubleWordAt0()) + "> (" + std::to_string(cmd.getWordAt4()) + ") triggered"
                     }
                 );
             }
