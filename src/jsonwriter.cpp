@@ -50,7 +50,7 @@ void JsonWriter::operator()() const {
         try {
             CS2CanCommand data = cs2reader->read();
 
-            if(data.header[1] & 0x01 && data.header[1] == static_cast<uint8_t>(CMD_PING | 0x01)) {
+            if(data.header[1] & 0x01 && data.header[1] == static_cast<uint8_t>(CanCommand::CMD_PING | 0x01)) {
                 watchdogToken->pingResponded();
                 continue;
             }
@@ -87,7 +87,7 @@ void JsonWriter::operator()() const {
 }
 
 bool JsonWriter::s88report(const CS2CanCommand &data) const {
-    if(data.header[1] != static_cast<uint8_t>(CMD_S88_EVENT | 0x01)) {
+    if(data.header[1] != static_cast<uint8_t>(CanCommand::CMD_S88_EVENT | 0x01)) {
         return false;
     }
 
@@ -108,16 +108,16 @@ bool JsonWriter::s88report(const CS2CanCommand &data) const {
 }
 
 bool JsonWriter::systemCommands(const CS2CanCommand &cmd) const {
-    if(static_cast<CanCommand>(cmd.header[1]) != CMD_SYSTEM) {
+    if(static_cast<CanCommand>(cmd.header[1]) != CanCommand::CMD_SYSTEM) {
         return false;
     }
 
     switch(static_cast<CanSystemSubCommand>(cmd.data[4])) {
-        case SYS_SUB_CMD_SYSTEM_GO:
+        case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_GO:
             endpoint->sendMsg(SystemReleaseEmergencyStop{});
             return true;
 
-        case SYS_SUB_CMD_SYSTEM_STOP:
+        case CanSystemSubCommand::SYS_SUB_CMD_SYSTEM_STOP:
             endpoint->sendMsg(SystemTriggerEmergencyStop{SystemTriggerEmergencyStop::EmergencyTriggerReason::CENTRAL_STATION});
             return true;
 
@@ -128,11 +128,11 @@ bool JsonWriter::systemCommands(const CS2CanCommand &cmd) const {
 
 bool JsonWriter::controlLocoCommands(const CS2CanCommand &cmd) const {
     switch(static_cast<CanCommand>(cmd.header[1])) {
-        case CMD_LOCO_DIRECTION:
+        case CanCommand::CMD_LOCO_DIRECTION:
             monitor->locCommandsTriggered("Fahrtrichtungswechsel", cmd.getUID(), cmd.data[4]);
             return true;
 
-        case CMD_LOCO_SPEED:
+        case CanCommand::CMD_LOCO_SPEED:
             monitor->locCommandsTriggered("Geschwindigkeitsänderung", cmd.getUID(), cmd.getWordAt4());
             return true;
 
@@ -143,7 +143,7 @@ bool JsonWriter::controlLocoCommands(const CS2CanCommand &cmd) const {
 
 bool JsonWriter::controlSwitch(const CS2CanCommand &cmd) const {
     switch(static_cast<CanCommand>(cmd.header[1])) {
-        case CMD_SET_SWITCH:
+        case CanCommand::CMD_SET_SWITCH:
             if(sharedData->automatic) {
                 cs2writer->send(setEmergencyStop());
                 endpoint->sendMsg(
