@@ -23,7 +23,6 @@
 #include <thread>
 #include "moba/cs2utils.h"
 #include "moba/messagingmessages.h"
-#include <moba-common/loggerprefix.h>
 
 Watchdog::Watchdog(
     WatchdogTokenPtr watchdogToken, CS2WriterPtr cs2writer, EndpointPtr endpoint, MonitorPtr monitor
