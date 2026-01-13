@@ -104,11 +104,9 @@ bool parseArguments(const int argc, char *argv[], moba::AppData &appData, CS2Con
                 cs2ContactData.portOut = std::stoi(optarg);
                 break;
 
-            case ':':
-                std::cerr << "missing argument for option " << static_cast<char>(optopt) << std::endl;
-
             default:
-                std::cerr << "unknown option " << static_cast<char>(optopt) << std::endl;
+                std::cerr << "Try '" << basename(argv[0]) << " --help' for more information." << std::endl;
+                exit(2);
         }
     }
 
