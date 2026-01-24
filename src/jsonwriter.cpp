@@ -51,7 +51,7 @@ void JsonWriter::operator()() const {
             CS2CanCommand data;
             cs2reader->read(data);
 
-            if(data.header[1] & 0x01 && data.header[1] == static_cast<uint8_t>(CanCommand::CMD_PING | 0x01)) {
+            if(data.isResponse() && data.header[1] == static_cast<uint8_t>(CanCommand::CMD_PING | 0x01)) {
                 watchdogToken->pingResponded();
                 continue;
             }
