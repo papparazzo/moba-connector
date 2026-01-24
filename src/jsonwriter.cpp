@@ -167,8 +167,11 @@ void JsonWriter::readFunctionList() const {
     ConfigReader configReader{};
     configReader.addHandler(cfgReader);
 
-    while(
-        configReader.handleCanCommand(cs2reader->read()) != 
-        ConfigReader::HANDLED_AND_FINISHED
-    ); // no op
+    CanCommandHandlerInterface::HandlerReturn result = ConfigReader::NOT_HANDLED;
+
+    do {
+        CS2CanCommand data;
+        cs2reader->read(data);
+        result = configReader.handleCanCommand(data);
+    } while(result != ConfigReader::HANDLED_AND_FINISHED);
 }
