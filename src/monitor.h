@@ -24,6 +24,7 @@
 #include <moba-common/loggerprefix.h>
 #include <moba-common/screen.h>
 
+#include "moba/cs2cancommand.h"
 #include "moba/systemmessages.h"
 
 class Monitor final {
@@ -33,6 +34,8 @@ public:
     void appendAction(moba::LogLevel level, const std::string &action);
 
     void printException(const std::string &where, const std::string &what);
+
+    void printCS2CanCommand(const CS2CanCommand &data);
 
     void feedbackContactTriggered(std::uint16_t module, std::uint16_t contact, std::uint16_t time, bool active);
 

@@ -22,7 +22,9 @@
 
 #include <iomanip>
 #include <string>
-#include <sstream>
+
+#include "moba/cs2cancommand.h"
+#include "moba/cs2utils.h"
 
 void Monitor::appendAction(const std::string &action, const std::string &message) {
     std::lock_guard l{m};
@@ -39,6 +41,11 @@ void Monitor::appendAction(const moba::LogLevel level, const std::string &action
 void Monitor::printException(const std::string &where, const std::string &what) {
     std::lock_guard l{m};
     std::cerr << moba::LogLevel::CRITICAL << where << " " << what << std::endl;
+}
+
+void Monitor::printCS2CanCommand(const CS2CanCommand &data) {
+    std::lock_guard l{m};
+    std::cerr << moba::LogLevel::NOTICE << getCommandName(data.getCanCommand()) << " [" << data << "]" << std::endl;
 }
 
 void Monitor::feedbackContactTriggered(const std::uint16_t module, const std::uint16_t contact, const std::uint16_t time, const bool active) {
