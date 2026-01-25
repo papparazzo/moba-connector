@@ -46,7 +46,7 @@ struct ActionLocDirection final: ActionAbstract {
             "ActionLocDirection",
             "switch direction to <" + direction.getDrivingDirection() + "> for localId <" + std::to_string(localId) + "> "
         );
-        cs2writer->send(::setLocDirection(localId, direction.drivingDirection));
+        cs2writer->send(setLocDirection(localId, direction.drivingDirection));
     }
 
 private:

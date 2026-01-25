@@ -29,8 +29,8 @@
 #include "moba/cs2utils.h"
 
 struct ActionSwitching final : ActionAbstract {
-	ActionSwitching(MonitorPtr monitor, CS2WriterPtr cs2writer, const std::uint32_t localId, const std::string& stand):
-    ActionAbstract{std::move(monitor)}, cs2writer{std::move(cs2writer)}, differ(false), localId{localId}, stand{stand} {
+	ActionSwitching(MonitorPtr monitor, CS2WriterPtr cs2writer, const std::uint32_t localId, std::string  stand):
+    ActionAbstract{std::move(monitor)}, cs2writer{std::move(cs2writer)}, differ(false), localId{localId}, stand{std::move(stand)} {
 	    if (localId == 0) {
 	        throw std::invalid_argument("given localId is invalid");
 	    }
@@ -41,9 +41,9 @@ struct ActionSwitching final : ActionAbstract {
 
 		monitor->appendAction("ActionSwitching", "switching actor to <" + stand + ">");
 
-        cs2writer->send(::setSwitch(localId, convert(stand), true));
+        cs2writer->send(setSwitch(localId, convert(stand), true));
         std::this_thread::sleep_for(50ms);
-        cs2writer->send(::setSwitch(localId, convert(stand), false));
+        cs2writer->send(setSwitch(localId, convert(stand), false));
         std::this_thread::sleep_for(250ms);
     }
 

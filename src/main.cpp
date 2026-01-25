@@ -37,6 +37,7 @@
 #include "jsonwriter.h"
 #include "monitor.h"
 #include "sharedData.h"
+#include "moba/cs2utils.h"
 
 namespace {
     moba::AppData appData = {
@@ -78,7 +79,7 @@ bool parseArguments(const int argc, char *argv[], moba::AppData &appData, CS2Con
     int optionIndex = 0;
 
     while(true) {
-        const int c = getopt_long(argc, argv, "hv", longOptions, &optionIndex);
+        const int c = getopt_long(argc, argv, "hvc:i:o:", longOptions, &optionIndex);
         if(c == -1) {
             break;
         }

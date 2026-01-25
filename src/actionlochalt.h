@@ -23,7 +23,6 @@
 #include "moba/cs2writer.h"
 #include "actionabstract.h"
 
-#include <thread>
 #include <utility>
 #include <chrono>
 #include <memory>
@@ -43,7 +42,7 @@ struct ActionLocHalt final: ActionAbstract {
 
     void operator()() override {
 		monitor->appendAction("ActionLocStop", "stopping localId <" + std::to_string(localId) +  ">");
-		cs2writer->send(::setLocoHalt(localId));
+		cs2writer->send(setLocoHalt(localId));
     }
 
 private:
