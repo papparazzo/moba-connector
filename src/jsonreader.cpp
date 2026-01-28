@@ -57,31 +57,31 @@ watchdogToken{std::move(watchdogToken)}, sharedData{std::move(sharedData)}, moni
 void JsonReader::setHardwareState(SystemHardwareStateChanged &&data) const {
     switch(data.hardwareState) {
         case SystemHardwareStateChanged::HardwareState::INCIDENT:
-            Monitor::printStatus("INCIDENT");
+            monitor->printStatus("INCIDENT");
             return cs2writer->send(setEmergencyStop());
 
         case SystemHardwareStateChanged::HardwareState::STANDBY:
-            Monitor::printStatus("STANDBY");
+            monitor->printStatus("STANDBY");
             return cs2writer->send(setEmergencyStop());
 
         case SystemHardwareStateChanged::HardwareState::MANUAL:
-            Monitor::printStatus("MANUAL");
+            monitor->printStatus("MANUAL");
             return cs2writer->send(setEmergencyStopClearing());
 
         case SystemHardwareStateChanged::HardwareState::AUTOMATIC:
-            Monitor::printStatus("AUTOMATIC");
+            monitor->printStatus("AUTOMATIC");
             return cs2writer->send(setEmergencyStopClearing());
 
         case SystemHardwareStateChanged::HardwareState::SHUTDOWN:
-            Monitor::printStatus("SHUTDOWN");
+            monitor->printStatus("SHUTDOWN");
             return cs2writer->send(setEmergencyStop());
 
         case SystemHardwareStateChanged::HardwareState::READY:
-            Monitor::printStatus("READY");
+            monitor->printStatus("READY");
             return cs2writer->send(setEmergencyStopClearing());
 
         case SystemHardwareStateChanged::HardwareState::NO_CONNECTION:
-            Monitor::printStatus("NO_CONNECTION");
+            monitor->printStatus("NO_CONNECTION");
             return cs2writer->send(setEmergencyStop());
     }
 }
