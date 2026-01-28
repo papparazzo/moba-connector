@@ -29,6 +29,8 @@
 
 class Monitor final {
 public:
+    explicit Monitor(const bool debug): debug{debug} {};
+
     void appendAction(const std::string &action, const std::string &message);
 
     void appendAction(moba::LogLevel level, const std::string &action);
@@ -47,6 +49,8 @@ private:
     std::mutex m;
     boost::circular_buffer<std::string> actions{20};
     boost::circular_buffer<std::string> canBusActions{20};
+
+    bool debug;
 };
 
 using MonitorPtr = std::shared_ptr<Monitor>;

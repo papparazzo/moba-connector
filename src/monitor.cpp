@@ -45,7 +45,9 @@ void Monitor::printException(const std::string &where, const std::string &what) 
 
 void Monitor::printCS2CanCommand(const CS2CanCommand &data) {
     std::lock_guard l{m};
-    std::cerr << moba::LogLevel::NOTICE << getCommandName(data.getCanCommand()) << " [" << data << "]" << std::endl;
+    if(debug) {
+        std::cerr << moba::LogLevel::NOTICE << getCommandName(data.getCanCommand()) << " [" << data << "]" << std::endl;
+    }
 }
 
 void Monitor::feedbackContactTriggered(const std::uint16_t module, const std::uint16_t contact, const std::uint16_t time, const bool active) {
