@@ -68,9 +68,10 @@ void printHelp(const std::string &appName, const CS2ContactData &cs2ContactData)
         << "-o, --cs2-port-out  port of the CentralStation for outgoing messages (default: " << cs2ContactData.portOut << ")" << std::endl;
 }
 
-bool parseArguments(const int argc, char *argv[], moba::AppData &appData, CS2ContactData &cs2ContactData) {
+bool parseArguments(const int argc, char *argv[], moba::AppData &data, CS2ContactData &cs2ContactData, bool &debug) {
     static option longOptions[] = {
         {"cs2-host",     required_argument, nullptr, 'c'},
+        {"debug",        no_argument,       nullptr, 'd'},
         {"cs2-port-in",  required_argument, nullptr, 'i'},
         {"cs2-port-out", required_argument, nullptr, 'o'},
         {"help",         no_argument,       nullptr, 'h'},
@@ -87,12 +88,16 @@ bool parseArguments(const int argc, char *argv[], moba::AppData &appData, CS2Con
         }
 
         switch(c) {
+            case 'd':
+                
+                break;
+
             case 'h':
                 printHelp(basename(argv[0]), cs2ContactData);
                 return true;
 
             case 'v':
-                moba::printAppData(appData);
+                moba::printAppData(data);
                 return true;
 
             case 'c':
@@ -115,10 +120,10 @@ bool parseArguments(const int argc, char *argv[], moba::AppData &appData, CS2Con
 
     switch(argc - optind) {
         case 2:
-            appData.port = std::stoi(argv[optind + 1]);
+            data.port = std::stoi(argv[optind + 1]);
 
         case 1:
-            appData.host = argv[optind];
+            data.host = argv[optind];
             break;
 
         default:
@@ -133,8 +138,9 @@ int main(const int argc, char *argv[]) {
         CS2Writer::DEFAULT_PORT,
         CS2Reader::DEFAULT_PORT
     };
+    bool debug = false;
 
-    if(parseArguments(argc, argv, appData, cs2ContactData)) {
+    if(parseArguments(argc, argv, appData, cs2ContactData, debug)) {
         return EXIT_SUCCESS;
     }
 
@@ -150,11 +156,11 @@ int main(const int argc, char *argv[]) {
     };
 
     const auto cs2WriterPtr = std::make_shared<CS2Writer>(cs2ContactData.host, cs2ContactData.portIn);
-    const auto cs2ReaderPtr = std::make_shared<CS2Reader>(cs2ContactData.portOut);
+    const auto cs2ReaderPtr = std::make_shared<CS2Reader>(cs2ContactData.host, cs2ContactData.portOut);
 
     const auto watchdogToken = std::make_shared<WatchdogToken>();
     const auto sharedData = std::make_shared<SharedData>();
-    const auto monitor = std::make_shared<Monitor>();
+    const auto monitor = std::make_shared<Monitor>(debug);
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
