@@ -74,5 +74,6 @@ void Monitor::locCommandsTriggered(const std::string& cmd, const std::uint32_t a
 }
 
 void Monitor::printStatus(const std::string &status) {
+    std::lock_guard l{m};
     std::cerr << moba::LogLevel::NOTICE << "Status switched to <" << status << ">" << std::endl;
 }
