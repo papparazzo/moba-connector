@@ -56,14 +56,16 @@ struct CS2ContactData {
     int portOut;
 };
 
-void printHelp(const std::string &appName, CS2ContactData &cs2ContactData) {
-    std::cout << appName << " [host] [port]" << std::endl;
-    std::cout << std::endl;
-    std::cout << "-h, --help          shows this help" << std::endl;
-    std::cout << "-v, --version       shows version-info" << std::endl;
-    std::cout << "-c, --cs2-host      host of the CentralStation (default: " << cs2ContactData.host << ")" << std::endl;
-    std::cout << "-i, --cs2-port-in   port of the CentralStation for incoming messages (default: " << cs2ContactData.portIn << ")" << std::endl;
-    std::cout << "-o, --cs2-port-out  port of the CentralStation for outgoing messages (default: " << cs2ContactData.portOut << ")" << std::endl;
+void printHelp(const std::string &appName, const CS2ContactData &cs2ContactData) {
+    std::cout
+        << appName << " [host] [port]" << std::endl
+        << std::endl
+        << "-d, --debug         enables debug output" << std::endl
+        << "-h, --help          shows this help" << std::endl
+        << "-v, --version       shows version-info" << std::endl
+        << "-c, --cs2-host      host of the CentralStation (default: " << cs2ContactData.host << ")" << std::endl
+        << "-i, --cs2-port-in   port of the CentralStation for incoming messages (default: " << cs2ContactData.portIn << ")" << std::endl
+        << "-o, --cs2-port-out  port of the CentralStation for outgoing messages (default: " << cs2ContactData.portOut << ")" << std::endl;
 }
 
 bool parseArguments(const int argc, char *argv[], moba::AppData &appData, CS2ContactData &cs2ContactData) {
