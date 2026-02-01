@@ -68,6 +68,7 @@ protected:
     CS2WriterPtr cs2writer;
     EndpointPtr endpoint;
     WatchdogTokenPtr watchdogToken;
+    void emergencyStop(const std::string &what) const;
     SharedDataPtr sharedData;
     MonitorPtr monitor;
 };

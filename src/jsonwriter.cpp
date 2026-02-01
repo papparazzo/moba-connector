@@ -68,21 +68,8 @@ void JsonWriter::operator()() const {
                 continue;
             }
         } catch(const std::exception &e) {
-            cs2writer->send(setEmergencyStop());
-            endpoint->sendMsg(
-                SystemTriggerEmergencyStop{
-                    SystemTriggerEmergencyStop::EmergencyTriggerReason::SOFTWARE_ERROR,
-                    "exception <" + std::string(e.what()) + "> occurred while reading CAN bus. Emergency stop set."
-                }
-            );
-            endpoint->sendMsg(MessagingSendNotification{NotificationData{
-                NotificationLevel::ERROR,
-                NotificationType::EXCEPTION,
-                "JsonWriter Exception",
-                e.what(),
-                "JsonWriter::operator()()"
-            }});
             monitor->printException("JsonWriter::operator()()", e.what());
+            emergencyStop(e.what());
         }
     }
 }
@@ -175,4 +162,26 @@ void JsonWriter::readFunctionList() const {
         cs2reader->read(data);
         result = configReader.handleCanCommand(data);
     } while(result != ConfigReader::HANDLED_AND_FINISHED);
+}
+
+void JsonWriter::emergencyStop(const std::string &what) const {
+    try {
+        cs2writer->send(setEmergencyStop());
+
+        endpoint->sendMsg(
+            SystemTriggerEmergencyStop{
+                SystemTriggerEmergencyStop::EmergencyTriggerReason::SOFTWARE_ERROR,
+                "exception <" + what + "> occurred while reading CAN bus. Emergency stop set."
+            }
+        );
+        endpoint->sendMsg(MessagingSendNotification{NotificationData{
+            NotificationLevel::ERROR,
+            NotificationType::EXCEPTION,
+            "JsonWriter Exception",
+            what,
+            "JsonWriter::operator()()"
+        }});
+    } catch(const std::exception &e) {
+        monitor->printException("JsonWriter::emergencyStop()", e.what());
+    }
 }
