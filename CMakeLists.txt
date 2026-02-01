@@ -18,9 +18,8 @@ add_executable(
     src/monitor.cpp
     src/actionlisthandler.cpp
     src/actionlist.cpp
-    src/actionlist.h
     src/actionlistcollection.cpp
-    src/actionlistcollection.h
+    src/argumentparser.cpp
 )
 
 install(TARGETS moba-connector)

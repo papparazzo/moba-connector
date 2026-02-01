@@ -37,7 +37,7 @@
 #include "jsonwriter.h"
 #include "monitor.h"
 #include "sharedData.h"
-#include "moba/cs2utils.h"
+#include "moba/cs2contactdata.h"
 
 namespace {
     moba::AppData appData = {
@@ -50,89 +50,9 @@ namespace {
     };
 }
 
-struct CS2ContactData {
-    std::string host;
-    int portIn;
-    int portOut;
-};
-
-void printHelp(const std::string &appName, const CS2ContactData &cs2ContactData) {
-    std::cout
-        << appName << " [host] [port]" << std::endl
-        << std::endl
-        << "-d, --debug         enables debug output" << std::endl
-        << "-h, --help          shows this help" << std::endl
-        << "-v, --version       shows version-info" << std::endl
-        << "-c, --cs2-host      host of the CentralStation (default: " << cs2ContactData.host << ")" << std::endl
-        << "-i, --cs2-port-in   port of the CentralStation for incoming messages (default: " << cs2ContactData.portIn << ")" << std::endl
-        << "-o, --cs2-port-out  port of the CentralStation for outgoing messages (default: " << cs2ContactData.portOut << ")" << std::endl;
-}
-
-bool parseArguments(const int argc, char *argv[], moba::AppData &data, CS2ContactData &cs2ContactData, bool &debug) {
-    static option longOptions[] = {
-        {"cs2-host",     required_argument, nullptr, 'c'},
-        {"debug",        no_argument,       nullptr, 'd'},
-        {"cs2-port-in",  required_argument, nullptr, 'i'},
-        {"cs2-port-out", required_argument, nullptr, 'o'},
-        {"help",         no_argument,       nullptr, 'h'},
-        {"version",      no_argument,       nullptr, 'v'},
-        {nullptr,        0,                 nullptr, 0 }
-    };
-
-    int optionIndex = 0;
-
-    while(true) {
-        const int c = getopt_long(argc, argv, "hvc:i:o:", longOptions, &optionIndex);
-        if(c == -1) {
-            break;
-        }
-
-        switch(c) {
-            case 'd':
-                
-                break;
-
-            case 'h':
-                printHelp(basename(argv[0]), cs2ContactData);
-                return true;
-
-            case 'v':
-                moba::printAppData(data);
-                return true;
-
-            case 'c':
-                cs2ContactData.host = optarg;
-                break;
-
-            case 'i':
-                cs2ContactData.portIn = std::stoi(optarg);
-                break;
-
-            case 'o':
-                cs2ContactData.portOut = std::stoi(optarg);
-                break;
-
-            default:
-                std::cerr << "Try '" << basename(argv[0]) << " --help' for more information." << std::endl;
-                exit(2);
-        }
-    }
-
-    switch(argc - optind) {
-        case 2:
-            data.port = std::stoi(argv[optind + 1]);
-
-        case 1:
-            data.host = argv[optind];
-            break;
-
-        default:
-            break;
-    }
-    return false;
-}
-
 int main(const int argc, char *argv[]) {
+    ArgumentParser argumentParser;
+
     CS2ContactData cs2ContactData = {
         "192.168.178.38",
         CS2Writer::DEFAULT_PORT,
@@ -140,7 +60,7 @@ int main(const int argc, char *argv[]) {
     };
     bool debug = false;
 
-    if(parseArguments(argc, argv, appData, cs2ContactData, debug)) {
+    if(argumentParser.parseArguments(argc, argv, appData, cs2ContactData, pingSettings, debug)) {
         return EXIT_SUCCESS;
     }
 
