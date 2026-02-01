@@ -64,6 +64,8 @@ private:
     [[nodiscard]]
     ActionList getActionList(const nlohmann::json &d, std::uint32_t localId) const;
 
+    void emergencyStop(const std::string &what) const;
+
     bool closing;
 
     CS2WriterPtr     cs2writer;

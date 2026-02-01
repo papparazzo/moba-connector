@@ -213,3 +213,25 @@ void JsonReader::operator()() {
         std::this_thread::sleep_for(std::chrono::milliseconds{500});
     }
 }
+
+void JsonReader::emergencyStop(const std::string &what) const {
+    try {
+        cs2writer->send(setEmergencyStop());
+
+        endpoint->sendMsg(
+            SystemTriggerEmergencyStop{
+                SystemTriggerEmergencyStop::EmergencyTriggerReason::SOFTWARE_ERROR,
+                "exception <" + what + "> occurred while reading Endpoint. Emergency stop set."
+            }
+        );
+        endpoint->sendMsg(MessagingSendNotification{NotificationData{
+            NotificationLevel::ERROR,
+            NotificationType::EXCEPTION,
+            "JsonReader Exception",
+            what,
+            "JsonReader::operator()()"
+        }});
+    } catch(const std::exception &e) {
+        monitor->printException("JsonReader::emergencyStop()", e.what());
+    }
+}
