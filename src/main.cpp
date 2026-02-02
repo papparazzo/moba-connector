@@ -20,10 +20,10 @@
 
 #include <memory>
 #include <thread>
-#include <getopt.h>
 
 #include <moba-common/helper.h>
 
+#include "argumentparser.h"
 #include "config.h"
 #include "jsonreader.h"
 #include "watchdog.h"
