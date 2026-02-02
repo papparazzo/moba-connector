@@ -26,7 +26,7 @@ class ArgumentParser {
 public:
     ArgumentParser() = default;
 
-    bool parseArguments(int argc, char *argv[], moba::AppData &appData, CS2ContactData &cs2ContactData, Watchdog::PingSettings &pingSettings, bool &debug) const;
+    static bool parseArguments(int argc, char *argv[], moba::AppData &appData, CS2ContactData &cs2ContactData, Watchdog::PingSettings &pingSettings, bool &debug) ;
 
     static void printHelp(const std::string &appName, const CS2ContactData &cs2ContactData, const Watchdog::PingSettings &pingSettings);
 

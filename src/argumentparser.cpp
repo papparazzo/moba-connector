@@ -28,7 +28,7 @@
 
 bool ArgumentParser::parseArguments(
     const int argc, char *argv[], moba::AppData &appData, CS2ContactData &cs2ContactData, Watchdog::PingSettings &pingSettings, bool &debug
-) const {
+) {
     static option longOptions[] = {
         {"cs2-host",      required_argument, nullptr, 'c'},
         {"debug",         no_argument,       nullptr, 'd'},
