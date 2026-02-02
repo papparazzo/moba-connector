@@ -75,11 +75,11 @@ bool ArgumentParser::parseArguments(
                 break;
 
             case 't':
-                pingSettings.pingTimeout = parseMilliseconds(optarg);
+                pingSettings.timeout = parseMilliseconds(optarg);
                 break;
 
             case 'n':
-                pingSettings.pingInterval = parseMilliseconds(optarg);
+                pingSettings.interval = parseMilliseconds(optarg);
                 break;
 
             default:
@@ -125,6 +125,6 @@ void ArgumentParser::printHelp(const std::string &appName, const CS2ContactData 
         << "-c, --cs2-host      host of the CentralStation (default: " << cs2ContactData.host << ")" << std::endl
         << "-i, --cs2-port-in   port of the CentralStation for incoming messages (default: " << cs2ContactData.portIn << ")" << std::endl
         << "-o, --cs2-port-out  port of the CentralStation for outgoing messages (default: " << cs2ContactData.portOut << ")" << std::endl
-        << "-t, --ping-timeout  watchdog ping timeout in ms (default: " << pingSettings.pingTimeout << ")" << std::endl
-        << "-n, --ping-interval watchdog ping interval in ms (default: " << pingSettings.pingInterval << ")" << std::endl;
+        << "-t, --ping-timeout  watchdog ping timeout in ms (default: " << pingSettings.timeout << ")" << std::endl
+        << "-n, --ping-interval watchdog ping interval in ms (default: " << pingSettings.interval << ")" << std::endl;
 }
