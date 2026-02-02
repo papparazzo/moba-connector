@@ -51,8 +51,6 @@ namespace {
 }
 
 int main(const int argc, char *argv[]) {
-    ArgumentParser argumentParser;
-
     CS2ContactData cs2ContactData = {
         "192.168.178.38",
         CS2Writer::DEFAULT_PORT,
@@ -60,7 +58,7 @@ int main(const int argc, char *argv[]) {
     };
     bool debug = false;
 
-    if(argumentParser.parseArguments(argc, argv, appData, cs2ContactData, pingSettings, debug)) {
+    if(ArgumentParser::parseArguments(argc, argv, appData, cs2ContactData, pingSettings, debug)) {
         return EXIT_SUCCESS;
     }
 
