@@ -20,44 +20,72 @@
 
 #include "watchdog.h"
 #include "moba/interfacemessages.h"
-#include <thread>
 #include "moba/cs2utils.h"
 #include "moba/messagingmessages.h"
 
-Watchdog::Watchdog(
-    WatchdogTokenPtr watchdogToken, CS2WriterPtr cs2writer, EndpointPtr endpoint, MonitorPtr monitor
-): watchdogToken{std::move(watchdogToken)}, cs2writer{std::move(cs2writer)},
-   endpoint{std::move(endpoint)}, monitor{std::move(monitor)}, lastState{Connectivity::ERROR} {
+#include <thread>
+
+Watchdog::Watchdog(CS2WriterPtr cs2writer, EndpointPtr endpoint, MonitorPtr monitor, const PingSettings ping_settings):
+    cs2writer{std::move(cs2writer)},
+    endpoint{std::move(endpoint)},
+    monitor{std::move(monitor)},
+    ping_settings{ping_settings},
+    thread(&Watchdog::operator(), this)
+{
 }
 
-void Watchdog::operator()() {
-    while(true) {
+Watchdog::~Watchdog() {
+    thread.request_stop();
+    cv.notify_all();
+}
+
+void Watchdog::ping_response() {
+    std::lock_guard lock(mutex);
+    pong_received = true;
+    cv.notify_all();
+}
+
+void Watchdog::synchronize_start() {
+    synchronize = true;
+}
+
+void Watchdog::operator()(const std::stop_token &st) {
+    std::unique_lock lock(mutex);
+
+    bool connected = false;
+
+    while(!st.stop_requested()) {
         try {
+            std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
+
             cs2writer->send(ping());
-            watchdogToken->pingStarted();
+            pong_received = false;
 
-            std::this_thread::sleep_for(std::chrono::milliseconds{30});
+            cv.wait_for(lock, ping_settings.timeout, [&]{ return pong_received; });
 
-            if(const auto tokenState = watchdogToken->getTokenState(); tokenState == WatchdogToken::TokenState::SYNCHRONIZE) {
+            auto diff = std::chrono::steady_clock::now() - start_time; // std::chrono::steady_clock::duration
+            if(pong_received) {
+                std::stringstream ss;
+                ss << "Watchdog ping received. Diff: " << std::chrono::duration_cast<std::chrono::milliseconds>(diff);
+                monitor->appendAction(moba::LogLevel::NOTICE, ss.str());
+            }
+
+            if(synchronize) {
                 endpoint->sendMsg(InterfaceConnected{true});
-                watchdogToken->synchronizeFinish();
-            } else if(tokenState == WatchdogToken::TokenState::CONNECTED && lastState == Connectivity::ERROR) {
-                endpoint->sendMsg(InterfaceConnected{false});
-                lastState = Connectivity::CONNECTED;
-            } else if(tokenState == WatchdogToken::TokenState::ERROR && lastState == Connectivity::CONNECTED) {
+                synchronize = false;
+            } else if (!pong_received && connected) {
+                monitor->appendAction(moba::LogLevel::CRITICAL, "Watchdog timeout!");
                 endpoint->sendMsg(InterfaceConnectionLost{});
-                lastState = Connectivity::ERROR;
+                connected = false;
+            } else if (pong_received && !connected) {
+                endpoint->sendMsg(InterfaceConnected{false});
+                connected = true;
             }
         } catch(const std::exception &e) {
-            endpoint->sendMsg(MessagingSendNotification{NotificationData{
-                NotificationLevel::ERROR,
-                NotificationType::EXCEPTION,
-                "Watchdog Exception",
-                e.what(),
-                "Watchdog::operator()()"
-            }});
             monitor->printException("Watchdog::operator()()", e.what());
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds{500});
+        if(connected && !st.stop_requested()) {
+            std::this_thread::sleep_for(ping_settings.interval);
+        }
     }
 }

@@ -20,33 +20,47 @@
 
 #pragma once
 
+#include <condition_variable>
+#include <stop_token>
+#include <thread>
+
 #include "monitor.h"
-#include "watchdogToken.h"
 #include "moba/cs2writer.h"
 #include "moba/endpoint.h"
 
 class Watchdog final {
 public:
-    Watchdog(WatchdogTokenPtr watchdogToken, CS2WriterPtr cs2writer, EndpointPtr endpoint, MonitorPtr monitor);
-
-    Watchdog(const Watchdog&) = delete;
-    Watchdog(Watchdog&&) = default;
-    Watchdog& operator=(const Watchdog&) = delete;
-
-    ~Watchdog() noexcept = default;
-
-    void operator()();
-
-protected:
-    enum class Connectivity {
-        CONNECTED,
-        ERROR
+    struct PingSettings {
+        std::chrono::milliseconds timeout{30};
+        std::chrono::milliseconds interval{500};
     };
 
-    WatchdogTokenPtr watchdogToken;
+    Watchdog(CS2WriterPtr cs2writer, EndpointPtr endpoint, MonitorPtr monitor, PingSettings ping_settings);
+
+    Watchdog(const Watchdog&) = delete;
+    Watchdog(Watchdog&&) = delete;
+    Watchdog& operator=(const Watchdog&) = delete;
+
+    ~Watchdog();
+
+    void ping_response();
+
+    void synchronize_start();
+
+private:
+    void operator()(const std::stop_token &st);
+
     CS2WriterPtr     cs2writer;
     EndpointPtr      endpoint;
     MonitorPtr       monitor;
-    Connectivity     lastState;
+    PingSettings     ping_settings;
+
+    std::jthread thread;
+    std::mutex mutex;
+    std::condition_variable cv;
+
+    volatile bool pong_received{false};
+    std::atomic_bool synchronize;
 };
 
+using WatchdogPtr = std::shared_ptr<Watchdog>;
