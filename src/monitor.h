@@ -22,14 +22,14 @@
 
 #include <boost/circular_buffer.hpp>
 #include <moba-common/loggerprefix.h>
-#include <moba-common/screen.h>
 
 #include "moba/cs2cancommand.h"
+#include "moba/cs2contactdata.h"
 #include "moba/systemmessages.h"
 
 class Monitor final {
 public:
-    explicit Monitor(const bool debug): debug{debug} {};
+    Monitor(bool debug, const CS2ContactData &cs2ContactData);
 
     void appendAction(const std::string &action, const std::string &message);
 
@@ -51,6 +51,7 @@ private:
     boost::circular_buffer<std::string> canBusActions{20};
 
     bool debug;
+    CS2ContactData cs2ContactData;
 };
 
 using MonitorPtr = std::shared_ptr<Monitor>;

@@ -26,6 +26,11 @@
 #include "moba/cs2cancommand.h"
 #include "moba/cs2utils.h"
 
+Monitor::Monitor(const bool debug, const CS2ContactData &cs2ContactData): debug{debug}, cs2ContactData{cs2ContactData} {
+    std::cerr << moba::LogLevel::NOTICE << "Starting monitor... " << std::endl;
+    std::cerr << moba::LogLevel::NOTICE << cs2ContactData << std::endl;
+}
+
 void Monitor::appendAction(const std::string &action, const std::string &message) {
     std::lock_guard l{m};
 
@@ -35,7 +40,9 @@ void Monitor::appendAction(const std::string &action, const std::string &message
 void Monitor::appendAction(const moba::LogLevel level, const std::string &action) {
     std::lock_guard l{m};
 
-    std::cerr << level << action << std::endl;
+    if(level != moba::LogLevel::NOTICE || debug) {
+        std::cerr << level << action << std::endl;
+    }
 }
 
 void Monitor::printException(const std::string &where, const std::string &what) {
