@@ -60,7 +60,7 @@ private:
     std::condition_variable cv;
 
     volatile bool pong_received{false};
-    std::atomic_bool synchronize;
+    std::atomic_bool synchronize{true};
 };
 
 using WatchdogPtr = std::shared_ptr<Watchdog>;
