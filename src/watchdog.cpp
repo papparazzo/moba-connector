@@ -70,8 +70,9 @@ void Watchdog::operator()(const std::stop_token &st) {
                 monitor->appendAction(moba::LogLevel::NOTICE, ss.str());
             }
 
-            if(synchronize) {
+            if(synchronize && pong_received) {
                 endpoint->sendMsg(InterfaceConnected{true});
+                connected = true;
                 synchronize = false;
             } else if (!pong_received && connected) {
                 monitor->appendAction(moba::LogLevel::CRITICAL, "Watchdog timeout!");
