@@ -1,5 +1,5 @@
 /*
-*  Project:    moba-connector
+ *  Project:    moba-connector
  *
  *  Copyright (C) 2018 Stefan Paproth <pappi-@gmx.de>
  *
