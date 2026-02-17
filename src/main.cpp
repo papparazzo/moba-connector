@@ -82,18 +82,13 @@ int main(const int argc, char *argv[]) {
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
-    JsonWriter jsonwriter{cs2ReaderPtr, cs2WriterPtr, endpoint, watchdogToken, sharedData, monitor};
+    JsonWriter jsonwriter{cs2ReaderPtr, cs2WriterPtr, endpoint, watchdog, sharedData, monitor};
     std::thread jsonwriterThread{std::move(jsonwriter)};
     jsonwriterThread.detach();
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
-    std::thread watchDogThread{Watchdog{watchdogToken, cs2WriterPtr, endpoint, monitor}};
-    watchDogThread.detach();
-
-    ///////////////////////////////////////////////////////////////////////////////////
-    //
-    JsonReader jsonReader{cs2WriterPtr, endpoint, watchdogToken, sharedData, monitor};
+    JsonReader jsonReader{cs2WriterPtr, endpoint, watchdog, sharedData, monitor};
     std::thread jsonReaderThread{std::move(jsonReader)};
     jsonReaderThread.join();
 
