@@ -40,6 +40,8 @@
 #include "actionsendrouteswitched.h"
 #include "actionswitching.h"
 #include "moba/enumactiontype.h"
+#include "moba/messagingmessages.h"
+#include "moba/notification.h"
 
 // TODO Consider renaming into CS2Writer instead of JsonReader
 JsonReader::JsonReader(
