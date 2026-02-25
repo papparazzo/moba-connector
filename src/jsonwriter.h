@@ -49,7 +49,7 @@ public:
     
     void operator()() const;
 
-protected:
+private:
     [[nodiscard]]
     bool s88report(const CS2CanCommand &data) const;
 
