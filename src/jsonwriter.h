@@ -26,7 +26,7 @@
 #include "moba/cs2writer.h"
 #include "moba/cs2reader.h"
 
-#include "watchdogToken.h"
+#include "watchdog.h"
 #include "sharedData.h"
 
 // TODO Consider renaming into CS2Reader instead of JsonWriter
@@ -36,7 +36,7 @@ public:
         CS2ReaderPtr cs2reader,
         CS2WriterPtr cs2writer,
         EndpointPtr endpoint,
-        WatchdogTokenPtr watchdogToken,
+        WatchdogPtr watchdog,
         SharedDataPtr sharedData,
         MonitorPtr monitor
     );
