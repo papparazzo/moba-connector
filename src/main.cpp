@@ -75,9 +75,10 @@ int main(const int argc, char *argv[]) {
     const auto cs2WriterPtr = std::make_shared<CS2Writer>(cs2ContactData.host, cs2ContactData.portIn);
     const auto cs2ReaderPtr = std::make_shared<CS2Reader>(cs2ContactData.host, cs2ContactData.portOut);
 
-    const auto watchdogToken = std::make_shared<WatchdogToken>();
     const auto sharedData = std::make_shared<SharedData>();
-    const auto monitor = std::make_shared<Monitor>(debug);
+    const auto monitor = std::make_shared<Monitor>(debug, cs2ContactData);
+
+    auto watchdog = std::make_shared<Watchdog>(cs2WriterPtr, endpoint, monitor, pingSettings);
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
