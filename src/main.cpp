@@ -27,7 +27,6 @@
 #include "config.h"
 #include "jsonreader.h"
 #include "watchdog.h"
-#include "watchdogToken.h"
 
 #include "moba/cs2reader.h"
 #include "moba/cs2writer.h"
