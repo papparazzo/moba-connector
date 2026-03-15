@@ -34,38 +34,41 @@ JsonWriter::JsonWriter(
     CS2ReaderPtr cs2reader,
     CS2WriterPtr cs2writer,
     EndpointPtr endpoint,
-    WatchdogTokenPtr watchdogToken,
+    WatchdogPtr watchdog,
     SharedDataPtr sharedData,
     MonitorPtr monitor
 ): cs2reader{std::move(cs2reader)}, cs2writer{std::move(cs2writer)}, endpoint{std::move(endpoint)},
-watchdogToken{std::move(watchdogToken)}, sharedData{std::move(sharedData)}, monitor{std::move(monitor)} {
+watchdog{std::move(watchdog)}, sharedData{std::move(sharedData)}, monitor{std::move(monitor)} {
 }
 
 void JsonWriter::operator()() const {
-    // TODO: Sollte die Liste nach einem Reset neu eingelesen werden?
-    //       Bzw. was, wenn neue Lok aufgegleist wurde?
-    readFunctionList();
-    
     while(true) {
         try {
-            CS2CanCommand data;
-            cs2reader->read(data);
+            // TODO: Sollte die Liste nach einem Reset neu eingelesen werden?
+            //       Bzw. was, wenn neue Lok aufgegleist wurde?
+            readFunctionList();
+            while(true) {
+                CS2CanCommand data;
+                cs2reader->read(data);
+                monitor->printCS2CanCommand(data);
 
-            if(data.isResponse() && data.header[1] == static_cast<uint8_t>(CanCommand::CMD_PING | 0x01)) {
-                watchdogToken->pingResponded();
-                continue;
-            }
-            if(s88report(data)) {
-                continue;
-            }
-            if(systemCommands(data)) {
-                continue;
-            }
-            if(controlLocoCommands(data)) {
-                continue;
-            }
-            if (controlSwitch(data)) {
-                continue;
+                if(data.isResponse() && data.header[1] == static_cast<uint8_t>(CanCommand::CMD_PING | 0x01)) {
+                    watchdog->ping_response();
+                    continue;
+                }
+                if(s88report(data)) {
+                    continue;
+                }
+                if(systemCommands(data)) {
+                    continue;
+                }
+                if(controlLocoCommands(data)) {
+                    continue;
+                }
+                if (controlSwitch(data)) {
+                    continue;
+                }
+                //monitor->printUnhandledCanCommand(data);
             }
         } catch(const std::exception &e) {
             monitor->printException("JsonWriter::operator()()", e.what());

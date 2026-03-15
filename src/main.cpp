@@ -55,22 +55,18 @@ int main(const int argc, char *argv[]) {
         CS2Writer::DEFAULT_PORT,
         CS2Reader::DEFAULT_PORT
     };
+
+    Watchdog::PingSettings pingSettings;
     bool debug = false;
 
     if(ArgumentParser::parseArguments(argc, argv, appData, cs2ContactData, pingSettings, debug)) {
         return EXIT_SUCCESS;
     }
 
+    MessageGroups groups{Message::INTERFACE, Message::SYSTEM};
+
     const auto socket = std::make_shared<Socket>(appData.host, appData.port);
-    const auto endpoint = EndpointPtr{
-        new Endpoint{
-            socket,
-            appData.appName,
-            "connector",
-            appData.version,
-            {Message::INTERFACE, Message::SYSTEM}
-        }
-    };
+    const auto endpoint = std::make_shared<Endpoint>(socket, appData.appName, "connector", appData.version, groups);
 
     const auto cs2WriterPtr = std::make_shared<CS2Writer>(cs2ContactData.host, cs2ContactData.portIn);
     const auto cs2ReaderPtr = std::make_shared<CS2Reader>(cs2ContactData.host, cs2ContactData.portOut);

@@ -47,11 +47,11 @@
 JsonReader::JsonReader(
     CS2WriterPtr cs2writer,
     EndpointPtr endpoint,
-    WatchdogTokenPtr watchdogToken,
+    WatchdogPtr watchdog,
     SharedDataPtr sharedData,
     MonitorPtr monitor
 ) : closing{false}, cs2writer{std::move(cs2writer)}, endpoint{std::move(endpoint)},
-watchdogToken{std::move(watchdogToken)}, sharedData{std::move(sharedData)}, monitor{std::move(monitor)} {
+watchdog{std::move(watchdog)}, sharedData{std::move(sharedData)}, monitor{std::move(monitor)} {
 }
 
 void JsonReader::setHardwareState(SystemHardwareStateChanged &&data) const {
@@ -205,10 +205,9 @@ void JsonReader::operator()() {
                 registry.handleMsg(endpoint->waitForNewMsg());
             }
         } catch(const std::exception &e) {
-            watchdogToken->synchronizeStart();
+            watchdog->synchronize_start();
             monitor->printException("JsonReader::operator()()", e.what());
-            endpoint->sendMsg(SystemTriggerEmergencyStop{SystemTriggerEmergencyStop::EmergencyTriggerReason::SOFTWARE_ERROR});
-            cs2writer->send(setEmergencyStop());
+            emergencyStop(e.what());
         }
         std::this_thread::sleep_for(std::chrono::milliseconds{500});
     }

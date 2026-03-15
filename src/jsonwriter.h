@@ -64,11 +64,12 @@ private:
     
     void readFunctionList() const;
 
-    CS2ReaderPtr cs2reader;
-    CS2WriterPtr cs2writer;
-    EndpointPtr endpoint;
-    WatchdogTokenPtr watchdogToken;
     void emergencyStop(const std::string &what) const;
+
+    CS2ReaderPtr  cs2reader;
+    CS2WriterPtr  cs2writer;
+    EndpointPtr   endpoint;
+    WatchdogPtr   watchdog;
     SharedDataPtr sharedData;
-    MonitorPtr monitor;
+    MonitorPtr    monitor;
 };

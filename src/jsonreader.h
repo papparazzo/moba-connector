@@ -27,7 +27,7 @@
 #include "moba/systemmessages.h"
 #include "moba/cs2writer.h"
 
-#include "watchdogToken.h"
+#include "watchdog.h"
 #include "sharedData.h"
 #include "actionlist.h"
 #include "moba/enumfunction.h"
@@ -38,7 +38,7 @@ public:
     JsonReader(
         CS2WriterPtr cs2writer,
         EndpointPtr endpoint,
-        WatchdogTokenPtr watchdogToken,
+        WatchdogPtr watchdog,
         SharedDataPtr sharedData,
         MonitorPtr monitor
     );
@@ -68,9 +68,9 @@ private:
 
     bool closing;
 
-    CS2WriterPtr     cs2writer;
-    EndpointPtr      endpoint;
-    WatchdogTokenPtr watchdogToken;
-    SharedDataPtr    sharedData;
-    MonitorPtr       monitor;
+    CS2WriterPtr  cs2writer;
+    EndpointPtr   endpoint;
+    WatchdogPtr   watchdog;
+    SharedDataPtr sharedData;
+    MonitorPtr    monitor;
 };
