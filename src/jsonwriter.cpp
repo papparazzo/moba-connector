@@ -91,6 +91,10 @@ bool JsonWriter::s88report(const CS2CanCommand &data) const {
 
     monitor->feedbackContactTriggered(module, contact, time, active);
 
+    if(!sharedData->automatic) {
+        return true;
+    }
+
     // FIXME: Hier eventuell auch noch active == false berücksichtigen...
     if(active) {
         sharedData->actionListHandler.trigger(ContactData{module, contact});
