@@ -140,6 +140,7 @@ bool JsonWriter::controlSwitch(const CS2CanCommand &cmd) const {
     switch(static_cast<CanCommand>(cmd.header[1])) {
         case CanCommand::CMD_SET_SWITCH:
             if(sharedData->automatic) {
+                monitor->locCommandsTriggered("Externe Schalter", cmd.getUID(), cmd.getWordAt4());
                 cs2writer->send(setEmergencyStop());
                 endpoint->sendMsg(
                     SystemTriggerEmergencyStop{
