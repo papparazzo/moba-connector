@@ -66,10 +66,12 @@ void JsonReader::setHardwareState(SystemHardwareStateChanged &&data) const {
 
         case SystemHardwareStateChanged::HardwareState::MANUAL:
             monitor->printStatus("MANUAL");
+            sharedData->automatic = false;
             return cs2writer->send(setEmergencyStopClearing());
 
         case SystemHardwareStateChanged::HardwareState::AUTOMATIC:
             monitor->printStatus("AUTOMATIC");
+            sharedData->automatic = true;
             return cs2writer->send(setEmergencyStopClearing());
 
         case SystemHardwareStateChanged::HardwareState::SHUTDOWN:
@@ -78,6 +80,7 @@ void JsonReader::setHardwareState(SystemHardwareStateChanged &&data) const {
 
         case SystemHardwareStateChanged::HardwareState::READY:
             monitor->printStatus("READY");
+            sharedData->automatic = true;
             return cs2writer->send(setEmergencyStopClearing());
 
         case SystemHardwareStateChanged::HardwareState::NO_CONNECTION:
