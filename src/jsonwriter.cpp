@@ -20,9 +20,9 @@
 
 #include "jsonwriter.h"
 
-#include <thread>
 #include <utility>
 
+#include "moba/configdumpreader.h"
 #include "moba/systemmessages.h"
 #include "moba/cs2utils.h"
 #include "moba/configloklistreader.h"
@@ -65,7 +65,7 @@ void JsonWriter::operator()() const {
                 if(controlLocoCommands(data)) {
                     continue;
                 }
-                if (controlSwitch(data)) {
+                if(controlSwitch(data)) {
                     continue;
                 }
                 //monitor->printUnhandledCanCommand(data);
