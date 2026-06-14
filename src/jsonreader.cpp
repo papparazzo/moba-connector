@@ -146,15 +146,15 @@ ActionList JsonReader::getActionList(const nlohmann::json &d, std::uint32_t loca
                 continue;
 
             case ActionType::SEND_ROUTE_SWITCHED:
-                actionList.append(std::make_shared<ActionSendRouteSwitched>(monitor, endpoint, iter["data"].get<int>()));
+                actionList.append(std::make_shared<ActionSendRouteSwitched>(monitor, endpoint, iter["trainId"].get<int>()));
                 continue;
 
             case ActionType::SEND_ROUTE_RELEASED:
-                actionList.append(std::make_shared<ActionSendRouteReleased>(monitor, endpoint, iter["data"].get<int>()));
+                actionList.append(std::make_shared<ActionSendRouteReleased>(monitor, endpoint, iter["trainId"].get<int>()));
                 continue;
 
             case ActionType::SEND_BLOCK_RELEASED:
-                actionList.append(std::make_shared<ActionSendBlockReleased>(monitor, endpoint, iter["data"].get<int>()));
+                actionList.append(std::make_shared<ActionSendBlockReleased>(monitor, endpoint, iter["blockId"].get<int>()));
                 continue;
 
             default:
