@@ -97,7 +97,7 @@ bool JsonWriter::s88report(const CS2CanCommand &data) const {
 
     // FIXME: Hier eventuell auch noch active == false berücksichtigen...
     if(active) {
-        sharedData->actionListHandler.trigger(ContactData{module, contact});
+        sharedData->actionListHandler.trigger(PortAddressData{module, contact});
     }
     return true;
 }
