@@ -20,7 +20,7 @@
 
 #include "actionlisthandler.h"
 
-void ActionListHandler::replaceActionList(const ContactData &contact, const ActionListCollectionPtr &actionListCollection) {
+void ActionListHandler::replaceActionList(const PortAddressData &contact, const ActionListCollectionPtr &actionListCollection) {
     std::lock_guard guard{mutex};
 
     if (!actionListCollections.erase(contact)) {
@@ -30,7 +30,7 @@ void ActionListHandler::replaceActionList(const ContactData &contact, const Acti
     actionListCollections.emplace(contact, actionListCollection);
 }
 
-void ActionListHandler::insertActionList(const ContactData &contact, const ActionListCollectionPtr &actionListCollection) {
+void ActionListHandler::insertActionList(const PortAddressData &contact, const ActionListCollectionPtr &actionListCollection) {
     std::lock_guard guard{mutex};
 
     if (actionListCollections.contains(contact)) {
@@ -40,7 +40,7 @@ void ActionListHandler::insertActionList(const ContactData &contact, const Actio
     actionListCollections.emplace(contact, actionListCollection);
 }
 
-void ActionListHandler::removeActionListByContact(const ContactData &contact) {
+void ActionListHandler::removeActionListByContact(const PortAddressData &contact) {
     std::lock_guard guard{mutex};
 
     if (!actionListCollections.erase(contact)) {
@@ -48,7 +48,7 @@ void ActionListHandler::removeActionListByContact(const ContactData &contact) {
     }
 }
 
-void ActionListHandler::trigger(const ContactData &contact) {
+void ActionListHandler::trigger(const PortAddressData &contact) {
     std::lock_guard guard{mutex};
 
     const auto iter = actionListCollections.find(contact);

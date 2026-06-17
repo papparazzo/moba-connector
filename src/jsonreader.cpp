@@ -172,7 +172,7 @@ void JsonReader::setActionList(const nlohmann::json &d, bool replace) const {
     }
 
     for(auto &c: d["triggerList"]) {
-        const auto triggerContact = ContactData{c["trigger"]};
+        const auto triggerContact = PortAddressData{c["trigger"]};
         const auto listCollection = std::make_shared<ActionListCollection>();
 
         for(auto &iter: c["actionLists"]) {

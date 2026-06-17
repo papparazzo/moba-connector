@@ -39,15 +39,15 @@ public:
 
     ~ActionListHandler() = default;
 
-    void replaceActionList(const ContactData &contact, const ActionListCollectionPtr &actionListCollection);
+    void replaceActionList(const PortAddressData &contact, const ActionListCollectionPtr &actionListCollection);
 
-    void insertActionList(const ContactData &contact, const ActionListCollectionPtr &actionListCollection);
+    void insertActionList(const PortAddressData &contact, const ActionListCollectionPtr &actionListCollection);
 
-    void removeActionListByContact(const ContactData &contact);
+    void removeActionListByContact(const PortAddressData &contact);
 
     void trigger(const ContactData &contact);
 
 private:
-    std::map<ContactData, ActionListCollectionPtr> actionListCollections;
+    std::map<PortAddressData, ActionListCollectionPtr> actionListCollections;
     std::mutex mutex;
 };
