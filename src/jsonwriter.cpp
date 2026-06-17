@@ -48,8 +48,7 @@ void JsonWriter::operator()() const {
             //       Bzw. was, wenn neue Lok aufgegleist wurde?
             readFunctionList();
             while(true) {
-                CS2CanCommand data;
-                cs2reader->read(data);
+                CS2CanCommand data = cs2reader->read();
                 monitor->printCS2CanCommand(data);
 
                 if(data.isResponse() && data.header[1] == static_cast<uint8_t>(CanCommand::CMD_PING | 0x01)) {
@@ -163,13 +162,9 @@ void JsonWriter::readFunctionList() const {
     ConfigReader configReader{};
     configReader.addHandler(cfgReader);
 
-    CanCommandHandlerInterface::HandlerReturn result = ConfigReader::NOT_HANDLED;
-
-    do {
-        CS2CanCommand data;
-        cs2reader->read(data);
-        result = configReader.handleCanCommand(data);
-    } while(result != ConfigReader::HANDLED_AND_FINISHED);
+    while(configReader.handleCanCommand(cs2reader->read()) != ConfigReader::HANDLED_AND_FINISHED) {
+        // no op
+    }
 }
 
 void JsonWriter::emergencyStop(const std::string &what) const {
