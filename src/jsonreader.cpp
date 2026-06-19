@@ -96,6 +96,8 @@ void JsonReader::shutdown() {
 }
 
 void JsonReader::reset() const {
+    std::cout << "resetting..." << std::endl;
+    sharedData->reset();
     cs2writer->send(setHalt());
 }
 

@@ -45,7 +45,9 @@ public:
 
     void removeActionListByContact(const PortAddressData &contact);
 
-    void trigger(const ContactData &contact);
+    void trigger(const PortAddressData &contact);
+
+    void clear();
 
 private:
     std::map<PortAddressData, ActionListCollectionPtr> actionListCollections;

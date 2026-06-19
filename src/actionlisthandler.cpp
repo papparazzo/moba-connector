@@ -64,3 +64,8 @@ void ActionListHandler::trigger(const PortAddressData &contact) {
         );
     }
 }
+
+void ActionListHandler::clear() {
+    std::lock_guard guard{mutex};
+    actionListCollections.clear();
+}

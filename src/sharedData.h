@@ -30,6 +30,12 @@ struct SharedData {
     SharedData(): locomotives{std::make_shared<LocomotiveFunctions>()}, automatic{false} {
     }
 
+    void reset() {
+        locomotives->clear();
+        automatic = false;
+        actionListHandler.clear();
+    }
+
     LocomotiveFunctionsPtr locomotives;
     ActionListHandler      actionListHandler;
     std::atomic_bool       automatic;
