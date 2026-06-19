@@ -69,7 +69,7 @@ int main(const int argc, char *argv[]) {
     const auto endpoint = std::make_shared<Endpoint>(socket, appData.appName, "connector", appData.version, groups);
 
     const auto cs2WriterPtr = std::make_shared<CS2Writer>(cs2ContactData.host, cs2ContactData.portIn);
-    const auto cs2ReaderPtr = std::make_shared<CS2Reader>(cs2ContactData.host, cs2ContactData.portOut);
+    const auto cs2ReaderPtr = std::make_shared<CS2Reader>(cs2ContactData.portOut);
 
     const auto sharedData = std::make_shared<SharedData>();
     const auto monitor = std::make_shared<Monitor>(debug, cs2ContactData);
