@@ -111,7 +111,7 @@ Function JsonReader::getFunction(const std::uint32_t localId, const std::string 
 ActionList JsonReader::getActionList(const nlohmann::json &d, std::uint32_t localId) const {
     ActionList actionList;
 
-    for(auto &iter: d["actions"]) {
+    for(auto &iter: d) {
         switch(auto action = iter["action"].get<std::string>(); stringToActionTypeEnum(action)) {
             case ActionType::DELAY:
                 actionList.append(std::make_shared<ActionDelay>(monitor, std::chrono::milliseconds(iter["delay"].get<int>())));
