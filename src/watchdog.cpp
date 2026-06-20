@@ -24,6 +24,7 @@
 #include "moba/messagingmessages.h"
 
 #include <thread>
+#include <mutex>
 
 Watchdog::Watchdog(CS2WriterPtr cs2writer, EndpointPtr endpoint, MonitorPtr monitor, const PingSettings ping_settings):
     cs2writer{std::move(cs2writer)},
@@ -40,7 +41,7 @@ Watchdog::~Watchdog() {
 }
 
 void Watchdog::ping_response() {
-    std::lock_guard lock(mutex);
+    std::scoped_lock lock(mutex);
     pong_received = true;
     cv.notify_all();
 }

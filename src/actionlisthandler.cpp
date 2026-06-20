@@ -21,7 +21,7 @@
 #include "actionlisthandler.h"
 
 void ActionListHandler::replaceActionList(const PortAddressData &contact, const ActionListCollectionPtr &actionListCollection) {
-    std::lock_guard guard{mutex};
+    std::scoped_lock guard{mutex};
 
     if (!actionListCollections.erase(contact)) {
         throw std::runtime_error("could not erase contact <" + static_cast<std::string>(contact) + "> from map.");
@@ -31,7 +31,7 @@ void ActionListHandler::replaceActionList(const PortAddressData &contact, const 
 }
 
 void ActionListHandler::insertActionList(const PortAddressData &contact, const ActionListCollectionPtr &actionListCollection) {
-    std::lock_guard guard{mutex};
+    std::scoped_lock guard{mutex};
 
     if (actionListCollections.contains(contact)) {
         throw std::runtime_error("entry for contact <" + static_cast<std::string>(contact) + "> already in map.");
@@ -41,7 +41,7 @@ void ActionListHandler::insertActionList(const PortAddressData &contact, const A
 }
 
 void ActionListHandler::removeActionListByContact(const PortAddressData &contact) {
-    std::lock_guard guard{mutex};
+    std::scoped_lock guard{mutex};
 
     if (!actionListCollections.erase(contact)) {
         throw std::runtime_error("could not erase contact <" + static_cast<std::string>(contact) + "> from map.");
@@ -49,7 +49,7 @@ void ActionListHandler::removeActionListByContact(const PortAddressData &contact
 }
 
 void ActionListHandler::trigger(const PortAddressData &contact) {
-    std::lock_guard guard{mutex};
+    std::scoped_lock guard{mutex};
 
     const auto iter = actionListCollections.find(contact);
     if (iter == actionListCollections.end()) {
@@ -66,6 +66,6 @@ void ActionListHandler::trigger(const PortAddressData &contact) {
 }
 
 void ActionListHandler::clear() {
-    std::lock_guard guard{mutex};
+    std::scoped_lock guard{mutex};
     actionListCollections.clear();
 }

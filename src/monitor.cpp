@@ -21,6 +21,7 @@
 #include "monitor.h"
 
 #include <iomanip>
+#include <mutex>
 #include <string>
 
 #include "moba/cs2cancommand.h"
@@ -32,13 +33,13 @@ Monitor::Monitor(const bool debug, const CS2ContactData &cs2ContactData): debug{
 }
 
 void Monitor::appendAction(const std::string &action, const std::string &message) {
-    std::lock_guard l{m};
+    std::scoped_lock l{m};
 
     std::cerr << moba::LogLevel::NOTICE << "[" << action << "] " << message << std::endl;
 }
 
 void Monitor::appendAction(const moba::LogLevel level, const std::string &action) {
-    std::lock_guard l{m};
+    std::scoped_lock l{m};
 
     if(level != moba::LogLevel::NOTICE || debug) {
         std::cerr << level << action << std::endl;
@@ -46,19 +47,19 @@ void Monitor::appendAction(const moba::LogLevel level, const std::string &action
 }
 
 void Monitor::printException(const std::string &where, const std::string &what) {
-    std::lock_guard l{m};
+    std::scoped_lock l{m};
     std::cerr << moba::LogLevel::CRITICAL << where << " " << what << std::endl;
 }
 
 void Monitor::printCS2CanCommand(const CS2CanCommand &data) {
-    std::lock_guard l{m};
+    std::scoped_lock l{m};
     if(debug) {
         std::cerr << moba::LogLevel::NOTICE << getCommandName(data.getCanCommand()) << " [" << data << "]" << std::endl;
     }
 }
 
 void Monitor::feedbackContactTriggered(const std::uint16_t module, const std::uint16_t contact, const std::uint16_t time, const bool active) {
-    std::lock_guard l{m};
+    std::scoped_lock l{m};
 
     std::cerr <<
         moba::LogLevel::NOTICE <<
@@ -71,7 +72,7 @@ void Monitor::feedbackContactTriggered(const std::uint16_t module, const std::ui
 }
 
 void Monitor::locCommandsTriggered(const std::string& cmd, const std::uint32_t addr, const int value) {
-    std::lock_guard l{m};
+    std::scoped_lock l{m};
 
     std::cerr <<
         moba::LogLevel::NOTICE <<
@@ -81,6 +82,6 @@ void Monitor::locCommandsTriggered(const std::string& cmd, const std::uint32_t a
 }
 
 void Monitor::printStatus(const std::string &status) {
-    std::lock_guard l{m};
+    std::scoped_lock l{m};
     std::cerr << moba::LogLevel::NOTICE << "Status switched to <" << status << ">" << std::endl;
 }
