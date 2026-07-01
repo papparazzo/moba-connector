@@ -26,13 +26,12 @@
 #include <stdexcept>
 #include <getopt.h>
 
-bool ArgumentParser::parseArguments(
-    const int argc, char *argv[], moba::AppData &appData, CS2ContactData &cs2ContactData, Watchdog::PingSettings &pingSettings, bool &debug
-) {
+bool ArgumentParser::parseArguments(const int argc, char *argv[], moba::AppData &appData, CS2ContactData &cs2ContactData) {
     static option longOptions[] = {
         {"cs2-host",      required_argument, nullptr, 'c'},
         {"debug",         no_argument,       nullptr, 'd'},
         {"cs2-port-in",   required_argument, nullptr, 'i'},
+        {"log-level",     required_argument, nullptr, 'l'},
         {"cs2-port-out",  required_argument, nullptr, 'o'},
         {"ping-timeout",  required_argument, nullptr, 't'},
         {"ping-interval", required_argument, nullptr, 'n'},
@@ -44,7 +43,7 @@ bool ArgumentParser::parseArguments(
     int optionIndex = 0;
 
     while(true) {
-        const int c = getopt_long(argc, argv, "hvc:i:o:dt:n:", longOptions, &optionIndex);
+        const int c = getopt_long(argc, argv, "hvc:i:o:dt:n:l:", longOptions, &optionIndex);
         if(c == -1) {
             break;
         }
@@ -57,6 +56,10 @@ bool ArgumentParser::parseArguments(
             case 'h':
                 printHelp(basename(argv[0]), cs2ContactData, pingSettings);
                 return true;
+
+            case 'l':
+                thresholdLevel = logLevelFromString(optarg);
+                break;
 
             case 'v':
                 moba::printAppData(appData);
@@ -119,12 +122,36 @@ void ArgumentParser::printHelp(const std::string &appName, const CS2ContactData 
     std::cout
         << appName << " [host] [port]" << std::endl
         << std::endl
-        << "-d, --debug         enables debug output" << std::endl
-        << "-h, --help          shows this help" << std::endl
-        << "-v, --version       shows version-info" << std::endl
-        << "-c, --cs2-host      host of the CentralStation (default: " << cs2ContactData.host << ")" << std::endl
-        << "-i, --cs2-port-in   port of the CentralStation for incoming messages (default: " << cs2ContactData.portIn << ")" << std::endl
-        << "-o, --cs2-port-out  port of the CentralStation for outgoing messages (default: " << cs2ContactData.portOut << ")" << std::endl
-        << "-t, --ping-timeout  watchdog ping timeout in ms (default: " << pingSettings.timeout << ")" << std::endl
-        << "-n, --ping-interval watchdog ping interval in ms (default: " << pingSettings.interval << ")" << std::endl;
+        << "-c, --cs2-host <host>          host of the CentralStation (default: " << cs2ContactData.host << ")" << std::endl
+        << "-d, --debug                    sends no \"stop\"-signal to cs2 when set" << std::endl
+        << "-h, --help                     shows this help" << std::endl
+        << "-i, --cs2-port-in <port>       port of the CentralStation for incoming messages (default: " << cs2ContactData.portIn << ")" << std::endl
+        << "-l, --log-level <level>        log level threshold. Everything below will be logged (level: trace, debug, notice, warning, error, critical; default: notice)" << std::endl
+        << "-n, --ping-interval <interval> watchdog ping interval in ms (default: " << pingSettings.interval << ")" << std::endl
+        << "-o, --cs2-port-out <port>      port of the CentralStation for outgoing messages (default: " << cs2ContactData.portOut << ")" << std::endl
+        << "-t, --ping-timeout <timeout>   watchdog ping timeout in ms (default: " << pingSettings.timeout << ")" << std::endl
+        << "-v, --version                  shows version-info" << std::endl;
+}
+
+moba::LogLevel ArgumentParser::logLevelFromString(const std::string& s) {
+    if (s == "trace") {
+        return moba::LogLevel::TRACE;
+    }
+    if (s == "debug") {
+        return moba::LogLevel::DEBUG;
+    }
+    if (s == "notice") {
+        return moba::LogLevel::NOTICE;
+    }
+    if (s == "warning") {
+        return moba::LogLevel::WARNING;
+    }
+    if (s == "error") {
+        return moba::LogLevel::ERROR;
+    }
+    if (s == "critical") {
+        return moba::LogLevel::CRITICAL;
+    }
+    // TODO: Do not throw exceptions at this point!
+    throw std::invalid_argument(std::format("invalid log level: {}", s));
 }
