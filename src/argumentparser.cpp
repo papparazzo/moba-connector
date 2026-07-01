@@ -86,7 +86,8 @@ bool ArgumentParser::parseArguments(const int argc, char *argv[], moba::AppData 
                 break;
 
             default:
-                std::cerr << "Try '" << basename(argv[0]) << " --help' for more information." << std::endl;
+                std::cerr <<
+                    std::format("Try '{} --help' for more information.", basename(argv[0])) << std::endl;
                 exit(2);
         }
     }
@@ -110,10 +111,12 @@ std::chrono::milliseconds ArgumentParser::parseMilliseconds(const std::string &s
     try {
         v = std::stoll(std::string{s});
     } catch (...) {
-        throw std::invalid_argument(std::string{"invalid milliseconds value: '"} + s + "'");
+        // TODO: Do not throw exceptions at this point!
+        throw std::invalid_argument(std::format("invalid milliseconds value: '{}'", s));
     }
     if (v < 0) {
-        throw std::invalid_argument(std::string{"milliseconds must be >= 0: '"} + s + "'");
+        // TODO: Do not throw exceptions at this point!
+        throw std::invalid_argument(std::format("milliseconds must be >= 0: '{}'", s));
     }
     return std::chrono::milliseconds{v};
 }
