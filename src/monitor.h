@@ -28,11 +28,11 @@
 
 class Monitor final {
 public:
-    Monitor(bool debug, const CS2ContactData &cs2ContactData);
+    Monitor(moba::LogLevel thresholdLevel, const CS2ContactData &cs2ContactData);
 
-    void appendAction(const std::string &action, const std::string &message);
+    void printAction(const std::string &action, const std::string &message);
 
-    void appendAction(moba::LogLevel level, const std::string &action);
+    void printMessage(moba::LogLevel level, const std::string &message);
 
     void printException(const std::string &where, const std::string &what);
 
@@ -49,8 +49,10 @@ private:
     boost::circular_buffer<std::string> actions{20};
     boost::circular_buffer<std::string> canBusActions{20};
 
-    bool debug;
+    moba::LogLevel thresholdLevel;
     CS2ContactData cs2ContactData;
+
+    void print(moba::LogLevel level, const std::string &message) const;
 };
 
 using MonitorPtr = std::shared_ptr<Monitor>;

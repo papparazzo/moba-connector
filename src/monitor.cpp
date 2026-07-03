@@ -27,61 +27,72 @@
 #include "moba/cs2cancommand.h"
 #include "moba/cs2utils.h"
 
-Monitor::Monitor(const bool debug, const CS2ContactData &cs2ContactData): debug{debug}, cs2ContactData{cs2ContactData} {
+Monitor::Monitor(
+    const moba::LogLevel thresholdLevel, const CS2ContactData &cs2ContactData
+): thresholdLevel{thresholdLevel}, cs2ContactData{cs2ContactData} {
     std::cerr << moba::LogLevel::NOTICE << "Starting monitor... " << std::endl;
     std::cerr << moba::LogLevel::NOTICE << cs2ContactData << std::endl;
 }
 
-void Monitor::appendAction(const std::string &action, const std::string &message) {
+void Monitor::printAction(const std::string &action, const std::string &message) {
     std::scoped_lock l{m};
 
-    std::cerr << moba::LogLevel::NOTICE << "[" << action << "] " << message << std::endl;
+    print(moba::LogLevel::NOTICE, std::format("[{}] {}", action, message));
 }
 
-void Monitor::appendAction(const moba::LogLevel level, const std::string &action) {
+void Monitor::printMessage(const moba::LogLevel level, const std::string &message) {
     std::scoped_lock l{m};
 
-    if(level != moba::LogLevel::NOTICE || debug) {
-        std::cerr << level << action << std::endl;
-    }
+    print(level, message);
 }
 
 void Monitor::printException(const std::string &where, const std::string &what) {
     std::scoped_lock l{m};
-    std::cerr << moba::LogLevel::CRITICAL << where << " " << what << std::endl;
+
+    print(moba::LogLevel::CRITICAL, std::format("{} {}", where, what));
 }
 
 void Monitor::printCS2CanCommand(const CS2CanCommand &data) {
     std::scoped_lock l{m};
-    if(debug) {
-        std::cerr << moba::LogLevel::NOTICE << getCommandName(data.getCanCommand()) << " [" << data << "]" << std::endl;
-    }
+
+    print(
+        moba::LogLevel::TRACE,
+        std::format("{} [{}]", getCommandName(data.getCanCommand()), data.getAsString())
+    );
 }
 
-void Monitor::feedbackContactTriggered(const std::uint16_t module, const std::uint16_t contact, const std::uint16_t time, const bool active) {
+void Monitor::feedbackContactTriggered(
+    const std::uint16_t module, const std::uint16_t contact, const std::uint16_t time, const bool active
+    ) {
     std::scoped_lock l{m};
 
-    std::cerr <<
-        moba::LogLevel::NOTICE <<
-        "Feedback module [" <<
-        std::setw(4) << std::setfill('0') << module << ":" <<
-        std::setw(4) << std::setfill('0') << contact << "] time " <<
-        std::setw(5) << std::setfill(' ') << time << " ms " <<
-        (active ? "[ on]" : "[off]")  << std::endl;
-
+    print(
+        moba::LogLevel::NOTICE,
+        std::format(
+            "Feedback module [{:04}:{:04}] time {:5} ms {}",
+            module,
+            contact,
+            time,
+            active ? "[ on]" : "[off]"
+        )
+    );
 }
 
 void Monitor::locCommandsTriggered(const std::string& cmd, const std::uint32_t addr, const int value) {
     std::scoped_lock l{m};
 
-    std::cerr <<
-        moba::LogLevel::NOTICE <<
-        cmd << " [" <<
-        std::setw(4) << std::setfill('0') << addr << ":" <<
-        std::setw(4) << std::setfill('0') << value << "]" << std::endl;
+    print(moba::LogLevel::DEBUG, std::format("{} [{:04}:{:04}] ", cmd, addr, value));
 }
 
 void Monitor::printStatus(const std::string &status) {
     std::scoped_lock l{m};
-    std::cerr << moba::LogLevel::NOTICE << "Status switched to <" << status << ">" << std::endl;
+
+    print(moba::LogLevel::NOTICE, std::format("Status switched to <{}>", status));
 }
+
+void Monitor::print(const moba::LogLevel level, const std::string &message) const {
+    if (level <= thresholdLevel) {
+        std::cerr << level << message << std::endl;
+    }
+}
+
