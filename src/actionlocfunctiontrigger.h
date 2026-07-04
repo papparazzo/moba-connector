@@ -45,9 +45,9 @@ struct ActionLocFunctionTrigger final : ActionAbstract {
 
         using namespace std::chrono_literals;
 
-        monitor->appendAction("ActionFunctionTrigger", "trigger function");
+        monitor->printAction("ActionFunctionTrigger", "trigger function");
 
-        monitor->appendAction(
+        monitor->printAction(
             "ActionLocFunctionTrigger",
             "trigger function <" + controllableFunctionEnumToString(function) + "> for localId <" + std::to_string(localId) +
             "> for <" + std::to_string(duration.count()) + "> seconds"

@@ -41,7 +41,7 @@ struct ActionLocHalt final: ActionAbstract {
 	}
 
     void operator()() override {
-		monitor->appendAction("ActionLocStop", "stopping localId <" + std::to_string(localId) +  ">");
+		monitor->printAction("ActionLocStop", std::format("stopping localId <{}>", localId));
 		cs2writer->send(setLocoHalt(localId));
     }
 

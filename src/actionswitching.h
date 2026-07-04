@@ -39,7 +39,7 @@ struct ActionSwitching final : ActionAbstract {
     void operator()() override {
         using namespace std::chrono_literals;
 
-		monitor->appendAction("ActionSwitching", "switching actor to <" + stand + ">");
+		monitor->printAction("ActionSwitching", "switching actor to <" + stand + ">");
 
         cs2writer->send(setSwitch(localId, convert(stand), true));
         std::this_thread::sleep_for(50ms);

@@ -38,7 +38,10 @@ struct ActionLocSpeed final: ActionAbstract {
     }
 
     void operator()() override {
-        monitor->appendAction("ActionLocSpeed", "set speed for localId <" + std::to_string(localId) +  "> to <" + std::to_string(speed) + ">");
+        monitor->printAction(
+            "ActionLocSpeed",
+            std::format("set speed for localId <{}> to <{}>", localId, speed)
+        );
         cs2writer->send(setLocSpeed(localId, speed));
     }
 

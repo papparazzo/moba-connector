@@ -46,7 +46,7 @@ struct ActionLocFunction final: ActionAbstract {
             return;
         }
 
-        monitor->appendAction(
+        monitor->printAction(
             "ActionLocFunction",
             "set function " + controllableFunctionEnumToString(function) + " for localId <" + std::to_string(localId) +  "> " + (active ? "on" : "off")
         );

@@ -42,9 +42,13 @@ struct ActionLocDirection final: ActionAbstract {
     }
 
     void operator()() override {
-        monitor->appendAction(
+        monitor->printAction(
             "ActionLocDirection",
-            "switch direction to <" + direction.getDrivingDirection() + "> for localId <" + std::to_string(localId) + "> "
+            std::format(
+                "switch direction to <{}> for localId <{}>",
+                direction.getDrivingDirection(),
+                localId
+            )
         );
         cs2writer->send(setLocDirection(localId, direction.drivingDirection));
     }

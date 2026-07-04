@@ -37,10 +37,16 @@ struct ActionFunction final: ActionAbstract {
     }
 
     void operator()() override {
-        monitor->appendAction(
+        monitor->printAction(
             "ActionFunction",
-            "set function <" + std::to_string(function.address.deviceId) + "/" + std::to_string(function.address.address.controller) + ":" +
-            std::to_string(function.address.address.port) + "> to <" + functionStateEnumToString(function.functionState)  +  "> ");
+            std::format(
+                "set function <{}/{}:{}> to <{}>",
+                function.address.deviceId,
+                function.address.address.controller,
+                function.address.address.port,
+                functionStateEnumToString(function.functionState)
+            )
+        );
         endpoint->sendMsg(EnvironmentSetFunctions{function});
     }
 

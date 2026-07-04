@@ -31,7 +31,7 @@ struct ActionSendBlockReleased final: ActionAbstract {
     }
 
     void operator()() override {
-        monitor->appendAction("ActionSendBlockReleased", "sending block released for id <" + std::to_string(id) + ">");
+        monitor->printAction("ActionSendBlockReleased", std::format("sending block released for id <{}>", id));
         endpoint->sendMsg(InterfaceBlockReleased{id});
     }
 

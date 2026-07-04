@@ -66,9 +66,10 @@ void Watchdog::operator()(const std::stop_token &st) {
 
             auto diff = std::chrono::steady_clock::now() - start_time; // std::chrono::steady_clock::duration
             if(pong_received) {
-                std::stringstream ss;
-                ss << "Watchdog ping received. Diff: " << std::chrono::duration_cast<std::chrono::milliseconds>(diff);
-                monitor->appendAction(moba::LogLevel::NOTICE, ss.str());
+                monitor->printMessage(
+                    moba::LogLevel::TRACE,
+                    std::format("Watchdog ping received. Diff: {}", diff)
+                );
             }
 
             if(synchronize && pong_received) {
@@ -76,7 +77,7 @@ void Watchdog::operator()(const std::stop_token &st) {
                 connected = true;
                 synchronize = false;
             } else if (!pong_received && connected) {
-                monitor->appendAction(moba::LogLevel::CRITICAL, "Watchdog timeout!");
+                monitor->printMessage(moba::LogLevel::CRITICAL, "Watchdog timeout!");
                 endpoint->sendMsg(InterfaceConnectionLost{});
                 connected = false;
             } else if (pong_received && !connected) {

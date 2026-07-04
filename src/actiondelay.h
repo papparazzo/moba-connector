@@ -30,7 +30,7 @@ struct ActionDelay final: ActionAbstract {
     explicit ActionDelay(MonitorPtr monitor, const std::chrono::milliseconds duration): ActionAbstract{std::move(monitor)}, duration{duration} {};
 
     void operator()() override {
-        monitor->appendAction("ActionDelay", "delaying for " + std::to_string(duration.count()) + "ms");
+        monitor->printAction("ActionDelay", std::format("delaying for {} ms", duration.count()));
         std::this_thread::sleep_for(duration);
     }
 
