@@ -56,10 +56,9 @@ int main(const int argc, char *argv[]) {
         CS2Reader::DEFAULT_PORT
     };
 
-    Watchdog::PingSettings pingSettings;
-    bool debug = false;
+    ArgumentParser parser;
 
-    if(ArgumentParser::parseArguments(argc, argv, appData, cs2ContactData, pingSettings, debug)) {
+    if(parser.parseArguments(argc, argv, appData, cs2ContactData)) {
         return EXIT_SUCCESS;
     }
 
@@ -72,13 +71,13 @@ int main(const int argc, char *argv[]) {
     const auto cs2ReaderPtr = std::make_shared<CS2Reader>(cs2ContactData.portOut);
 
     const auto sharedData = std::make_shared<SharedData>();
-    const auto monitor = std::make_shared<Monitor>(debug, cs2ContactData);
+    const auto monitor = std::make_shared<Monitor>(parser.getThresholdLogLevel(), cs2ContactData);
 
-    auto watchdog = std::make_shared<Watchdog>(cs2WriterPtr, endpoint, monitor, pingSettings);
+    auto watchdog = std::make_shared<Watchdog>(cs2WriterPtr, endpoint, monitor, parser.getPingSettings());
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
-    JsonWriter jsonwriter{cs2ReaderPtr, cs2WriterPtr, endpoint, watchdog, sharedData, monitor};
+    JsonWriter jsonwriter{cs2ReaderPtr, cs2WriterPtr, endpoint, watchdog, sharedData, monitor, parser.getDebug()};
     std::thread jsonwriterThread{std::move(jsonwriter)};
     jsonwriterThread.detach();
 

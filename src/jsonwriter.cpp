@@ -36,9 +36,10 @@ JsonWriter::JsonWriter(
     EndpointPtr endpoint,
     WatchdogPtr watchdog,
     SharedDataPtr sharedData,
-    MonitorPtr monitor
+    MonitorPtr monitor,
+    bool debug
 ): cs2reader{std::move(cs2reader)}, cs2writer{std::move(cs2writer)}, endpoint{std::move(endpoint)},
-watchdog{std::move(watchdog)}, sharedData{std::move(sharedData)}, monitor{std::move(monitor)} {
+watchdog{std::move(watchdog)}, sharedData{std::move(sharedData)}, monitor{std::move(monitor)}, debug{debug} {
 }
 
 void JsonWriter::operator()() const {
@@ -71,7 +72,9 @@ void JsonWriter::operator()() const {
             }
         } catch(const std::exception &e) {
             monitor->printException("JsonWriter::operator()()", e.what());
-            emergencyStop(e.what());
+            if (!debug) {
+                emergencyStop(e.what());
+            }
         }
     }
 }

@@ -20,17 +20,41 @@
 
 #pragma once
 
+#include <moba-common/helper.h>
 #include "watchdog.h"
 
 class ArgumentParser {
 public:
     ArgumentParser() = default;
 
-    static bool parseArguments(int argc, char *argv[], moba::AppData &appData, CS2ContactData &cs2ContactData, Watchdog::PingSettings &pingSettings, bool &debug) ;
+    [[nodiscard]]
+    Watchdog::PingSettings getPingSettings() const {
+        return pingSettings;
+    }
+
+    [[nodiscard]]
+    bool getDebug() const {
+        return debug;
+    }
+
+    [[nodiscard]]
+    moba::LogLevel getThresholdLogLevel() const {
+        return thresholdLevel;
+    }
+
+    bool parseArguments(int argc, char *argv[], moba::AppData &appData, CS2ContactData &cs2ContactData) ;
 
     static void printHelp(const std::string &appName, const CS2ContactData &cs2ContactData, const Watchdog::PingSettings &pingSettings);
 
 private:
+    Watchdog::PingSettings pingSettings;
+    bool debug{false};
+    moba::LogLevel thresholdLevel{moba::LogLevel::NOTICE};
+
     static std::chrono::milliseconds parseMilliseconds(const std::string &s);
+
+    [[nodiscard]]
+    static moba::LogLevel logLevelFromString(const std::string& s);
 };
+
 

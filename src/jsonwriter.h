@@ -38,7 +38,8 @@ public:
         EndpointPtr endpoint,
         WatchdogPtr watchdog,
         SharedDataPtr sharedData,
-        MonitorPtr monitor
+        MonitorPtr monitor,
+        bool debug
     );
 
     ~JsonWriter() noexcept = default;
@@ -72,4 +73,6 @@ private:
     WatchdogPtr   watchdog;
     SharedDataPtr sharedData;
     MonitorPtr    monitor;
+
+    bool debug;
 };
