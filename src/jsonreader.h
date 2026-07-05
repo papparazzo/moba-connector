@@ -40,7 +40,8 @@ public:
         EndpointPtr endpoint,
         WatchdogPtr watchdog,
         SharedDataPtr sharedData,
-        MonitorPtr monitor
+        MonitorPtr monitor,
+        bool suppressSound
     );
 
     ~JsonReader() noexcept = default;
@@ -67,6 +68,7 @@ private:
     void emergencyStop(const std::string &what) const;
 
     bool closing;
+    bool suppressSound;
 
     CS2WriterPtr  cs2writer;
     EndpointPtr   endpoint;

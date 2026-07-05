@@ -49,9 +49,10 @@ JsonReader::JsonReader(
     EndpointPtr endpoint,
     WatchdogPtr watchdog,
     SharedDataPtr sharedData,
-    MonitorPtr monitor
+    MonitorPtr monitor,
+    bool suppressSound
 ) : closing{false}, cs2writer{std::move(cs2writer)}, endpoint{std::move(endpoint)},
-watchdog{std::move(watchdog)}, sharedData{std::move(sharedData)}, monitor{std::move(monitor)} {
+watchdog{std::move(watchdog)}, sharedData{std::move(sharedData)}, monitor{std::move(monitor)}, suppressSound{suppressSound} {
 }
 
 void JsonReader::setHardwareState(SystemHardwareStateChanged &&data) const {
@@ -107,7 +108,7 @@ Function JsonReader::getFunction(const std::uint32_t localId, const std::string 
 
     auto func = sharedData->locomotives->getFunction(localId, static_cast<int>(funcEnum));
 
-    return static_cast<Function>(func);
+    return ::suppressSound(static_cast<Function>(func), suppressSound);
 }
 
 ActionList JsonReader::getActionList(const nlohmann::json &d, std::uint32_t localId) const {
