@@ -28,22 +28,23 @@
 
 bool ArgumentParser::parseArguments(const int argc, char *argv[], moba::AppData &appData, CS2ContactData &cs2ContactData) {
     static option longOptions[] = {
-        {"cs2-host",      required_argument, nullptr, 'c'},
-        {"debug",         no_argument,       nullptr, 'd'},
-        {"cs2-port-in",   required_argument, nullptr, 'i'},
-        {"log-level",     required_argument, nullptr, 'l'},
-        {"cs2-port-out",  required_argument, nullptr, 'o'},
-        {"ping-timeout",  required_argument, nullptr, 't'},
-        {"ping-interval", required_argument, nullptr, 'n'},
-        {"help",          no_argument,       nullptr, 'h'},
-        {"version",       no_argument,       nullptr, 'v'},
-        {nullptr,         0,                 nullptr, 0 }
+        {"cs2-host",       required_argument, nullptr, 'c'},
+        {"debug",          no_argument,       nullptr, 'd'},
+        {"cs2-port-in",    required_argument, nullptr, 'i'},
+        {"log-level",      required_argument, nullptr, 'l'},
+        {"cs2-port-out",   required_argument, nullptr, 'o'},
+        {"ping-timeout",   required_argument, nullptr, 't'},
+        {"ping-interval",  required_argument, nullptr, 'n'},
+        {"help",           no_argument,       nullptr, 'h'},
+        {"suppress-sound", no_argument,       nullptr, 's'},
+        {"version",        no_argument,       nullptr, 'v'},
+        {nullptr,          0,                 nullptr, 0 }
     };
 
     int optionIndex = 0;
 
     while(true) {
-        const int c = getopt_long(argc, argv, "hvc:i:o:dt:n:l:", longOptions, &optionIndex);
+        const int c = getopt_long(argc, argv, "hvc:i:o:sdt:n:l:", longOptions, &optionIndex);
         if(c == -1) {
             break;
         }
@@ -83,6 +84,10 @@ bool ArgumentParser::parseArguments(const int argc, char *argv[], moba::AppData 
 
             case 'n':
                 pingSettings.interval = parseMilliseconds(optarg);
+                break;
+
+            case 's':
+                suppressSound = true;
                 break;
 
             default:
@@ -132,6 +137,7 @@ void ArgumentParser::printHelp(const std::string &appName, const CS2ContactData 
         << "-l, --log-level <level>        log level threshold. Everything below will be logged (level: trace, debug, notice, warning, error, critical; default: notice)" << std::endl
         << "-n, --ping-interval <interval> watchdog ping interval in ms (default: " << pingSettings.interval << ")" << std::endl
         << "-o, --cs2-port-out <port>      port of the CentralStation for outgoing messages (default: " << cs2ContactData.portOut << ")" << std::endl
+        << "-s, --suppress-sound           do not play sound when set" << std::endl
         << "-t, --ping-timeout <timeout>   watchdog ping timeout in ms (default: " << pingSettings.timeout << ")" << std::endl
         << "-v, --version                  shows version-info" << std::endl;
 }

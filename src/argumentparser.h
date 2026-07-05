@@ -38,6 +38,11 @@ public:
     }
 
     [[nodiscard]]
+    bool getSuppressSound() const {
+        return suppressSound;
+    }
+
+    [[nodiscard]]
     moba::LogLevel getThresholdLogLevel() const {
         return thresholdLevel;
     }
@@ -49,6 +54,8 @@ public:
 private:
     Watchdog::PingSettings pingSettings;
     bool debug{false};
+    bool suppressSound{false};
+
     moba::LogLevel thresholdLevel{moba::LogLevel::NOTICE};
 
     static std::chrono::milliseconds parseMilliseconds(const std::string &s);
