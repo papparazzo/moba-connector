@@ -83,7 +83,7 @@ int main(const int argc, char *argv[]) {
 
     ///////////////////////////////////////////////////////////////////////////////////
     //
-    JsonReader jsonReader{cs2WriterPtr, endpoint, watchdog, sharedData, monitor};
+    JsonReader jsonReader{cs2WriterPtr, endpoint, watchdog, sharedData, monitor, parser.getSuppressSound()};
     std::thread jsonReaderThread{std::move(jsonReader)};
     jsonReaderThread.join();
 
